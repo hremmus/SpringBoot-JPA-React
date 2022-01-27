@@ -1,0 +1,16 @@
+server:
+  servlet:
+    encoding:
+      charset: utf-8
+      enabled: true
+      
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/studydb
+    username: study
+    password: 1111
+    
+  jpa:
+    hibernate:
+      ddl-auto: update # create, create-drop, validate, update
+    show-sql: true
