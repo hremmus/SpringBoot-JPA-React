@@ -20,11 +20,11 @@ import io.jsonwebtoken.UnsupportedJwtException;
 @Component
 public class JwtUtils {
   private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
-  @Value("${spring.jwt.secret}")
+  @Value("${jwt.secret}")
   private String jwtSecret;
-  @Value("${spring.jwt.expiration-ms}")
+  @Value("${jwt.expiration-ms}")
   private int jwtExpirationMs;
-  @Value("${spring.jwt.cookie-name}")
+  @Value("${jwt.cookie-name}")
   private String jwtCookie;
 
   public String getJwtFromCookies(HttpServletRequest request) {

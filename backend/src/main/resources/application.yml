@@ -9,12 +9,13 @@ spring:
     url: jdbc:mysql://localhost:3306/studydb
     username: study
     password: 1111
-  jwt:
-    cookie-name: secretkey
-    secret: youcantrevealthesecretkey
-    expiration-ms: 86400000
     
   jpa:
     hibernate:
       ddl-auto: update # create, create-drop, validate, update
     show-sql: true
+    
+jwt:
+  cookie-name: secretkey
+  secret: youcantrevealthesecretkey
+  expiration-ms: 30
