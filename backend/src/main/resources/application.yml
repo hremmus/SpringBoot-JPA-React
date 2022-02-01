@@ -6,9 +6,10 @@ server:
       
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/studydb
-    username: study
-    password: 1111
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
     
   jpa:
     hibernate:
@@ -19,3 +20,4 @@ jwt:
   cookie-name: secretkey
   secret: youcantrevealthesecretkey
   expiration-ms: 30
+  refresh-expiration-ms: 180
