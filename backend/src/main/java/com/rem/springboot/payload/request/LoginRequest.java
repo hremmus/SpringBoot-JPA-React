@@ -1,19 +1,23 @@
 package com.rem.springboot.payload.request;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @NoArgsConstructor
+@AllArgsConstructor
 @Getter
+@Setter
+@EqualsAndHashCode
 public class LoginRequest {
-  private String username;
+  @NotBlank
+  @Email
+  private String email;
+
+  @NotBlank
   private String password;
-
-  public void setUsername(String username) {
-    this.username = (username != null && !username.isEmpty()) ? username.toLowerCase() : null;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
-  }
 }
