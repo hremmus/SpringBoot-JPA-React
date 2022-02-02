@@ -1,4 +1,4 @@
-package com.rem.springboot.domain;
+package com.rem.springboot.entity;
 
 public enum ERole {
   ROLE_USER,
