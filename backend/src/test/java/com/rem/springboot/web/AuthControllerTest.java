@@ -19,14 +19,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rem.springboot.payload.request.LoginRequest;
 import com.rem.springboot.payload.request.SignUpRequest;
 import com.rem.springboot.payload.response.LoginResponse;
+import com.rem.springboot.payload.response.RefreshTokenResponse;
 import com.rem.springboot.service.AuthServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
   @InjectMocks
   AuthController authController;
-  @Mock AuthServiceImpl authService;
+
+  @Mock
+  AuthServiceImpl authService;
+
   MockMvc mockMvc;
+
   ObjectMapper objectMapper = new ObjectMapper();
 
   @BeforeEach
@@ -53,7 +58,7 @@ class AuthControllerTest {
   void loginTest() throws Exception {
     // given
     LoginRequest request = new LoginRequest("user@email.com", "password");
-    given(authService.login(request)).willReturn(new LoginResponse("access"));
+    given(authService.login(request)).willReturn(new LoginResponse("access", "refresh"));
 
     // when, then
     mockMvc.perform(
@@ -61,7 +66,8 @@ class AuthControllerTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(request)))
     .andExpect(status().isOk())
-    .andExpect(jsonPath("$.result.data.accessToken").value("access"));
+    .andExpect(jsonPath("$.result.data.accessToken").value("access"))
+    .andExpect(jsonPath("$.result.data.refreshToken").value(null));
 
     verify(authService).login(request);
   }
@@ -78,5 +84,18 @@ class AuthControllerTest {
         .content(objectMapper.writeValueAsString(request)))
     .andExpect(status().isCreated())
     .andExpect(jsonPath("$.result").doesNotExist());
+  }
+
+  @Test
+  void refreshTokenTest() throws Exception {
+    // given
+    given(authService.refreshToken("refreshToken")).willReturn(new RefreshTokenResponse("accessToken"));
+
+    // when, then
+    mockMvc.perform(
+        post("/api/auth/refreshtoken")
+        .header("Authorization", "refreshToken"))
+    .andExpect(status().isOk())
+    .andExpect(jsonPath("$.result.data.accessToken").value("accessToken"));
   }
 }

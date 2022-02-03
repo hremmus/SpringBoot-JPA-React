@@ -18,4 +18,11 @@ public class TokenConfig {
       @Value("${jwt.max-age.access}") long maxAgeSeconds) {
     return new JwtUtils(jwtHandler, key, maxAgeSeconds);
   }
+
+  @Bean
+  public JwtUtils refreshTokenProvider(
+      @Value("${jwt.key.refresh}") String key,
+      @Value("${jwt.max-age.refresh}") long maxAgeSeconds) {
+    return new JwtUtils(jwtHandler, key, maxAgeSeconds);
+  }
 }

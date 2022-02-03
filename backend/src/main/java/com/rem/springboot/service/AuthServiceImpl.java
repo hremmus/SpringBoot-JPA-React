@@ -12,11 +12,13 @@ import com.rem.springboot.entity.ERole;
 import com.rem.springboot.entity.Role;
 import com.rem.springboot.entity.User;
 import com.rem.springboot.exception.LoginFailureException;
+import com.rem.springboot.exception.RefreshTokenFailureException;
 import com.rem.springboot.exception.UserEmailAlreadyExistsException;
 import com.rem.springboot.exception.UserNicknameAlreadyExistsException;
 import com.rem.springboot.payload.request.LoginRequest;
 import com.rem.springboot.payload.request.SignUpRequest;
 import com.rem.springboot.payload.response.LoginResponse;
+import com.rem.springboot.payload.response.RefreshTokenResponse;
 import com.rem.springboot.repository.RoleRepository;
 import com.rem.springboot.repository.UserRepository;
 import com.rem.springboot.security.JwtUtils;
@@ -29,7 +31,8 @@ public class AuthServiceImpl {
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
   private final PasswordEncoder passwordEncoder;
-  private final JwtUtils jwtUtils;
+  private final JwtUtils accessTokenProvider;
+  private final JwtUtils refreshTokenProvider;
 
   @Transactional
   public void signUp(SignUpRequest request) throws RoleNotFoundException {
@@ -65,8 +68,15 @@ public class AuthServiceImpl {
     User user = userRepository.findByEmail(request.getEmail()).orElseThrow(LoginFailureException::new);
     validatePassword(request, user);
     JwtUtils.PrivateClaims privateClaims = createPrivateClaims(user);
-    String accessToken = jwtUtils.createToken(privateClaims);
-    return new LoginResponse(accessToken);
+    String accessToken = accessTokenProvider.createToken(privateClaims);
+    String refreshToken = refreshTokenProvider.createToken(privateClaims);
+    return new LoginResponse(accessToken, refreshToken);
+  }
+
+  public RefreshTokenResponse refreshToken(String refreshToken) {
+    JwtUtils.PrivateClaims privateClaims = refreshTokenProvider.parse(refreshToken)
+        .orElseThrow(RefreshTokenFailureException::new);
+    return new RefreshTokenResponse(accessTokenProvider.createToken(privateClaims));
   }
 
   private void validateSignUpInfo(SignUpRequest request) {

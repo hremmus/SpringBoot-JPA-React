@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseCookie;
 import io.jsonwebtoken.Claims;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,12 +26,17 @@ public class JwtUtils {
   private static final String USER_ID = "USER_ID";
 
   public String createToken(PrivateClaims privateClaims) {
-    return jwtHandler.createToken(
+    return jwtHandler.generateToken(
         key,
         Map.of(USER_ID, privateClaims.getUserId(), ROLE_TYPES, privateClaims.getRoles().stream().collect(joining(SEP))),
         maxAgeSeconds
         );
   }
+
+  public ResponseCookie createJwtCookie(String token) {
+    return jwtHandler.generateJwtCookie(token);
+  }
+
 
   public Optional<PrivateClaims> parse(String token) {
     return jwtHandler.parse(key, token).map(this::convert);
