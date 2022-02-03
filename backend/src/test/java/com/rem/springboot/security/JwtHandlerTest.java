@@ -61,6 +61,6 @@ class JwtHandlerTest {
   }
 
   private String createToken(String encodedKey, Map<String, Object> claims, long maxAgeSeconds) {
-    return jwtHandler.createToken(encodedKey, claims, maxAgeSeconds);
+    return jwtHandler.generateToken(encodedKey, claims, maxAgeSeconds);
   }
 }

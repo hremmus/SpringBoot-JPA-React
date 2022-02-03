@@ -12,11 +12,11 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
-  private final JwtUtils jwtUtils;
+  private final JwtUtils accessTokenProvider;
 
   @Override
   public UserDetailsImpl loadUserByUsername(String token) throws UsernameNotFoundException {
-    return jwtUtils.parse(token)
+    return accessTokenProvider.parse(token)
         .map(this::convert)
         .orElse(null);
   }

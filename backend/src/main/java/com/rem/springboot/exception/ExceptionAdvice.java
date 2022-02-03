@@ -54,4 +54,10 @@ public class ExceptionAdvice {
   public Response roleNotFoundException() {
     return Response.failure(-1008, "요청한 권한 등급을 찾을 수 없습니다.");
   }
+
+  @ExceptionHandler(RefreshTokenFailureException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  public Response refreshTokenFailureException() {
+    return Response.failure(-1009, "토큰 재발급에 실패하였습니다.");
+  }
 }
