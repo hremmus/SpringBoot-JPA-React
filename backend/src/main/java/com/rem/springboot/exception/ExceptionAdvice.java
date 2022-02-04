@@ -2,6 +2,7 @@ package com.rem.springboot.exception;
 
 import javax.management.relation.RoleNotFoundException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -17,6 +18,12 @@ public class ExceptionAdvice {
   public Response exception(Exception e) {
     log.info("e = {}", e.getMessage());
     return Response.failure(-1000, "오류가 발생하였습니다.");
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  @ResponseStatus(HttpStatus.FORBIDDEN)
+  public Response accessDeniedException() {
+    return Response.failure(-1002, "접근이 거부되었습니다.");
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)

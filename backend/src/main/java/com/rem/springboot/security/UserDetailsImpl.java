@@ -5,7 +5,6 @@ import java.util.Objects;
 import java.util.Set;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -14,9 +13,8 @@ import lombok.Getter;
 public class UserDetailsImpl implements UserDetails {
   private static final long serialVersionUID = 1L;
 
-  private String id;
-  @JsonIgnore
-  private Set<? extends GrantedAuthority> authorities;
+  private final String id;
+  private final Set<GrantedAuthority> authorities;
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -25,7 +23,7 @@ public class UserDetailsImpl implements UserDetails {
 
   @Override
   public String getUsername() {
-    throw new UnsupportedOperationException();
+    return id;
   }
 
   @Override
