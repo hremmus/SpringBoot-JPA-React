@@ -1,7 +1,7 @@
 package com.rem.springboot.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -15,18 +15,13 @@ import com.rem.springboot.security.AccessDeniedHandlerImpl;
 import com.rem.springboot.security.AuthTokenFilter;
 import com.rem.springboot.security.AuthenticationEntryPointImpl;
 import com.rem.springboot.security.UserDetailsServiceImpl;
+import lombok.RequiredArgsConstructor;
 
 @EnableWebSecurity
+@RequiredArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
-  @Autowired
-  UserDetailsServiceImpl userDetailsService;
-
-  @Autowired
-  private AuthenticationEntryPointImpl unauthorizedHandler;
-
-  @Autowired
-  private AccessDeniedHandlerImpl accessDeniedHandler;
+  private final UserDetailsServiceImpl userDetailsService;
 
   @Override
   public void configure(WebSecurity web) {
@@ -38,12 +33,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   protected void configure(HttpSecurity http) throws Exception {
     http
     .cors().and().csrf().disable()
-    .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).accessDeniedHandler(accessDeniedHandler).and()
+    .exceptionHandling()
+    .authenticationEntryPoint(new AuthenticationEntryPointImpl())
+    .accessDeniedHandler(new AccessDeniedHandlerImpl()).and()
     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-    .authorizeRequests().antMatchers("/api/auth/**", "/api/test/**").permitAll()
-    .anyRequest().authenticated();
-
-    http.addFilterBefore(new AuthTokenFilter(userDetailsService), UsernamePasswordAuthenticationFilter.class);
+    .authorizeRequests()
+    .antMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+    .antMatchers(HttpMethod.DELETE, "/api/user/{id}/**").authenticated()
+    .antMatchers(HttpMethod.GET, "/api/**").permitAll()
+    .anyRequest().hasAnyRole("ADMIN").and()
+    .addFilterBefore(new AuthTokenFilter(userDetailsService), UsernamePasswordAuthenticationFilter.class);
   }
 
   @Bean
