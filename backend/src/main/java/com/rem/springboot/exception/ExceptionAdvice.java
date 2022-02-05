@@ -67,4 +67,10 @@ public class ExceptionAdvice {
   public Response refreshTokenFailureException() {
     return Response.failure(-1009, "토큰 재발급에 실패하였습니다.");
   }
+
+  @ExceptionHandler(CategoryNotFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public Response categoryNotFoundException() {
+    return Response.failure(-1010, "존재하지 않는 카테고리입니다.");
+  }
 }
