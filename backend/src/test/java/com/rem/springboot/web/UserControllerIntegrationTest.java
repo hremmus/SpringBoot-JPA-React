@@ -4,9 +4,6 @@ import static org.springframework.security.test.web.servlet.setup.SecurityMockMv
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import java.util.List;
-import javax.management.relation.RoleNotFoundException;
-import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,22 +11,22 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
-import com.rem.springboot.entity.ERole;
-import com.rem.springboot.entity.Role;
+import com.rem.springboot.TestInitDB;
 import com.rem.springboot.entity.User;
 import com.rem.springboot.exception.UserNotFoundException;
 import com.rem.springboot.payload.request.LoginRequest;
 import com.rem.springboot.payload.response.LoginResponse;
-import com.rem.springboot.repository.RoleRepository;
 import com.rem.springboot.repository.UserRepository;
 import com.rem.springboot.service.AuthServiceImpl;
 
 @Transactional
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class UserControllerIntegrationTest {
   @Autowired
@@ -39,13 +36,7 @@ class UserControllerIntegrationTest {
   MockMvc mockMvc;
 
   @Autowired
-  EntityManager em;
-
-  @Autowired
   PasswordEncoder passwordEncoder;
-
-  @Autowired
-  RoleRepository roleRepository;
 
   @Autowired
   UserRepository userRepository;
@@ -53,28 +44,20 @@ class UserControllerIntegrationTest {
   @Autowired
   AuthServiceImpl authService;
 
+  @Autowired
+  TestInitDB initDB;
+
   @BeforeEach
-  void beforeEach() throws RoleNotFoundException {
+  void beforeEach() throws Exception {
     mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
 
-    roleRepository.saveAll(List.of(new Role(ERole.ROLE_USER), new Role(ERole.ROLE_ADMIN)));
-    userRepository.saveAll(List.of(
-        new User("user1@email.com", passwordEncoder.encode("password"), "nickname1", List.of(
-            roleRepository.findByName(ERole.ROLE_USER).orElseThrow(RoleNotFoundException::new))),
-        new User("user2@email.com", passwordEncoder.encode("password"), "nickname2", List.of(
-            roleRepository.findByName(ERole.ROLE_USER).orElseThrow(RoleNotFoundException::new))),
-        new User("admin@email.com", passwordEncoder.encode("password"), "admin", List.of(
-            roleRepository.findByName(ERole.ROLE_USER).orElseThrow(RoleNotFoundException::new),
-            roleRepository.findByName(ERole.ROLE_ADMIN).orElseThrow(RoleNotFoundException::new)))));
-
-    em.flush();
-    em.clear();
+    initDB.init();
   }
 
   @Test
   void readTest() throws Exception {
     // given
-    User user = userRepository.findByEmail("user1@email.com").orElseThrow(UserNotFoundException::new);
+    User user = userRepository.findByEmail(initDB.getUser1Email()).orElseThrow(UserNotFoundException::new);
 
     // when, then
     mockMvc.perform(
@@ -85,8 +68,8 @@ class UserControllerIntegrationTest {
   @Test
   void deleteTest() throws Exception {
     // given
-    User user = userRepository.findByEmail("user1@email.com").orElseThrow(UserNotFoundException::new);
-    LoginResponse loginResponse = authService.login(new LoginRequest("user1@email.com", "password"));
+    User user = userRepository.findByEmail(initDB.getUser1Email()).orElseThrow(UserNotFoundException::new);
+    LoginResponse loginResponse = authService.login(new LoginRequest(initDB.getUser1Email(), initDB.getPassword()));
 
     // when, then
     mockMvc.perform(
@@ -97,8 +80,8 @@ class UserControllerIntegrationTest {
   @Test
   void deleteByAdminTest() throws Exception {
     // given
-    User user = userRepository.findByEmail("user1@email.com").orElseThrow(UserNotFoundException::new);
-    LoginResponse adminLoginReponse = authService.login(new LoginRequest("admin@email.com",  "password"));
+    User user = userRepository.findByEmail(initDB.getUser1Email()).orElseThrow(UserNotFoundException::new);
+    LoginResponse adminLoginReponse = authService.login(new LoginRequest(initDB.getAdminEmail(), initDB.getPassword()));
 
     // when, then
     mockMvc.perform(
@@ -109,7 +92,7 @@ class UserControllerIntegrationTest {
   @Test
   void deleteUnauthorizedByNoneTokenTest() throws Exception {
     // given
-    User user = userRepository.findByEmail("user1@email.com").orElseThrow(UserNotFoundException::new);
+    User user = userRepository.findByEmail(initDB.getUser1Email()).orElseThrow(UserNotFoundException::new);
 
     // when, then
     mockMvc.perform(
@@ -120,8 +103,8 @@ class UserControllerIntegrationTest {
   @Test
   void deleteAccessDeniedByNotResourceOwnerTest() throws Exception {
     // given
-    User user = userRepository.findByEmail("user1@email.com").orElseThrow(UserNotFoundException::new);
-    LoginResponse attackerLoginResponse = authService.login(new LoginRequest("user2@email.com", "password"));
+    User user = userRepository.findByEmail(initDB.getUser1Email()).orElseThrow(UserNotFoundException::new);
+    LoginResponse attackerLoginResponse = authService.login(new LoginRequest(initDB.getUser2Email(), initDB.getPassword()));
 
     // when, then
     mockMvc.perform(
@@ -132,8 +115,8 @@ class UserControllerIntegrationTest {
   @Test
   void deleteUnauthorizedByRefreshTokenTest() throws Exception {
     // given
-    User user = userRepository.findByEmail("user1@email.com").orElseThrow(UserNotFoundException::new);
-    LoginResponse loginResponse = authService.login(new LoginRequest("user1@email.com", "password"));
+    User user = userRepository.findByEmail(initDB.getUser1Email()).orElseThrow(UserNotFoundException::new);
+    LoginResponse loginResponse = authService.login(new LoginRequest(initDB.getUser1Email(), initDB.getPassword()));
 
     // when, then
     mockMvc.perform(
