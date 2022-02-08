@@ -1,6 +1,7 @@
 package com.rem.springboot.service;
 
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toSet;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -11,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.rem.springboot.entity.ERole;
 import com.rem.springboot.entity.Role;
 import com.rem.springboot.entity.User;
+import com.rem.springboot.entity.UserRole;
 import com.rem.springboot.exception.LoginFailureException;
 import com.rem.springboot.exception.RefreshTokenFailureException;
 import com.rem.springboot.exception.UserEmailAlreadyExistsException;
@@ -42,8 +44,7 @@ public class AuthServiceImpl {
     Set<String> strRoles = request.getRole();
     Set<Role> roles = new HashSet<>();
     if (strRoles == null) {
-      Role userRole = roleRepository.findByName(ERole.ROLE_USER).orElseThrow(RoleNotFoundException::new);
-      roles.add(userRole);
+      roles.add(roleRepository.findByName(ERole.ROLE_USER).orElseThrow(RoleNotFoundException::new));
     } else {
       strRoles.forEach(role -> {
         switch (role) {
@@ -58,7 +59,9 @@ public class AuthServiceImpl {
         }
       });
     }
-    user.setRoles(roles);
+
+    Set<UserRole> userRoles = roles.stream().map(r -> new UserRole(user, r)).collect(toSet());
+    user.setRoles(userRoles);
 
     userRepository.save(user);
   }
@@ -96,6 +99,7 @@ public class AuthServiceImpl {
     return new JwtUtils.PrivateClaims(
         String.valueOf(user.getId()),
         user.getRoles().stream()
+        .map(userRole -> userRole.getRole())
         .map(role -> role.getName())
         .map(eRole -> eRole.toString())
         .collect(Collectors.toList()));

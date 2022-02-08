@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.rem.springboot.entity.ERole;
 import com.rem.springboot.entity.Role;
 import com.rem.springboot.entity.User;
+import com.rem.springboot.entity.UserRole;
 import com.rem.springboot.exception.UserNotFoundException;
 
 
@@ -78,7 +79,7 @@ class UserRepositoryTest {
     User user = userRepository.save(
         new User("user5@gmail.com", "123456", "nickname5", createRole(ERole.ROLE_USER)));
     User newUser = new User("user6@gmail.com", "123456", user.getNickname(),
-        user.getRoles().stream().collect(toList()));
+        user.getRoles().stream().map(r -> r.getRole()).collect(toList()));
 
     // when, then
     assertThatThrownBy(() -> userRepository.save(newUser))
@@ -109,10 +110,10 @@ class UserRepositoryTest {
 
     // when
     User foundUser = userRepository.findByEmail(user.getEmail()).orElseThrow(UserNotFoundException::new);
-    Set<Role> memberRoles = foundUser.getRoles();
+    Set<UserRole> userRoles = foundUser.getRoles();
 
     // then
-    assertThat(memberRoles.size()).isLessThan(roles.size());
+    assertThat(userRoles.size()).isLessThan(roles.size());
   }
 
   @Test
@@ -129,8 +130,7 @@ class UserRepositoryTest {
     userRepository.deleteById(user.getId());
 
     // then
-    List<Integer> result = em.createNativeQuery(
-        "SELECT user_id FROM user_role JOIN user ON user_role.user_id = user.id").getResultList();
+    List<UserRole> result = em.createQuery("select ur from UserRole ur", UserRole.class).getResultList();
     assertThat(result.size()).isZero();
   }
 
