@@ -7,13 +7,10 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
@@ -32,11 +29,12 @@ public class User {
     this.email = email;
     this.password = password;
     this.nickname = nickname;
-    this.roles = roles.stream().map(r -> new Role(r.getName())).collect(toSet());
+    this.roles = roles.stream().map(r -> new UserRole(this, r)).collect(toSet());
   }
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "user_id")
   private Long id;
 
   @Column(unique = true)
@@ -55,9 +53,6 @@ public class User {
   private String nickname;
 
   @Setter
-  @ManyToMany(fetch = FetchType.LAZY, cascade = { CascadeType.PERSIST, CascadeType.MERGE })
-  @JoinTable(name = "user_role",
-  joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-  inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
-  private Set<Role> roles = new HashSet<>();
+  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private Set<UserRole> roles = new HashSet<>();
 }
