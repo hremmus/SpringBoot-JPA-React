@@ -73,4 +73,11 @@ public class ExceptionAdvice {
   public Response categoryNotFoundException() {
     return Response.failure(-1010, "존재하지 않는 카테고리입니다.");
   }
+
+  @ExceptionHandler(CannotConvertHierarchicalStructureException.class)
+  @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+  public Response cannotConvertNestedStructureException(CannotConvertHierarchicalStructureException e) {
+    log.error("e = {}", e.getMessage());
+    return Response.failure(-1011, "계층형 구조 변환에 실패하였습니다.");
+  }
 }

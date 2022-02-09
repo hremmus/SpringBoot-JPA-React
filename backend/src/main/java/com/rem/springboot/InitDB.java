@@ -8,9 +8,11 @@ import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import com.rem.springboot.entity.Category;
 import com.rem.springboot.entity.ERole;
 import com.rem.springboot.entity.Role;
 import com.rem.springboot.entity.User;
+import com.rem.springboot.repository.CategoryRepository;
 import com.rem.springboot.repository.RoleRepository;
 import com.rem.springboot.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class InitDB {
   private final PasswordEncoder passwordEncoder;
   private final RoleRepository roleRepository;
   private final UserRepository userRepository;
+  private final CategoryRepository categoryRepository;
 
   private String user1Email = "user1@email.com";
   private String user2Email = "user2@email.com";
@@ -37,6 +40,7 @@ public class InitDB {
 
     initRole();
     initTestUser();
+    initCategory();
 
     log.info("initialize database");
   }
@@ -54,6 +58,17 @@ public class InitDB {
         new User(adminEmail, passwordEncoder.encode(password), "admin", List.of(
             roleRepository.findByName(ERole.ROLE_USER).orElseThrow(RoleNotFoundException::new),
             roleRepository.findByName(ERole.ROLE_ADMIN).orElseThrow(RoleNotFoundException::new)))));
+  }
+
+  private void initCategory() {
+    Category c1 = categoryRepository.save(new Category("category1", null));
+    Category c2 = categoryRepository.save(new Category("category2", c1));
+    Category c3 = categoryRepository.save(new Category("category3", c1));
+    Category c4 = categoryRepository.save(new Category("category4", c2));
+    Category c5 = categoryRepository.save(new Category("category5", c2));
+    Category c6 = categoryRepository.save(new Category("category6", c4));
+    Category c7 = categoryRepository.save(new Category("category7", c3));
+    Category c8 = categoryRepository.save(new Category("category8", null));
   }
 
   public String getUser1Email() {
