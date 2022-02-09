@@ -6,9 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import com.rem.springboot.entity.Category;
 import com.rem.springboot.entity.ERole;
 import com.rem.springboot.entity.Role;
 import com.rem.springboot.entity.User;
+import com.rem.springboot.repository.CategoryRepository;
 import com.rem.springboot.repository.RoleRepository;
 import com.rem.springboot.repository.UserRepository;
 
@@ -23,6 +25,9 @@ public class TestInitDB {
   @Autowired
   UserRepository userRepository;
 
+  @Autowired
+  CategoryRepository categoryRepository;
+
   private String user1Email = "user1@eamil.com";
   private String user2Email = "user2@email.com";
   private String adminEmail = "admin@email.com";
@@ -32,6 +37,7 @@ public class TestInitDB {
   public void init() throws Exception {
     initRole();
     initTestUser();
+    initCategory();
   }
 
   private void initRole() {
@@ -47,6 +53,12 @@ public class TestInitDB {
         new User(adminEmail, passwordEncoder.encode(password), "admin", List.of(
             roleRepository.findByName(ERole.ROLE_USER).orElseThrow(RoleNotFoundException::new),
             roleRepository.findByName(ERole.ROLE_ADMIN).orElseThrow(RoleNotFoundException::new)))));
+  }
+
+  private void initCategory() {
+    Category category1 = new Category("category1", null);
+    Category category2 = new Category("category2", category1);
+    categoryRepository.saveAll(List.of(category1, category2));
   }
 
   public String getUser1Email() {
