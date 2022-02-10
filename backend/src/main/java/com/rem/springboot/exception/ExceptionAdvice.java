@@ -80,4 +80,17 @@ public class ExceptionAdvice {
     log.error("e = {}", e.getMessage());
     return Response.failure(-1011, "계층형 구조 변환에 실패하였습니다.");
   }
+
+  @ExceptionHandler(PostNotFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public Response postNotFoundException() {
+    return Response.failure(-1012, "존재하지 않는 게시글입니다.");
+  }
+
+  @ExceptionHandler(UnsupportedFileFormatException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public Response unsupportedFileFormatException() {
+    return Response.failure(-1013, "지원하지 않는 파일 형식입니다.");
+  }
+
 }
