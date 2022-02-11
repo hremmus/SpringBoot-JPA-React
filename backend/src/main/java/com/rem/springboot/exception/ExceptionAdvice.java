@@ -3,7 +3,7 @@ package com.rem.springboot.exception;
 import javax.management.relation.RoleNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -26,9 +26,9 @@ public class ExceptionAdvice {
     return Response.failure(-1002, "접근이 거부되었습니다.");
   }
 
-  @ExceptionHandler(MethodArgumentNotValidException.class)
+  @ExceptionHandler(BindException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
-  public Response methodArgumentNotValidException(MethodArgumentNotValidException e) {
+  public Response bindException(BindException e) {
     return Response.failure(-1003, e.getBindingResult().getFieldError().getDefaultMessage());
   }
 
@@ -93,4 +93,10 @@ public class ExceptionAdvice {
     return Response.failure(-1013, "지원하지 않는 파일 형식입니다.");
   }
 
+  @ExceptionHandler(FileUploadFailureException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public Response fileUploadFailureException(FileUploadFailureException e) {
+    log.error("e = {}", e.getMessage());
+    return Response.failure(-1014, "파일 업로드에 실패하였습니다.");
+  }
 }
