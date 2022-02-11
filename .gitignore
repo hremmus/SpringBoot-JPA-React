@@ -54,3 +54,5 @@ node_modules/
 **/*.back.*
 
 application-secret.yml
+
+/backend/src/test/resources/static/*

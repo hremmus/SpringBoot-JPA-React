@@ -24,8 +24,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   private final UserDetailsServiceImpl userDetailsService;
 
   @Override
-  public void configure(WebSecurity web) {
-    web
+  public void configure(WebSecurity webSecurity) {
+    webSecurity
     .ignoring().antMatchers("/h2-console/**", "/favicon.ico");
   }
 
@@ -38,10 +38,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     .accessDeniedHandler(new AccessDeniedHandlerImpl()).and()
     .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
     .authorizeRequests()
+    .antMatchers(HttpMethod.GET, "/image/**").permitAll()
     .antMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
     .antMatchers(HttpMethod.DELETE, "/api/user/{id}/**").authenticated()
     .antMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
     .antMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
+    .antMatchers(HttpMethod.POST, "/api/posts").authenticated()
     .antMatchers(HttpMethod.GET, "/api/**").permitAll()
     .anyRequest().hasAnyRole("ADMIN").and()
     .addFilterBefore(new AuthTokenFilter(userDetailsService), UsernamePasswordAuthenticationFilter.class);
