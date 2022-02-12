@@ -2,7 +2,9 @@ package com.rem.springboot.web;
 
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -24,5 +26,11 @@ public class PostController {
   @AssignUserId
   public Response create(@Valid @ModelAttribute PostCreateRequest request) {
     return Response.success(postService.create(request));
+  }
+
+  @GetMapping("/posts/{id}")
+  @ResponseStatus(HttpStatus.OK)
+  public Response read(@PathVariable Long id) {
+    return Response.success(postService.read(id));
   }
 }
