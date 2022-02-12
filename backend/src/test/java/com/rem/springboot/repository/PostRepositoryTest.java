@@ -91,6 +91,19 @@ class PostRepositoryTest {
   }
 
   @Test
+  void findByIdWithUserTest() {
+    // given
+    Post post = postRepository.save(new Post("title", "content", user, category, List.of()));
+
+    // when
+    Post foundPost = postRepository.findByIdWithUser(post.getId()).orElseThrow(PostNotFoundException::new);
+
+    // then
+    User foundUser = foundPost.getUser();
+    assertThat(foundUser.getEmail()).isEqualTo(user.getEmail());
+  }
+
+  @Test
   void deleteCascadeImageTest() {
     // given
     Post post = postRepository.save(new Post("title", "content", user, category,

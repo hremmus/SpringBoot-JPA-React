@@ -2,6 +2,7 @@ package com.rem.springboot.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.util.List;
@@ -114,5 +115,16 @@ class PostControllerIntegrationTest {
         })
         .contentType(MediaType.MULTIPART_FORM_DATA))
     .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void readTest() throws Exception {
+    // given
+    Post post = postRepository.save(new Post("title", "content", user1, category, List.of()));
+
+    // when, then
+    mockMvc.perform(
+        get("/api/posts/{id}", post.getId()))
+    .andExpect(status().isOk());
   }
 }

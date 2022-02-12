@@ -1,6 +1,7 @@
 package com.rem.springboot.service;
 
 import static java.util.stream.Collectors.toList;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -18,11 +19,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import com.rem.springboot.dto.PostDto;
 import com.rem.springboot.entity.Category;
 import com.rem.springboot.entity.Image;
 import com.rem.springboot.entity.Post;
 import com.rem.springboot.entity.User;
 import com.rem.springboot.exception.CategoryNotFoundException;
+import com.rem.springboot.exception.PostNotFoundException;
 import com.rem.springboot.exception.UnsupportedFileFormatException;
 import com.rem.springboot.exception.UserNotFoundException;
 import com.rem.springboot.payload.request.PostCreateRequest;
@@ -108,5 +111,30 @@ class PostServiceImplTest {
     assertThatThrownBy(() -> postService.create(new PostCreateRequest("title", "content", 1L, 1L,
         List.of(new MockMultipartFile("test", "test.txt", MediaType.TEXT_PLAIN_VALUE, "test".getBytes())))))
     .isInstanceOf(UnsupportedFileFormatException.class);
+  }
+
+  @Test
+  void readTest() {
+    // given
+    Post post = new Post("title", "content", new User("user@email.com", "password", "nickname", List.of()),
+        new Category("name", null),
+        List.of(new Image("origin_filename1.jpg"), new Image("origin_filename2.jpg")));
+    given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+
+    // when
+    PostDto postDto = postService.read(1L);
+
+    // then
+    assertThat(postDto.getTitle()).isEqualTo(post.getTitle());
+    assertThat(postDto.getImages().size()).isEqualTo(post.getImages().size());
+  }
+
+  @Test
+  void readExceptionByPostNotFoundTest() {
+    // given
+    given(postRepository.findById(anyLong())).willReturn(Optional.empty());
+
+    // when, then
+    assertThatThrownBy(() -> postService.read(1L)).isInstanceOf(PostNotFoundException.class);
   }
 }
