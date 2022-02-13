@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
-public class Post {
+public class Post extends EntityDate {
   public Post(String title, String content, User user, Category category, List<Image> images) {
     this.title = title;
     this.content = content;

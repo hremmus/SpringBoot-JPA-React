@@ -24,7 +24,7 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
-public class User {
+public class User extends EntityDate {
   public User(String email, String password, String nickname, List<Role> roles) {
     this.email = email;
     this.password = password;
