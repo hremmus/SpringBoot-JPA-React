@@ -17,9 +17,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import com.rem.springboot.dto.PostDto;
+import com.rem.springboot.dto.PostListDto;
+import com.rem.springboot.dto.PostReadCondition;
 import com.rem.springboot.entity.Category;
 import com.rem.springboot.entity.Image;
 import com.rem.springboot.entity.Post;
@@ -111,6 +114,18 @@ class PostServiceImplTest {
     assertThatThrownBy(() -> postService.create(new PostCreateRequest("title", "content", 1L, 1L,
         List.of(new MockMultipartFile("test", "test.txt", MediaType.TEXT_PLAIN_VALUE, "test".getBytes())))))
     .isInstanceOf(UnsupportedFileFormatException.class);
+  }
+
+  @Test
+  void readAllTest() {
+    // given
+    given(postRepository.findAllByCondition(any())).willReturn(Page.empty());
+
+    // when
+    PostListDto postListDto = postService.readAll(new PostReadCondition(1, 1, List.of(), List.of()));
+
+    // then
+    assertThat(postListDto.getPosts().size()).isZero();
   }
 
   @Test

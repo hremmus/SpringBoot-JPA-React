@@ -1,6 +1,7 @@
 package com.rem.springboot;
 
 import java.util.List;
+import java.util.stream.IntStream;
 import javax.management.relation.RoleNotFoundException;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Profile;
@@ -10,9 +11,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.rem.springboot.entity.Category;
 import com.rem.springboot.entity.ERole;
+import com.rem.springboot.entity.Post;
 import com.rem.springboot.entity.Role;
 import com.rem.springboot.entity.User;
 import com.rem.springboot.repository.CategoryRepository;
+import com.rem.springboot.repository.PostRepository;
 import com.rem.springboot.repository.RoleRepository;
 import com.rem.springboot.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +30,7 @@ public class InitDB {
   private final RoleRepository roleRepository;
   private final UserRepository userRepository;
   private final CategoryRepository categoryRepository;
+  private final PostRepository postRepository;
 
   private String user1Email = "user1@email.com";
   private String user2Email = "user2@email.com";
@@ -41,6 +45,7 @@ public class InitDB {
     initRole();
     initTestUser();
     initCategory();
+    initPost();
 
     log.info("initialize database");
   }
@@ -69,6 +74,14 @@ public class InitDB {
     Category c6 = categoryRepository.save(new Category("category6", c4));
     Category c7 = categoryRepository.save(new Category("category7", c3));
     Category c8 = categoryRepository.save(new Category("category8", null));
+  }
+
+  private void initPost() {
+    User user = userRepository.findAll().get(0);
+    Category category = categoryRepository.findAll().get(0);
+    IntStream.range(0, 100)
+    .forEach(i -> postRepository.save(
+        new Post("title" + i, "content" + i, user, category, List.of())));
   }
 
   public String getUser1Email() {

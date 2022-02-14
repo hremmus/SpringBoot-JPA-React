@@ -1,6 +1,7 @@
 package com.rem.springboot.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
@@ -18,6 +19,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.multipart.MultipartFile;
+import com.rem.springboot.dto.PostReadCondition;
 import com.rem.springboot.payload.request.PostCreateRequest;
 import com.rem.springboot.service.PostServiceImpl;
 
@@ -67,6 +69,23 @@ class PostControllerTest {
 
     PostCreateRequest capturedRequest = postCreateRequestArgumentCaptor.getValue();
     assertThat(capturedRequest.getImages().size()).isEqualTo(2);
+  }
+
+  @Test
+  void readAllTest() throws Exception {
+    // given
+    PostReadCondition condition = new PostReadCondition(0, 1, List.of(1L, 2L), List.of(1L, 2L));
+
+    // when, then
+    mockMvc.perform(
+        get("/api/posts")
+        .param("page", String.valueOf(condition.getPage()))
+        .param("size", String.valueOf(condition.getSize()))
+        .param("categoryId", String.valueOf(condition.getCategoryId().get(0)), String.valueOf(condition.getCategoryId().get(1)))
+        .param("userId", String.valueOf(condition.getUserId().get(0)), String.valueOf(condition.getUserId().get(1))))
+    .andExpect(status().isOk());
+
+    verify(postService).readAll(refEq(condition));
   }
 
   @Test
