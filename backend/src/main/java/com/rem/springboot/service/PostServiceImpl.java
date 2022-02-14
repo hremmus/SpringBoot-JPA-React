@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import com.rem.springboot.dto.PostDto;
+import com.rem.springboot.dto.PostListDto;
+import com.rem.springboot.dto.PostReadCondition;
 import com.rem.springboot.entity.Category;
 import com.rem.springboot.entity.Image;
 import com.rem.springboot.entity.Post;
@@ -39,6 +41,10 @@ public class PostServiceImpl {
 
     uploadImages(post.getImages(), request.getImages());
     return new PostCreateResponse(post.getId());
+  }
+
+  public PostListDto readAll(PostReadCondition condition) {
+    return PostListDto.toDto(postRepository.findAllByCondition(condition));
   }
 
   public PostDto read(Long id) {

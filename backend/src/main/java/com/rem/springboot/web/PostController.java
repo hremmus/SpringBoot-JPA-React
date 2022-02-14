@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import com.rem.springboot.aop.AssignUserId;
+import com.rem.springboot.dto.PostReadCondition;
 import com.rem.springboot.dto.Response;
 import com.rem.springboot.payload.request.PostCreateRequest;
 import com.rem.springboot.service.PostServiceImpl;
@@ -26,6 +27,12 @@ public class PostController {
   @AssignUserId
   public Response create(@Valid @ModelAttribute PostCreateRequest request) {
     return Response.success(postService.create(request));
+  }
+
+  @GetMapping("/posts")
+  @ResponseStatus(HttpStatus.OK)
+  public Response readAll(@Valid PostReadCondition condition) {
+    return Response.success(postService.readAll(condition));
   }
 
   @GetMapping("/posts/{id}")

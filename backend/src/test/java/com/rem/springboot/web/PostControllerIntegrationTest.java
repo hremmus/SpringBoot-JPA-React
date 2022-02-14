@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import com.rem.springboot.TestInitDB;
+import com.rem.springboot.dto.PostReadCondition;
 import com.rem.springboot.entity.Category;
 import com.rem.springboot.entity.Post;
 import com.rem.springboot.entity.User;
@@ -96,6 +97,21 @@ class PostControllerIntegrationTest {
     assertThat(post.getTitle()).isEqualTo("title");
     assertThat(post.getContent()).isEqualTo("content");
     assertThat(post.getUser().getId()).isEqualTo(user1.getId());
+  }
+
+  @Test
+  void readAllTest() throws Exception {
+    // given
+    PostReadCondition condition = new PostReadCondition(0, 1, List.of(), List.of());
+
+    // when, then
+    mockMvc.perform(
+        get("/api/posts")
+        .param("page", String.valueOf(condition.getPage()))
+        .param("size", String.valueOf(condition.getSize()))
+        .param("categoryId", String.valueOf(1L), String.valueOf(2L))
+        .param("userId", String.valueOf(1L)))
+    .andExpect(status().isOk());
   }
 
   @Test
