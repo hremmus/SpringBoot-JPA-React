@@ -23,6 +23,7 @@ import com.rem.springboot.dto.PostReadCondition;
 import com.rem.springboot.entity.Category;
 import com.rem.springboot.entity.Post;
 import com.rem.springboot.entity.User;
+import com.rem.springboot.exception.PostNotFoundException;
 import com.rem.springboot.exception.UserNotFoundException;
 import com.rem.springboot.payload.request.LoginRequest;
 import com.rem.springboot.payload.request.PostCreateRequest;
@@ -62,7 +63,7 @@ class PostControllerIntegrationTest {
   @Autowired
   PostServiceImpl postService;
 
-  User user1, user2;
+  User user1, user2, admin;
   Category category;
 
   @BeforeEach
@@ -70,6 +71,8 @@ class PostControllerIntegrationTest {
     mockMvc = MockMvcBuilders.webAppContextSetup(context).apply(springSecurity()).build();
     initDB.init();
     user1 = userRepository.findByEmail(initDB.getUser1Email()).orElseThrow(UserNotFoundException::new);
+    user2 = userRepository.findByEmail(initDB.getUser2Email()).orElseThrow(UserNotFoundException::new);
+    admin = userRepository.findByEmail(initDB.getAdminEmail()).orElseThrow(UserNotFoundException::new);
     category = categoryRepository.findAll().get(0);
   }
 
@@ -142,5 +145,89 @@ class PostControllerIntegrationTest {
     mockMvc.perform(
         get("/api/posts/{id}", post.getId()))
     .andExpect(status().isOk());
+  }
+
+  @Test
+  void updateByResourceOwnerTest() throws Exception {
+    // given
+    LoginResponse loginResponse = authService.login(new LoginRequest(initDB.getUser1Email(), initDB.getPassword()));
+    Post post = postRepository.save(new Post("title", "content", user1, category, List.of()));
+
+    String updatedTitle = "updatedTitle";
+    String updatedContent = "updatedContent";
+
+    // when, then
+    mockMvc.perform(
+        multipart("/api/posts/{id}", post.getId())
+        .param("title", updatedTitle)
+        .param("content", updatedContent)
+        .with(requestPostProcessor -> { requestPostProcessor.setMethod("PUT"); return requestPostProcessor; })
+        .contentType(MediaType.MULTIPART_FORM_DATA)
+        .header("Authorization", loginResponse.getAccessToken()))
+    .andExpect(status().isOk());
+
+    Post updatedPost = postRepository.findById(post.getId()).orElseThrow(PostNotFoundException::new);
+    assertThat(updatedPost.getTitle()).isEqualTo(updatedTitle);
+    assertThat(updatedPost.getContent()).isEqualTo(updatedContent);
+  }
+
+  @Test
+  void updateByAdminTest() throws Exception {
+    // given
+    LoginResponse loginResponse = authService.login(new LoginRequest(initDB.getAdminEmail(), initDB.getPassword()));
+    Post post = postRepository.save(new Post("title", "content", user1, category, List.of()));
+
+    String updatedTitle = "updatedTitle";
+    String updatedContent = "updatedContent";
+
+    // when, then
+    mockMvc.perform(
+        multipart("/api/posts/{id}", post.getId())
+        .param("title", updatedTitle)
+        .param("content", updatedContent)
+        .with(requestPostProcessor -> { requestPostProcessor.setMethod("PUT"); return requestPostProcessor; })
+        .contentType(MediaType.MULTIPART_FORM_DATA)
+        .header("Authorization", loginResponse.getAccessToken()))
+    .andExpect(status().isOk());
+
+    Post updatedPost = postRepository.findById(post.getId()).orElseThrow(PostNotFoundException::new);
+    assertThat(updatedPost.getTitle()).isEqualTo(updatedTitle);
+    assertThat(updatedPost.getContent()).isEqualTo(updatedContent);
+  }
+
+  @Test
+  void updateUnauthorizedByNoneTokenTest() throws Exception {
+    Post post = postRepository.save(new Post("title", "content", user2, category, List.of()));
+
+    String updatedTitle = "updatedTitle";
+    String updatedContent = "updatedContent";
+
+    // when, then
+    mockMvc.perform(
+        multipart("/api/posts/{id}", post.getId())
+        .param("title", updatedTitle)
+        .param("content", updatedContent)
+        .with(requestPostProcessor -> { requestPostProcessor.setMethod("PUT"); return requestPostProcessor; })
+        .contentType(MediaType.MULTIPART_FORM_DATA))
+    .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void updateAccessDeniedByNotResourceOwnerTest() throws Exception {
+    LoginResponse notOwnerLoginResponse = authService.login(new LoginRequest(initDB.getUser2Email(), initDB.getPassword()));
+    Post post = postRepository.save(new Post("title", "content", user1, category, List.of()));
+
+    String updatedTitle = "updatedTitle";
+    String updatedContent = "updatedContent";
+
+    // when, then
+    mockMvc.perform(
+        multipart("/api/posts/{id}", post.getId())
+        .param("title", updatedTitle)
+        .param("content", updatedContent)
+        .with(requestPostProcessor -> { requestPostProcessor.setMethod("PUT"); return requestPostProcessor; })
+        .contentType(MediaType.MULTIPART_FORM_DATA)
+        .header("Authorization", notOwnerLoginResponse.getAccessToken()))
+    .andExpect(status().isForbidden());
   }
 }

@@ -3,6 +3,7 @@ package com.rem.springboot.service;
 import static java.util.stream.Collectors.toList;
 import java.util.List;
 import java.util.stream.IntStream;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,7 +18,9 @@ import com.rem.springboot.exception.CategoryNotFoundException;
 import com.rem.springboot.exception.PostNotFoundException;
 import com.rem.springboot.exception.UserNotFoundException;
 import com.rem.springboot.payload.request.PostCreateRequest;
+import com.rem.springboot.payload.request.PostUpdateRequest;
 import com.rem.springboot.payload.response.PostCreateResponse;
+import com.rem.springboot.payload.response.PostUpdateResponse;
 import com.rem.springboot.repository.CategoryRepository;
 import com.rem.springboot.repository.PostRepository;
 import com.rem.springboot.repository.UserRepository;
@@ -51,7 +54,21 @@ public class PostServiceImpl {
     return PostDto.toDto(postRepository.findById(id).orElseThrow(PostNotFoundException::new));
   }
 
+  @Transactional
+  @PreAuthorize("@postGuard.check(#id)")
+  public PostUpdateResponse update(Long id, PostUpdateRequest request) {
+    Post post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
+    Post.ImageUpdateResult result = post.update(request);
+    uploadImages(result.getAddedImages(), result.getAddedImageFiles());
+    deleteImages(result.getDeletedImages());
+    return new PostUpdateResponse(id);
+  }
+
   private void uploadImages(List<Image> images, List<MultipartFile> fileImages) {
     IntStream.range(0, images.size()).forEach(i -> fileService.upload(fileImages.get(i), images.get(i).getUniqueName()));
+  }
+
+  private void deleteImages(List<Image> images) {
+    images.stream().forEach(i -> fileService.delete(i.getUniqueName()));
   }
 }
