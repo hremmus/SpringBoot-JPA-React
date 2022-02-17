@@ -1,7 +1,9 @@
 package com.rem.springboot.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -229,5 +231,59 @@ class PostControllerIntegrationTest {
         .contentType(MediaType.MULTIPART_FORM_DATA)
         .header("Authorization", notOwnerLoginResponse.getAccessToken()))
     .andExpect(status().isForbidden());
+  }
+
+  @Test
+  void deleteByResourceOwnerTest() throws Exception {
+    // given
+    LoginResponse loginResponse = authService.login(new LoginRequest(initDB.getUser1Email(), initDB.getPassword()));
+    Post post = postRepository.save(new Post("title", "content", user1, category, List.of()));
+
+    // when, then
+    mockMvc.perform(
+        delete("/api/posts/{id}", post.getId())
+        .header("Authorization", loginResponse.getAccessToken()))
+    .andExpect(status().isOk());
+
+    assertThatThrownBy(() -> postService.read(post.getId())).isInstanceOf(PostNotFoundException.class);
+  }
+
+  @Test
+  void deleteByAdminTest() throws Exception {
+    // given
+    LoginResponse adminLoginResponse = authService.login(new LoginRequest(initDB.getAdminEmail(), initDB.getPassword()));
+    Post post = postRepository.save(new Post("title", "content", user1, category, List.of()));
+
+    // when, then
+    mockMvc.perform(
+        delete("/api/posts/{id}", post.getId())
+        .header("Authorization", adminLoginResponse.getAccessToken()))
+    .andExpect(status().isOk());
+
+    assertThatThrownBy(() -> postService.read(post.getId())).isInstanceOf(PostNotFoundException.class);
+  }
+
+  @Test
+  void deleteAccessDeniedByNotResourceOwnerTest() throws Exception {
+    // given
+    LoginResponse notOwnerLoginResponse = authService.login(new LoginRequest(initDB.getUser2Email(), initDB.getPassword()));
+    Post post = postRepository.save(new Post("title", "content", user1, category, List.of()));
+
+    // when, then
+    mockMvc.perform(
+        delete("/api/posts/{id}", post.getId())
+        .header("Authorization", notOwnerLoginResponse.getAccessToken()))
+    .andExpect(status().isForbidden());
+  }
+
+  @Test
+  void deleteUnauthorizedByNoneTokenTest() throws Exception {
+    // given
+    Post post = postRepository.save(new Post("title", "content", user1, category, List.of()));
+
+    // when, then
+    mockMvc.perform(
+        delete("/api/posts/{id}", post.getId()))
+    .andExpect(status().isUnauthorized());
   }
 }

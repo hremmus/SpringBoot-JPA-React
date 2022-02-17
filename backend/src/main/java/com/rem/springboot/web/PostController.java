@@ -2,6 +2,7 @@ package com.rem.springboot.web;
 
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,5 +48,12 @@ public class PostController {
   @ResponseStatus(HttpStatus.OK)
   public Response update(@PathVariable Long id, @Valid @ModelAttribute PostUpdateRequest request) {
     return Response.success(postService.update(id, request));
+  }
+
+  @DeleteMapping("/posts/{id}")
+  @ResponseStatus(HttpStatus.OK)
+  public Response delete(@PathVariable Long id) {
+    postService.delete(id);
+    return Response.success();
   }
 }

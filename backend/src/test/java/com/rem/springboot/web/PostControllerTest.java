@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -137,5 +138,18 @@ class PostControllerTest {
     List<Long> capturedDeletedImages = capturedRequest.getDeletedImages();
     assertThat(capturedDeletedImages.size()).isEqualTo(2);
     assertThat(capturedDeletedImages).contains(deletedImages.get(0), deletedImages.get(1));
+  }
+
+  @Test
+  void deleteTest() throws Exception {
+    // given
+    Long id = 1L;
+
+    // when, then
+    mockMvc.perform(
+        delete("/api/posts/{id}", id))
+    .andExpect(status().isOk());
+
+    verify(postService).delete(id);
   }
 }
