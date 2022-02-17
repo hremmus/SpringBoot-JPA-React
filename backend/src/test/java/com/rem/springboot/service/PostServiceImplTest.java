@@ -191,4 +191,32 @@ class PostServiceImplTest {
     assertThatThrownBy(() -> postService.update(1L, new PostUpdateRequest("title", "content", List.of(), List.of())))
     .isInstanceOf(PostNotFoundException.class);
   }
+
+  @Test
+  void deleteTest() {
+    // given
+    Image a = new Image("a.png");
+    ReflectionTestUtils.setField(a, "id", 1L);
+    Image b = new Image("b.jpg");
+    ReflectionTestUtils.setField(b, "id", 2L);
+    Post post = new Post("title", "content", new User("user@email.com", "password", "nickname", List.of()),
+        new Category("name", null), List.of(a, b));
+    given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+
+    // when
+    postService.delete(1L);
+
+    // then
+    verify(fileService, times(post.getImages().size())).delete(anyString());
+    verify(postRepository).delete(any());
+  }
+
+  @Test
+  void deleteExceptionByNotFoundPostTest() {
+    // given
+    given(postRepository.findById(anyLong())).willReturn(Optional.empty());
+
+    // when, then
+    assertThatThrownBy(() -> postService.delete(1L)).isInstanceOf(PostNotFoundException.class);
+  }
 }

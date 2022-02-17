@@ -35,6 +35,23 @@ class FileServiceImplTest {
     assertThat(isExists(testLocation + filename)).isTrue();
   }
 
+  @Test
+  void deleteTest() {
+    // given
+    MultipartFile file = new MockMultipartFile("myFile", "myFile.txt", MediaType.TEXT_PLAIN_VALUE, "test".getBytes());
+    String filename = "testFile.txt";
+    fileService.upload(file, filename);
+    boolean before = isExists(testLocation + filename);
+
+    // when
+    fileService.delete(filename);
+
+    // then
+    boolean after = isExists(testLocation + filename);
+    assertThat(before).isTrue();
+    assertThat(after).isFalse();
+  }
+
   boolean isExists(String filePath) {
     return new File(filePath).exists();
   }

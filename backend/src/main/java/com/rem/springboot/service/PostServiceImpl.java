@@ -64,6 +64,14 @@ public class PostServiceImpl {
     return new PostUpdateResponse(id);
   }
 
+  @Transactional
+  @PreAuthorize("@postGuard.check(#id)")
+  public void delete(Long id) {
+    Post post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
+    deleteImages(post.getImages());
+    postRepository.delete(post);
+  }
+
   private void uploadImages(List<Image> images, List<MultipartFile> fileImages) {
     IntStream.range(0, images.size()).forEach(i -> fileService.upload(fileImages.get(i), images.get(i).getUniqueName()));
   }

@@ -33,6 +33,6 @@ public class FileServiceImpl implements InitializingBean, FileService {
 
   @Override
   public void delete(String filename) {
-
+    new File(location + filename).delete();
   }
 }
