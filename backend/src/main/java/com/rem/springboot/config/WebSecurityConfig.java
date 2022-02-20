@@ -46,6 +46,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     .antMatchers(HttpMethod.POST, "/api/posts/**").authenticated()
     .antMatchers(HttpMethod.PUT, "/api/posts/{id}").authenticated()
     .antMatchers(HttpMethod.DELETE, "/api/posts/{id}").authenticated()
+    .antMatchers(HttpMethod.POST, "/api/comments/**").authenticated()
     .antMatchers(HttpMethod.GET, "/api/**").permitAll()
     .anyRequest().hasAnyRole("ADMIN").and()
     .addFilterBefore(new AuthTokenFilter(userDetailsService), UsernamePasswordAuthenticationFilter.class);

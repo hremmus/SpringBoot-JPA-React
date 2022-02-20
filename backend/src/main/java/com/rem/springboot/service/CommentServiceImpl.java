@@ -1,0 +1,36 @@
+package com.rem.springboot.service;
+
+import java.util.Optional;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import com.rem.springboot.entity.Comment;
+import com.rem.springboot.entity.Post;
+import com.rem.springboot.entity.User;
+import com.rem.springboot.exception.CommentNotFoundException;
+import com.rem.springboot.exception.PostNotFoundException;
+import com.rem.springboot.exception.UserNotFoundException;
+import com.rem.springboot.payload.request.CommentCreateRequest;
+import com.rem.springboot.repository.CommentRepository;
+import com.rem.springboot.repository.PostRepository;
+import com.rem.springboot.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class CommentServiceImpl {
+  private final CommentRepository commentRepository;
+  private final UserRepository userRepository;
+  private final PostRepository postRepository;
+
+  @Transactional
+  public void create(CommentCreateRequest request) {
+    User user = userRepository.findById(request.getUserId()).orElseThrow(UserNotFoundException::new);
+    Post post = postRepository.findById(request.getPostId()).orElseThrow(PostNotFoundException::new);
+    Comment parent = Optional.ofNullable(request.getParentId())
+        .map(id -> commentRepository.findById(id).orElseThrow(CommentNotFoundException::new))
+        .orElse(null);
+
+    commentRepository.save(new Comment(request.getContent(), user, post, parent));
+  }
+}
