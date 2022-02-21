@@ -10,11 +10,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.rem.springboot.entity.Category;
+import com.rem.springboot.entity.Comment;
 import com.rem.springboot.entity.ERole;
 import com.rem.springboot.entity.Post;
 import com.rem.springboot.entity.Role;
 import com.rem.springboot.entity.User;
 import com.rem.springboot.repository.CategoryRepository;
+import com.rem.springboot.repository.CommentRepository;
 import com.rem.springboot.repository.PostRepository;
 import com.rem.springboot.repository.RoleRepository;
 import com.rem.springboot.repository.UserRepository;
@@ -31,6 +33,7 @@ public class InitDB {
   private final UserRepository userRepository;
   private final CategoryRepository categoryRepository;
   private final PostRepository postRepository;
+  private final CommentRepository commentRepository;
 
   private String user1Email = "user1@email.com";
   private String user2Email = "user2@email.com";
@@ -46,6 +49,7 @@ public class InitDB {
     initTestUser();
     initCategory();
     initPost();
+    initComment();
 
     log.info("initialize database");
   }
@@ -82,6 +86,19 @@ public class InitDB {
     IntStream.range(0, 100)
     .forEach(i -> postRepository.save(
         new Post("title" + i, "content" + i, user, category, List.of())));
+  }
+
+  private void initComment() {
+    User user = userRepository.findAll().get(0);
+    Post post = postRepository.findAll().get(0);
+    Comment comment1 = commentRepository.save(new Comment("content", user, post, null));
+    Comment comment2 = commentRepository.save(new Comment("content", user, post, comment1));
+    Comment comment3 = commentRepository.save(new Comment("content", user, post, comment1));
+    Comment comment4 = commentRepository.save(new Comment("content", user, post, comment2));
+    Comment comment5 = commentRepository.save(new Comment("content", user, post, comment2));
+    Comment comment6 = commentRepository.save(new Comment("content", user, post, comment4));
+    Comment comment7 = commentRepository.save(new Comment("content", user, post, comment3));
+    Comment comment8 = commentRepository.save(new Comment("content", user, post, null));
   }
 
   public String getUser1Email() {
