@@ -2,6 +2,7 @@ package com.rem.springboot.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.util.List;
@@ -114,5 +115,14 @@ class CommentControllerIntegrationTest {
         .contentType(MediaType.APPLICATION_JSON)
         .content(objectMapper.writeValueAsString(request)))
     .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void readAllTest() throws Exception {
+    // given, when, then
+    mockMvc.perform(
+        get("/api/comments")
+        .param("postId", String.valueOf(1)))
+    .andExpect(status().isOk());
   }
 }

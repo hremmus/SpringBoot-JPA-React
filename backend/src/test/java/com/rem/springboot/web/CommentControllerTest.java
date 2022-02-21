@@ -2,6 +2,7 @@ package com.rem.springboot.web;
 
 import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,6 +16,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rem.springboot.payload.request.CommentCreateRequest;
+import com.rem.springboot.payload.request.CommentReadCondition;
 import com.rem.springboot.service.CommentServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,5 +48,19 @@ class CommentControllerTest {
     .andExpect(status().isCreated());
 
     verify(commentService).create(refEq(request));
+  }
+
+  @Test
+  void readAllTest() throws Exception {
+    // given
+    CommentReadCondition condition = new CommentReadCondition(1L);
+
+    // when, then
+    mockMvc.perform(
+        get("/api/comments")
+        .param("postId", String.valueOf(condition.getPostId())))
+    .andExpect(status().isOk());
+
+    verify(commentService).readAll(refEq(condition));
   }
 }
