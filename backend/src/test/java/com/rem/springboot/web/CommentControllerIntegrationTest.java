@@ -3,6 +3,7 @@ package com.rem.springboot.web;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import java.util.List;
@@ -24,8 +25,10 @@ import com.rem.springboot.entity.Category;
 import com.rem.springboot.entity.Comment;
 import com.rem.springboot.entity.Post;
 import com.rem.springboot.entity.User;
+import com.rem.springboot.exception.CommentNotFoundException;
 import com.rem.springboot.exception.UserNotFoundException;
 import com.rem.springboot.payload.request.CommentCreateRequest;
+import com.rem.springboot.payload.request.CommentUpdateRequest;
 import com.rem.springboot.payload.request.LoginRequest;
 import com.rem.springboot.payload.response.LoginResponse;
 import com.rem.springboot.repository.CategoryRepository;
@@ -124,5 +127,68 @@ class CommentControllerIntegrationTest {
         get("/api/comments")
         .param("postId", String.valueOf(1)))
     .andExpect(status().isOk());
+  }
+
+  @Test
+  void updateByResourceOwnerTest() throws Exception {
+    // given
+    LoginResponse loginResponse = authService.login(new LoginRequest(initDB.getUser1Email(), initDB.getPassword()));
+    Comment comment = commentRepository.save(new Comment("content", user1, post, null));
+
+    CommentUpdateRequest request = new CommentUpdateRequest("updated content");
+
+    // when, then
+    mockMvc.perform(
+        patch("/api/comments/{id}", comment.getId())
+        .param("content", request.getContent())
+        .header("Authorization", loginResponse.getAccessToken()))
+    .andExpect(status().isOk());
+
+    Comment updatedComment = commentRepository.findById(comment.getId()).orElseThrow(CommentNotFoundException::new);
+    assertThat(updatedComment.getContent()).isEqualTo(comment.getContent());
+  }
+
+  @Test
+  void updateUnauthorizedByNoneTokenTest() throws Exception {
+    Comment comment = commentRepository.save(new Comment("content", user1, post, null));
+
+    CommentUpdateRequest request = new CommentUpdateRequest("updated content");
+
+    // when, then
+    mockMvc.perform(
+        patch("/api/comments/{id}", comment.getId())
+        .param("content", request.getContent()))
+    .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void updateAccessDeniedByNotResourceOwnerTest() throws Exception {
+    LoginResponse notOwnerLoginResponse = authService.login(new LoginRequest(initDB.getUser2Email(), initDB.getPassword()));
+    Comment comment = commentRepository.save(new Comment("content", user1, post, null));
+
+    CommentUpdateRequest request = new CommentUpdateRequest("updated content");
+
+    // when, then
+    mockMvc.perform(
+        patch("/api/comments/{id}", comment.getId())
+        .param("content", request.getContent())
+        .header("Authorization", notOwnerLoginResponse.getAccessToken()))
+    .andExpect(status().isForbidden());
+  }
+
+  @Test
+  void updateAccessDeniedByAdminTest() throws Exception {
+    // given
+    LoginResponse adminLoginResponse = authService.login(new LoginRequest(initDB.getAdminEmail(), initDB.getPassword()));
+    Comment comment = commentRepository.save(new Comment("content", user1, post, null));
+
+    CommentUpdateRequest request = new CommentUpdateRequest("updated content");
+
+    // when, then
+    mockMvc.perform(
+        patch("/api/comments/{id}", comment.getId())
+        .param("content", request.getContent())
+        .header("Authorization", adminLoginResponse.getAccessToken()))
+    .andExpect(status().isForbidden());
   }
 }

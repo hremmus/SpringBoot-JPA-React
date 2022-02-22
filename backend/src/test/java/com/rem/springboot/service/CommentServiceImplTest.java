@@ -23,6 +23,7 @@ import com.rem.springboot.exception.PostNotFoundException;
 import com.rem.springboot.exception.UserNotFoundException;
 import com.rem.springboot.payload.request.CommentCreateRequest;
 import com.rem.springboot.payload.request.CommentReadCondition;
+import com.rem.springboot.payload.request.CommentUpdateRequest;
 import com.rem.springboot.repository.CommentRepository;
 import com.rem.springboot.repository.PostRepository;
 import com.rem.springboot.repository.UserRepository;
@@ -125,5 +126,33 @@ class CommentServiceImplTest {
     assertThat(result.size()).isEqualTo(2);
     assertThat(result.get(0).getContent()).isNull();
     assertThat(result.get(0).getUser()).isNull();
+  }
+
+  @Test
+  void updateTest() {
+    // given
+    User user = new User("user@email.com", "123456a!", "nickname", List.of());
+    Post post = new Post("title", "content", user, new Category("category", null), List.of());
+    Comment comment = new Comment("content", user, post, null);
+    given(commentRepository.findById(anyLong())).willReturn(Optional.of(comment));
+
+    CommentUpdateRequest request = new CommentUpdateRequest("updated content");
+
+    // when
+    commentService.update(1L, request);
+    Comment updatedComment = commentRepository.findById(1L).orElseThrow(CommentNotFoundException::new);
+
+    // then
+    assertThat(updatedComment.getContent()).isEqualTo(request.getContent());
+  }
+
+  @Test
+  void updateExceptionByCommentNotFoundTest() {
+    // given
+    given(commentRepository.findById(anyLong())).willReturn(Optional.empty());
+
+    // when, then
+    assertThatThrownBy(() -> commentService.update(1L, new CommentUpdateRequest("updated content")))
+    .isInstanceOf(CommentNotFoundException.class);
   }
 }

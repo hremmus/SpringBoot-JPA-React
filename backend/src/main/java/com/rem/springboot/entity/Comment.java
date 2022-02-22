@@ -59,6 +59,10 @@ public class Comment extends EntityDate {
   @OneToMany(mappedBy = "parent")
   private List<Comment> children = new ArrayList<>();
 
+  public void update(String content) {
+    this.content = content;
+  }
+
   public void delete() {
     deleted = true;
   }

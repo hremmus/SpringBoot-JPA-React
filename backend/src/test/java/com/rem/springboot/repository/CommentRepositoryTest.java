@@ -16,6 +16,7 @@ import com.rem.springboot.entity.Comment;
 import com.rem.springboot.entity.Post;
 import com.rem.springboot.entity.User;
 import com.rem.springboot.exception.CommentNotFoundException;
+import com.rem.springboot.payload.request.CommentUpdateRequest;
 
 @DataJpaTest
 @Import(QuerydslConfig.class)
@@ -240,5 +241,24 @@ class CommentRepositoryTest {
     assertThat(result.get(5).getId()).isEqualTo(comment5.getId());
     assertThat(result.get(6).getId()).isEqualTo(comment7.getId());
     assertThat(result.get(7).getId()).isEqualTo(comment6.getId());
+  }
+
+  @Test
+  void updateTest() {
+    // given
+    Comment comment = commentRepository.save(new Comment("content", user, post, null));
+    em.flush();
+    em.clear();
+
+    // when
+    CommentUpdateRequest request = new CommentUpdateRequest("updated content");
+    Comment foundComment = commentRepository.findById(comment.getId()).orElseThrow(CommentNotFoundException::new);
+    foundComment.update(request.getContent());
+    em.flush();
+    em.clear();
+
+    // then
+    Comment result = commentRepository.findById(comment.getId()).orElseThrow(CommentNotFoundException::new);
+    assertThat(result.getContent()).isEqualTo(request.getContent());
   }
 }

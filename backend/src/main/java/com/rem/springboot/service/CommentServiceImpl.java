@@ -2,6 +2,7 @@ package com.rem.springboot.service;
 
 import java.util.List;
 import java.util.Optional;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.rem.springboot.dto.CommentDto;
@@ -13,6 +14,8 @@ import com.rem.springboot.exception.PostNotFoundException;
 import com.rem.springboot.exception.UserNotFoundException;
 import com.rem.springboot.payload.request.CommentCreateRequest;
 import com.rem.springboot.payload.request.CommentReadCondition;
+import com.rem.springboot.payload.request.CommentUpdateRequest;
+import com.rem.springboot.payload.response.CommentUpdateResponse;
 import com.rem.springboot.repository.CommentRepository;
 import com.rem.springboot.repository.PostRepository;
 import com.rem.springboot.repository.UserRepository;
@@ -40,5 +43,13 @@ public class CommentServiceImpl {
   public List<CommentDto> readAll(CommentReadCondition condition) {
     return CommentDto.toDtoList(
         commentRepository.findAllWithUserAndParentByPostIdOrderByParentIdAscNullsFirstCommentIdAsc(condition.getPostId()));
+  }
+
+  @Transactional
+  @PreAuthorize("@commentGuard.isResourceOwner(#id)")
+  public CommentUpdateResponse update(Long id, CommentUpdateRequest request) {
+    Comment comment = commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
+    comment.update(request.getContent());
+    return new CommentUpdateResponse(id);
   }
 }

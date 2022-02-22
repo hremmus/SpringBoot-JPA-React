@@ -3,6 +3,7 @@ package com.rem.springboot.web;
 import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +18,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rem.springboot.payload.request.CommentCreateRequest;
 import com.rem.springboot.payload.request.CommentReadCondition;
+import com.rem.springboot.payload.request.CommentUpdateRequest;
 import com.rem.springboot.service.CommentServiceImpl;
 
 @ExtendWith(MockitoExtension.class)
@@ -62,5 +64,17 @@ class CommentControllerTest {
     .andExpect(status().isOk());
 
     verify(commentService).readAll(refEq(condition));
+  }
+
+  @Test
+  void updateTest() throws Exception {
+    // given
+    CommentUpdateRequest request = new CommentUpdateRequest("updated content");
+
+    // when, then
+    mockMvc.perform(
+        patch("/api/comments/{id}", 1L)
+        .param("content", request.getContent()))
+    .andExpect(status().isOk());
   }
 }
