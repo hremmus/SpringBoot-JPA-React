@@ -133,7 +133,7 @@ class CommentRepositoryTest {
     em.clear();
 
     // when
-    Comment comment = commentRepository.findByIdIfParentPresent(child.getId()).orElseThrow(CommentNotFoundException::new);
+    Comment comment = commentRepository.findByIdWithParent(child.getId()).orElseThrow(CommentNotFoundException::new);
 
     // then
     assertThat(comment.getParent().getContent()).isEqualTo("comment1");
@@ -158,7 +158,7 @@ class CommentRepositoryTest {
     em.clear();
 
     // when
-    Comment comment = commentRepository.findByIdIfParentPresent(comment5.getId()).orElseThrow(CommentNotFoundException::new);
+    Comment comment = commentRepository.findByIdWithParent(comment5.getId()).orElseThrow(CommentNotFoundException::new);
     comment.findDeletableComment().ifPresentOrElse(c -> commentRepository.delete(c), () -> comment5.delete());
     em.flush();
     em.clear();
@@ -187,7 +187,7 @@ class CommentRepositoryTest {
     em.clear();
 
     // when
-    Comment comment = commentRepository.findByIdIfParentPresent(comment5.getId()).orElseThrow(CommentNotFoundException::new);
+    Comment comment = commentRepository.findByIdWithParent(comment5.getId()).orElseThrow(CommentNotFoundException::new);
     comment.findDeletableComment().ifPresentOrElse(c -> commentRepository.delete(c), () -> comment5.delete());
     em.flush();
     em.clear();

@@ -2,6 +2,7 @@ package com.rem.springboot.web;
 
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,5 +44,12 @@ public class CommentController {
   @ResponseStatus(HttpStatus.OK)
   public Response update(@PathVariable Long id, @Valid @RequestParam("content") CommentUpdateRequest request) {
     return Response.success(commentService.update(id, request));
+  }
+
+  @DeleteMapping("/comments/{id}")
+  @ResponseStatus(HttpStatus.OK)
+  public Response delete(@PathVariable Long id) {
+    commentService.delete(id);
+    return Response.success();
   }
 }

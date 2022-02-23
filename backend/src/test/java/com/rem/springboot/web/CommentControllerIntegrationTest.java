@@ -2,6 +2,7 @@ package com.rem.springboot.web;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -189,6 +190,60 @@ class CommentControllerIntegrationTest {
         patch("/api/comments/{id}", comment.getId())
         .param("content", request.getContent())
         .header("Authorization", adminLoginResponse.getAccessToken()))
+    .andExpect(status().isForbidden());
+  }
+
+  @Test
+  void deleteByResourceOwnerTest() throws Exception {
+    // given
+    LoginResponse loginResponse = authService.login(new LoginRequest(initDB.getUser1Email(), initDB.getPassword()));
+    Comment comment = commentRepository.save(new Comment("content", user1, post, null));
+
+    // when, then
+    mockMvc.perform(
+        delete("/api/comments/{id}", comment.getId())
+        .header("Authorization", loginResponse.getAccessToken()))
+    .andExpect(status().isOk());
+
+    assertThat(commentRepository.findById(comment.getId())).isEmpty();
+  }
+
+  @Test
+  void deleteByAdminTest() throws Exception {
+    // given
+    LoginResponse adminLoginResponse = authService.login(new LoginRequest(initDB.getAdminEmail(), initDB.getPassword()));
+    Comment comment = commentRepository.save(new Comment("content", user1, post, null));
+
+    // when, then
+    mockMvc.perform(
+        delete("/api/comments/{id}", comment.getId())
+        .header("Authorization", adminLoginResponse.getAccessToken()))
+    .andExpect(status().isOk());
+
+    assertThat(commentRepository.findById(comment.getId())).isEmpty();
+  }
+
+  @Test
+  void deleteUnauthorizedByNoneTokenTest() throws Exception {
+    // given
+    Comment comment = commentRepository.save(new Comment("content", user1, post, null));
+
+    // when, then
+    mockMvc.perform(
+        delete("/api/comments/{id}", comment.getId()))
+    .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void deleteAccessDeniedByNotResourceOwnerTest() throws Exception {
+    // given
+    LoginResponse loginResponse = authService.login(new LoginRequest(initDB.getUser1Email(), initDB.getPassword()));
+    Comment comment = commentRepository.save(new Comment("content", user2, post, null));
+
+    // when, then
+    mockMvc.perform(
+        delete("/api/comments/{id}", comment.getId())
+        .header("Authorization", loginResponse.getAccessToken()))
     .andExpect(status().isForbidden());
   }
 }
