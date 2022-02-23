@@ -2,6 +2,7 @@ package com.rem.springboot.web;
 
 import static org.mockito.ArgumentMatchers.refEq;
 import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -76,5 +77,18 @@ class CommentControllerTest {
         patch("/api/comments/{id}", 1L)
         .param("content", request.getContent()))
     .andExpect(status().isOk());
+  }
+
+  @Test
+  void deleteTest() throws Exception {
+    // given
+    Long id = 1L;
+
+    // when, then
+    mockMvc.perform(
+        delete("/api/comments/{id}", id))
+    .andExpect(status().isOk());
+
+    verify(commentService).delete(id);
   }
 }

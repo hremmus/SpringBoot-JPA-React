@@ -52,4 +52,11 @@ public class CommentServiceImpl {
     comment.update(request.getContent());
     return new CommentUpdateResponse(id);
   }
+
+  @Transactional
+  @PreAuthorize("@commentGuard.check(#id)")
+  public void delete(Long id) {
+    Comment comment = commentRepository.findById(id).orElseThrow(CommentNotFoundException::new);
+    comment.findDeletableComment().ifPresentOrElse(commentRepository::delete, comment::delete);
+  }
 }
