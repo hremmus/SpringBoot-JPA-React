@@ -20,12 +20,14 @@ public class CommentDto {
   private UserDto user;
   @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
   private LocalDateTime createdDate;
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
+  private LocalDateTime modifiedDate;
   private List<CommentDto> children;
 
   public static List<CommentDto> toDtoList(List<Comment> comments) {
     HierarchicalStructureConverter converter = HierarchicalStructureConverter.newInstance(
         comments,
-        c -> new CommentDto(c.getId(), c.isDeleted() ? null : c.getContent(), c.isDeleted() ? null : UserDto.toDto(c.getUser()), c.getCreatedDate(), new ArrayList<>()),
+        c -> new CommentDto(c.getId(), c.isDeleted() ? null : c.getContent(), c.isDeleted() ? null : UserDto.toDto(c.getUser()), c.getCreatedDate(), c.getModifiedDate(), new ArrayList<>()),
         c -> c.getParent(),
         c -> c.getId(),
         d -> d.getChildren());
