@@ -1,6 +1,6 @@
 import HeaderContainer from "containers/HeaderContainer";
+import Auth from "pages/Auth";
 import Home from "pages/Home";
-import Login from "pages/Login";
 import React from "react";
 import { Route, Routes } from "react-router-dom";
 
@@ -10,7 +10,7 @@ const App = () => {
       <HeaderContainer />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/auth/*" element={<Auth />} />
       </Routes>
     </div>
   );

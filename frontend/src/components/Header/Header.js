@@ -1,3 +1,4 @@
+import Bg from "assets/img/green-top.png";
 import { media } from "lib/styleUtils";
 import oc from "open-color";
 import React from "react";
@@ -18,7 +19,7 @@ const Top = styled.div`
   display: inline-block;
   height: 45px;
   width: 100%;
-  background: url(img/green-top.png), hsla(15, 14%, 95%, 0.85);
+  background: url(${Bg});
   background-position: top bottom;
   background-repeat: repeat-x;
   background-size: 100% 100%;
