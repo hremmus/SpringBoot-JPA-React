@@ -20,8 +20,12 @@ import com.rem.springboot.payload.request.SignUpRequest;
 import com.rem.springboot.payload.response.LoginResponse;
 import com.rem.springboot.security.JwtUtils;
 import com.rem.springboot.service.AuthServiceImpl;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
+import springfox.documentation.annotations.ApiIgnore;
 
+@Api(value = "Auth Controller", tags = "Auth")
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/auth")
@@ -30,6 +34,7 @@ public class AuthController {
   private final AuthServiceImpl authService;
   private final JwtUtils refreshTokenProvider;
 
+  @ApiOperation("회원 가입")
   @PostMapping("/signup")
   @ResponseStatus(HttpStatus.CREATED)
   public Response registerUser(@Valid @RequestBody SignUpRequest request) throws RoleNotFoundException {
@@ -37,6 +42,7 @@ public class AuthController {
     return success();
   }
 
+  @ApiOperation(value = "로그인", notes="로그인 성공 시 JWT 토큰을 반환한다.")
   @PostMapping("/signin")
   @ResponseStatus(HttpStatus.OK)
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest request) {
@@ -49,9 +55,10 @@ public class AuthController {
         .body(success(response));
   }
 
+  @ApiOperation(value = "토큰 재발급", notes="리프레시 토큰을 넘겨 받아 새 액세스 토큰을 발급한다.")
   @PostMapping("/refreshtoken")
   @ResponseStatus(HttpStatus.OK)
-  public Response refreshToken(@RequestHeader(value = "Authorization") String refreshToken) {
+  public Response refreshToken(@ApiIgnore @RequestHeader("Authorization") String refreshToken) {
     return success(authService.refreshToken(refreshToken));
   }
 }

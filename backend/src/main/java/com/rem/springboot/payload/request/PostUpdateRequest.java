@@ -4,23 +4,30 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.NotBlank;
 import org.springframework.web.multipart.MultipartFile;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@ApiModel(value = "게시글 수정 요청")
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 public class PostUpdateRequest {
-  @NotBlank
+  @ApiModelProperty(value = "게시글 제목", notes = "제목을 입력하세요.", required = true, example = "title")
+  @NotBlank(message = "{postUpdateRequest.title.notBlank}")
   private String title;
 
-  @NotBlank
+  @ApiModelProperty(value = "게시글 본문", notes = "본문을 입력하세요.", required = true, example = "mcontent")
+  @NotBlank(message = "{postUpdateRequest.content.notBlank}")
   private String content;
 
+  @ApiModelProperty(value = "이미지 추가", notes = "이미지를 첨부하세요.")
   private List<MultipartFile> addedImages = new ArrayList<>();
 
+  @ApiModelProperty(value = "이미지 제거", notes = "제거할 이미지의 번호를 입력하세요.")
   private List<Long> deletedImages = new ArrayList<>();
 }

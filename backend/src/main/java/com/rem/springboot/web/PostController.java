@@ -17,14 +17,19 @@ import com.rem.springboot.dto.Response;
 import com.rem.springboot.payload.request.PostCreateRequest;
 import com.rem.springboot.payload.request.PostUpdateRequest;
 import com.rem.springboot.service.PostServiceImpl;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 
+@Api(value = "Post Controller", tags = "Post")
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class PostController {
   private final PostServiceImpl postService;
 
+  @ApiOperation("게시글 생성")
   @PostMapping("/posts")
   @ResponseStatus(HttpStatus.CREATED)
   @AssignUserId
@@ -32,27 +37,32 @@ public class PostController {
     return Response.success(postService.create(request));
   }
 
+  @ApiOperation("게시글 목록 조회")
   @GetMapping("/posts")
   @ResponseStatus(HttpStatus.OK)
   public Response readAll(@Valid PostReadCondition condition) {
     return Response.success(postService.readAll(condition));
   }
 
+  @ApiOperation("게시글 조회")
   @GetMapping("/posts/{id}")
   @ResponseStatus(HttpStatus.OK)
-  public Response read(@PathVariable Long id) {
+  public Response read(@ApiParam(value = "게시글 ID", required = true) @PathVariable Long id) {
     return Response.success(postService.read(id));
   }
 
+  @ApiOperation("게시글 수정")
   @PutMapping("/posts/{id}")
   @ResponseStatus(HttpStatus.OK)
-  public Response update(@PathVariable Long id, @Valid @ModelAttribute PostUpdateRequest request) {
+  public Response update(@ApiParam(value = "게시글 ID", required = true) @PathVariable Long id,
+      @Valid @ModelAttribute PostUpdateRequest request) {
     return Response.success(postService.update(id, request));
   }
 
+  @ApiOperation("게시글 삭제")
   @DeleteMapping("/posts/{id}")
   @ResponseStatus(HttpStatus.OK)
-  public Response delete(@PathVariable Long id) {
+  public Response delete(@ApiParam(value = "게시글 ID", required = true) @PathVariable Long id) {
     postService.delete(id);
     return Response.success();
   }

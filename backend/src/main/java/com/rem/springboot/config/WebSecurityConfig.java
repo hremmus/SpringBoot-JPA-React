@@ -27,6 +27,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   public void configure(WebSecurity webSecurity) {
     webSecurity
     .ignoring().antMatchers("/h2-console/**", "/favicon.ico");
+
+    webSecurity
+    .ignoring().mvcMatchers("/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**");
   }
 
   @Override
