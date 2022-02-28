@@ -12,7 +12,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CommentReadCondition {
-  @NotNull
-  @PositiveOrZero
+  @NotNull(message = "게시글 번호를 입력하세요.")
+  @PositiveOrZero(message = "게시글 번호를 올바르게 입력하세요.")
   private Long postId;
 }

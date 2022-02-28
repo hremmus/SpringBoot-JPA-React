@@ -18,14 +18,19 @@ import com.rem.springboot.payload.request.CommentCreateRequest;
 import com.rem.springboot.payload.request.CommentReadCondition;
 import com.rem.springboot.payload.request.CommentUpdateRequest;
 import com.rem.springboot.service.CommentServiceImpl;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 
+@Api(value = "Comment Controller", tags = "Comment")
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class CommentController {
   private final CommentServiceImpl commentService;
 
+  @ApiOperation("댓글 생성")
   @PostMapping("/comments")
   @ResponseStatus(HttpStatus.CREATED)
   @AssignUserId
@@ -34,21 +39,25 @@ public class CommentController {
     return Response.success();
   }
 
+  @ApiOperation("해당 게시글의 모든 댓글 조회")
   @GetMapping("/comments")
   @ResponseStatus(HttpStatus.OK)
   public Response readAll(@Valid CommentReadCondition condition) {
     return Response.success(commentService.readAll(condition));
   }
 
+  @ApiOperation("댓글 수정")
   @PatchMapping("/comments/{id}")
   @ResponseStatus(HttpStatus.OK)
-  public Response update(@PathVariable Long id, @Valid @RequestParam("content") CommentUpdateRequest request) {
+  public Response update(@ApiParam(value = "댓글 ID", required = true) @PathVariable Long id,
+      @Valid @RequestParam("content") CommentUpdateRequest request) {
     return Response.success(commentService.update(id, request));
   }
 
+  @ApiOperation("댓글 삭제")
   @DeleteMapping("/comments/{id}")
   @ResponseStatus(HttpStatus.OK)
-  public Response delete(@PathVariable Long id) {
+  public Response delete(@ApiParam(value = "댓글 ID", required = true) @PathVariable Long id) {
     commentService.delete(id);
     return Response.success();
   }
