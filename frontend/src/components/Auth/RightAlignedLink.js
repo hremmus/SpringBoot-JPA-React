@@ -14,12 +14,12 @@ const StyledLink = styled(Link)`
   }
 `;
 
-const RightAlignedLink = () => {
+const RightAlignedLink = ({ href, children }) => {
   return (
     <StylesProvider injectFirst>
       <Aligner>
-        <StyledLink href="/auth/join" underline="always">
-          회원가입
+        <StyledLink href={href} underline="always">
+          {children}
         </StyledLink>
       </Aligner>
     </StylesProvider>

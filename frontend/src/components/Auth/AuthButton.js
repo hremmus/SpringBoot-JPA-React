@@ -28,8 +28,8 @@ const Wrapper = styled.div`
   }
 `;
 
-const LoginButton = ({ children, onClick }) => (
+const AuthButton = ({ children, onClick }) => (
   <Wrapper onClick={onClick}>{children}</Wrapper>
 );
 
-export default LoginButton;
+export default AuthButton;
