@@ -1,5 +1,5 @@
+import LoginButton from "components/Auth/AuthButton";
 import InputWithLabel from "components/Auth/InputWithLabel";
-import LoginButton from "components/Auth/LoginButton";
 import RightAlignedLink from "components/Auth/RightAlignedLink";
 import React, { Component } from "react";
 
@@ -16,7 +16,7 @@ export default class LoginContainer extends Component {
           variant="standard"
         />
         <LoginButton>로그인</LoginButton>
-        <RightAlignedLink />
+        <RightAlignedLink href="/auth/join">회원가입</RightAlignedLink>
       </div>
     );
   }

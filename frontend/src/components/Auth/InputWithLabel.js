@@ -4,6 +4,7 @@ import React from "react";
 
 const StyledTextField = styled(TextField)({
   width: "100%",
+  marginTop: "0.5rem",
   marginBottom: "1rem",
 });
 
