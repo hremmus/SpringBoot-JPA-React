@@ -3,8 +3,10 @@ import InputWithLabel from "components/Auth/InputWithLabel";
 import RightAlignedLink from "components/Auth/RightAlignedLink";
 import React from "react";
 import { connect } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import * as authActions from "redux/modules/auth";
+import { joinUser } from "services/AuthService";
 
 const JoinContainer = (props) => {
   const handleChange = (e) => {
@@ -18,7 +20,19 @@ const JoinContainer = (props) => {
     });
   };
 
+  const navigate = useNavigate();
   const { email, password, passwordConfirm, nickname } = props.form.toJS();
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    joinUser({ email, password, passwordConfirm, nickname }).then(
+      (response) => {
+        if (response.status === 201) {
+          navigate("/");
+        }
+      }
+    );
+  };
 
   return (
     <div>
@@ -62,7 +76,7 @@ const JoinContainer = (props) => {
         value={nickname}
         onChange={handleChange}
       />
-      <AuthButton>회원가입</AuthButton>
+      <AuthButton onClick={handleSubmit}>회원가입</AuthButton>
       <RightAlignedLink href="/auth/login">돌아가기</RightAlignedLink>
     </div>
   );
