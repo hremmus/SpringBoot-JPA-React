@@ -9,11 +9,10 @@ export const loginUser = ({ email, password }) => {
   });
 };
 
-export const joinUser = ({ email, password, passwordConfirm, nickname }) => {
+export const joinUser = ({ email, password, nickname }) => {
   return axios.post(API_BASE_URL + "/signup/", {
     email,
     password,
-    passwordConfirm,
     nickname,
   });
 };
