@@ -1,4 +1,5 @@
 import LoginButton from "components/Auth/AuthButton";
+import AuthError from "components/Auth/AuthError";
 import InputWithLabel from "components/Auth/InputWithLabel";
 import RightAlignedLink from "components/Auth/RightAlignedLink";
 import React from "react";
@@ -22,14 +23,26 @@ const LoginContainer = (props) => {
 
   const navigate = useNavigate();
   const { email, password } = props.form.toJS();
+  const { error } = props;
+
+  const setError = (message) => {
+    const { AuthActions } = props;
+    AuthActions.setError({
+      form: "login",
+      message,
+    });
+  };
 
   const handleSubmit = (e) => {
-    e.preventDefault();
-    loginUser({ email, password }).then((response) => {
-      if (response.status === 200) {
-        navigate("/");
-      }
-    });
+    loginUser({ email, password })
+      .then((response) => {
+        if (response.data.success) {
+          navigate("/");
+        }
+      })
+      .catch((error) => {
+        setError(error.response.data.result.message);
+      });
   };
 
   return (
@@ -50,6 +63,7 @@ const LoginContainer = (props) => {
         value={password}
         onChange={handleChange}
       />
+      {error && <AuthError>{error}</AuthError>}
       <LoginButton onClick={handleSubmit}>로그인</LoginButton>
       <RightAlignedLink href="/auth/join">회원가입</RightAlignedLink>
     </div>
@@ -59,6 +73,7 @@ const LoginContainer = (props) => {
 export default connect(
   (state) => ({
     form: state.auth.getIn(["login", "form"]),
+    error: state.auth.getIn(["login", "error"]),
   }),
   (dispatch) => ({
     AuthActions: bindActionCreators(authActions, dispatch),

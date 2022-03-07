@@ -22,6 +22,7 @@ const initialState = Map({
       email: "",
       password: "",
     }),
+    error: null,
   }),
 });
 

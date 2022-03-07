@@ -35,7 +35,7 @@ public class ExceptionAdvice {
   @ExceptionHandler(LoginFailureException.class)
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   public Response loginFailureException() {
-    return Response.failure(-1004, "로그인에 실패하였습니다.");
+    return Response.failure(-1004, "아이디 또는 비밀번호를 잘못 입력했습니다.");
   }
 
   @ExceptionHandler(UserEmailAlreadyExistsException.class)
