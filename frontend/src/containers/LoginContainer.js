@@ -1,3 +1,4 @@
+import axios from "axios";
 import LoginButton from "components/Auth/AuthButton";
 import AuthError from "components/Auth/AuthError";
 import InputWithLabel from "components/Auth/InputWithLabel";
@@ -37,11 +38,13 @@ const LoginContainer = (props) => {
     loginUser({ email, password })
       .then((response) => {
         if (response.data.success) {
+          const accessToken = response.data.result.data.accessToken;
+          axios.defaults.headers.common["Authorization"] = `${accessToken}`;
           navigate("/");
         }
       })
       .catch((error) => {
-        setError(error.response.data.result.message);
+        setError(error.data.result.message);
       });
   };
 
