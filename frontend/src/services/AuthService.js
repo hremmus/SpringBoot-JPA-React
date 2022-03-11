@@ -1,16 +1,16 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:8080/api/auth";
+const baseURL = "http://localhost:8080/api/auth";
 
 export const loginUser = ({ email, password }) => {
-  return axios.post(API_BASE_URL + "/signin/", {
+  return axios.post(baseURL + "/signin/", {
     email,
     password,
   });
 };
 
 export const joinUser = ({ email, password, nickname }) => {
-  return axios.post(API_BASE_URL + "/signup/", {
+  return axios.post(baseURL + "/signup/", {
     email,
     password,
     nickname,

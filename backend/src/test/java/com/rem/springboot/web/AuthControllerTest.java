@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.rem.springboot.dto.UserDto;
 import com.rem.springboot.payload.request.LoginRequest;
 import com.rem.springboot.payload.request.SignUpRequest;
 import com.rem.springboot.payload.response.LoginResponse;
@@ -58,7 +59,7 @@ class AuthControllerTest {
   void loginTest() throws Exception {
     // given
     LoginRequest request = new LoginRequest("user@email.com", "password");
-    given(authService.login(request)).willReturn(new LoginResponse("access", "refresh"));
+    given(authService.login(request)).willReturn(new LoginResponse(new UserDto(1L, "user@email.com", "nickname"), "access", "refresh"));
 
     // when, then
     mockMvc.perform(

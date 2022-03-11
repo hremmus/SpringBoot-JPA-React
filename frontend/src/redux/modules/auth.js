@@ -24,6 +24,7 @@ const initialState = Map({
     }),
     error: null,
   }),
+  result: Map({}),
 });
 
 export default handleActions(
