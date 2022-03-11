@@ -2,6 +2,7 @@ package com.rem.springboot.web;
 
 import static com.rem.springboot.dto.Response.success;
 import javax.management.relation.RoleNotFoundException;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -45,11 +46,10 @@ public class AuthController {
   @ApiOperation(value = "로그인", notes="로그인 성공 시 JWT 토큰을 반환한다.")
   @PostMapping("/signin")
   @ResponseStatus(HttpStatus.OK)
-  public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest request) {
+  public ResponseEntity<?> authenticateUser(HttpServletRequest httpServletRequest, @Valid @RequestBody LoginRequest request) {
     LoginResponse response = authService.login(request);
     ResponseCookie jwtCookie = refreshTokenProvider.createJwtCookie(response.getRefreshToken());
     response.setRefreshToken(null);
-
     return ResponseEntity.ok()
         .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
         .body(success(response));

@@ -9,6 +9,7 @@ import javax.management.relation.RoleNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.rem.springboot.dto.UserDto;
 import com.rem.springboot.entity.ERole;
 import com.rem.springboot.entity.Role;
 import com.rem.springboot.entity.User;
@@ -73,7 +74,7 @@ public class AuthServiceImpl {
     JwtUtils.PrivateClaims privateClaims = createPrivateClaims(user);
     String accessToken = accessTokenProvider.createToken(privateClaims);
     String refreshToken = refreshTokenProvider.createToken(privateClaims);
-    return new LoginResponse(accessToken, refreshToken);
+    return new LoginResponse(UserDto.toDto(user), accessToken, refreshToken);
   }
 
   public RefreshTokenResponse refreshToken(String refreshToken) {

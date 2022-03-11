@@ -8,6 +8,7 @@ import { connect } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import * as authActions from "redux/modules/auth";
+import * as userActions from "redux/modules/user";
 import { loginUser } from "services/AuthService";
 
 const LoginContainer = (props) => {
@@ -35,16 +36,21 @@ const LoginContainer = (props) => {
   };
 
   const handleSubmit = (e) => {
+    const { UserActions } = props;
+
     loginUser({ email, password })
       .then((response) => {
         if (response.data.success) {
-          const accessToken = response.data.result.data.accessToken;
-          axios.defaults.headers.common["Authorization"] = `${accessToken}`;
-          navigate("/");
+          axios.defaults.headers.common[
+            "Authorization"
+          ] = `${response.data.result.data.accessToken}`;
+          UserActions.setLoggedInfo(response.data.result.data.user);
         }
+
+        navigate("/");
       })
       .catch((error) => {
-        setError(error.data.result.message);
+        setError(error.response.data.result.message);
       });
   };
 
@@ -77,8 +83,10 @@ export default connect(
   (state) => ({
     form: state.auth.getIn(["login", "form"]),
     error: state.auth.getIn(["login", "error"]),
+    result: state.auth.get("result"),
   }),
   (dispatch) => ({
     AuthActions: bindActionCreators(authActions, dispatch),
+    UserActions: bindActionCreators(userActions, dispatch),
   })
 )(LoginContainer);
