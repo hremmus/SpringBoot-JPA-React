@@ -16,3 +16,7 @@ export const joinUser = ({ email, password, nickname }) => {
     nickname,
   });
 };
+
+export const logoutUser = () => {
+  return axios.get(baseURL + "/signout/");
+};
