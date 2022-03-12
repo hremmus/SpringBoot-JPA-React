@@ -3,12 +3,15 @@ package com.rem.springboot.web;
 import static com.rem.springboot.dto.Response.success;
 import javax.management.relation.RoleNotFoundException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -20,8 +23,11 @@ import com.rem.springboot.payload.request.LoginRequest;
 import com.rem.springboot.payload.request.SignUpRequest;
 import com.rem.springboot.payload.response.LoginResponse;
 import com.rem.springboot.security.JwtUtils;
+import com.rem.springboot.security.UserDetailsImpl;
 import com.rem.springboot.service.AuthServiceImpl;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import springfox.documentation.annotations.ApiIgnore;
@@ -60,5 +66,19 @@ public class AuthController {
   @ResponseStatus(HttpStatus.OK)
   public Response refreshToken(@ApiIgnore @RequestHeader("Authorization") String refreshToken) {
     return success(authService.refreshToken(refreshToken));
+  }
+
+  @ApiOperation("로그아웃")
+  @GetMapping("/signout")
+  @ResponseStatus(HttpStatus.OK)
+  @ApiImplicitParams({
+    @ApiImplicitParam(name = "Authorization", value = "accessToken", required = true, dataType = "String", paramType = "header")
+  })
+  public Response logout(@ApiIgnore HttpServletResponse response, @ApiIgnore @AuthenticationPrincipal UserDetailsImpl userDetails) {
+    authService.logout(Long.valueOf(userDetails.getId()));
+    ResponseCookie responseCookie = ResponseCookie.from("refreshToken", "").path("/api").httpOnly(true).maxAge(0).build();
+    response.setHeader(HttpHeaders.AUTHORIZATION, null);
+    response.setHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
+    return success();
   }
 }

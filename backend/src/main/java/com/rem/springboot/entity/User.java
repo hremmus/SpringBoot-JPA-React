@@ -55,4 +55,10 @@ public class User extends EntityDate {
   @Setter
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<UserRole> roles = new HashSet<>();
+
+  private String refreshToken;
+
+  public void setRefreshToken(String refreshToken) {
+    this.refreshToken = refreshToken;
+  }
 }

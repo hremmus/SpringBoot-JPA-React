@@ -4,6 +4,7 @@ import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
@@ -166,4 +167,17 @@ public class AuthServiceImplTest {
     .isInstanceOf(RefreshTokenFailureException.class);
   }
 
+  @Test
+  void logoutTest() {
+    // given
+    User user = new User("user@email.com", "password", "nickname", emptyList());
+    user.setRefreshToken("refreshToken");
+    given(userRepository.findById(anyLong())).willReturn(Optional.ofNullable(user));
+
+    // when
+    authService.logout(anyLong());
+
+    // then
+    assertThat(user.getRefreshToken()).isEqualTo("");
+  }
 }

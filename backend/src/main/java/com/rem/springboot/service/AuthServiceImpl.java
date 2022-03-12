@@ -18,6 +18,7 @@ import com.rem.springboot.exception.LoginFailureException;
 import com.rem.springboot.exception.RefreshTokenFailureException;
 import com.rem.springboot.exception.UserEmailAlreadyExistsException;
 import com.rem.springboot.exception.UserNicknameAlreadyExistsException;
+import com.rem.springboot.exception.UserNotFoundException;
 import com.rem.springboot.payload.request.LoginRequest;
 import com.rem.springboot.payload.request.SignUpRequest;
 import com.rem.springboot.payload.response.LoginResponse;
@@ -74,6 +75,7 @@ public class AuthServiceImpl {
     JwtUtils.PrivateClaims privateClaims = createPrivateClaims(user);
     String accessToken = accessTokenProvider.createToken(privateClaims);
     String refreshToken = refreshTokenProvider.createToken(privateClaims);
+    user.setRefreshToken(refreshToken);
     return new LoginResponse(UserDto.toDto(user), accessToken, refreshToken);
   }
 
@@ -104,5 +106,9 @@ public class AuthServiceImpl {
         .map(role -> role.getName())
         .map(eRole -> eRole.toString())
         .collect(Collectors.toList()));
+  }
+
+  public void logout(Long userId) {
+    userRepository.findById(userId).orElseThrow(UserNotFoundException::new).setRefreshToken("");
   }
 }
