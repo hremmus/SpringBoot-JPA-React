@@ -2,52 +2,53 @@ import AuthButton from "components/Auth/AuthButton";
 import AuthError from "components/Auth/AuthError";
 import InputWithLabel from "components/Auth/InputWithLabel";
 import RightAlignedLink from "components/Auth/RightAlignedLink";
-import React from "react";
-import { connect } from "react-redux";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { bindActionCreators } from "redux";
-import * as authActions from "redux/modules/auth";
+import { changeInput, initializeForm, setError } from "redux/modules/auth";
 import { joinUser } from "services/AuthService";
 
 const JoinContainer = (props) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { form, authError } = useSelector(({ auth }) => ({
+    form: auth.join,
+    authError: auth.authError,
+  }));
+
+  useEffect(() => {
+    dispatch(initializeForm("join"));
+  }, [dispatch]);
+
   const handleChange = (e) => {
-    const { AuthActions } = props;
     const { name, value } = e.target;
 
-    AuthActions.changeInput({
-      name,
-      value,
-      form: "join",
-    });
-  };
-
-  const navigate = useNavigate();
-  const { email, password, passwordConfirm, nickname } = props.form.toJS();
-  const { error } = props;
-
-  const setError = (message) => {
-    const { AuthActions } = props;
-    AuthActions.setError({
-      form: "join",
-      message,
-    });
+    dispatch(
+      changeInput({
+        form: "join",
+        key: name,
+        value,
+      })
+    );
   };
 
   const handleSubmit = (e) => {
-    if (password !== passwordConfirm) {
-      setError("비밀번호가 일치하지 않습니다.");
+    if (form.password !== form.passwordConfirm) {
+      dispatch(setError("비밀번호가 일치하지 않습니다."));
       return;
     }
 
-    joinUser({ email, password, nickname })
-      .then((response) => {
-        if (response.data.success) {
-          navigate("/");
-        }
-      })
-      .catch((error) => {
-        setError(error.response.data.result.message);
-      });
+    dispatch(
+      joinUser(form)
+        .then((response) => {
+          if (response.data.success) {
+            navigate("/");
+          }
+        })
+        .catch((error) => {
+          dispatch(setError(error.response.data.result.message));
+        })
+    );
   };
 
   return (
@@ -58,7 +59,7 @@ const JoinContainer = (props) => {
         label="이메일"
         variant="outlined"
         size="small"
-        value={email}
+        value={form.email}
         onChange={handleChange}
       />
       <InputWithLabel
@@ -69,7 +70,7 @@ const JoinContainer = (props) => {
         placeholder="영문, 숫자, 특수문자 조합으로 8~20자"
         variant="outlined"
         size="small"
-        value={password}
+        value={form.password}
         onChange={handleChange}
       />
       <InputWithLabel
@@ -79,7 +80,7 @@ const JoinContainer = (props) => {
         label="비밀번호 확인"
         variant="outlined"
         size="small"
-        value={passwordConfirm}
+        value={form.passwordConfirm}
         onChange={handleChange}
       />
       <InputWithLabel
@@ -89,22 +90,14 @@ const JoinContainer = (props) => {
         placeholder="영문 또는 한글로 최대 10자까지 가능"
         variant="outlined"
         size="small"
-        value={nickname}
+        value={form.nickname}
         onChange={handleChange}
       />
-      {error && <AuthError>{error}</AuthError>}
+      {authError && <AuthError>{authError}</AuthError>}
       <AuthButton onClick={handleSubmit}>회원가입</AuthButton>
       <RightAlignedLink href="/auth/login">돌아가기</RightAlignedLink>
     </div>
   );
 };
 
-export default connect(
-  (state) => ({
-    form: state.auth.getIn(["join", "form"]),
-    error: state.auth.getIn(["join", "error"]),
-  }),
-  (dispatch) => ({
-    AuthActions: bindActionCreators(authActions, dispatch),
-  })
-)(JoinContainer);
+export default JoinContainer;

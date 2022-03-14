@@ -3,54 +3,53 @@ import LoginButton from "components/Auth/AuthButton";
 import AuthError from "components/Auth/AuthError";
 import InputWithLabel from "components/Auth/InputWithLabel";
 import RightAlignedLink from "components/Auth/RightAlignedLink";
-import React from "react";
-import { connect } from "react-redux";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { bindActionCreators } from "redux";
-import * as authActions from "redux/modules/auth";
-import * as userActions from "redux/modules/user";
+import { setLoggedInfo } from "redux/modules/user";
 import { loginUser } from "services/AuthService";
+import { changeInput, initializeForm, setError } from "./../redux/modules/auth";
 
 const LoginContainer = (props) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { form, authError } = useSelector(({ auth }) => ({
+    form: auth.login,
+    authError: auth.authError,
+  }));
+
+  useEffect(() => {
+    dispatch(initializeForm("login"));
+  }, [dispatch]);
+
   const handleChange = (e) => {
-    const { AuthActions } = props;
     const { name, value } = e.target;
 
-    AuthActions.changeInput({
-      name,
-      value,
-      form: "login",
-    });
-  };
-
-  const navigate = useNavigate();
-  const { email, password } = props.form.toJS();
-  const { error } = props;
-
-  const setError = (message) => {
-    const { AuthActions } = props;
-    AuthActions.setError({
-      form: "login",
-      message,
-    });
+    dispatch(
+      changeInput({
+        form: "login",
+        key: name,
+        value,
+      })
+    );
   };
 
   const handleSubmit = (e) => {
-    const { UserActions } = props;
+    e.preventDefault();
 
-    loginUser({ email, password })
+    loginUser(form)
       .then((response) => {
         if (response.data.success) {
           axios.defaults.headers.common[
             "Authorization"
           ] = `${response.data.result.data.accessToken}`;
-          UserActions.setLoggedInfo(response.data.result.data.user);
+          dispatch(setLoggedInfo(response.data.result.data.user));
         }
 
         navigate("/");
       })
       .catch((error) => {
-        setError(error.response.data.result.message);
+        dispatch(setError(error.response.data.result.message));
       });
   };
 
@@ -60,7 +59,7 @@ const LoginContainer = (props) => {
         name="email"
         label="이메일"
         variant="standard"
-        value={email}
+        value={form.email}
         onChange={handleChange}
       />
       <InputWithLabel
@@ -69,24 +68,14 @@ const LoginContainer = (props) => {
         label="비밀번호"
         autoComplete="current-password"
         variant="standard"
-        value={password}
+        value={form.password}
         onChange={handleChange}
       />
-      {error && <AuthError>{error}</AuthError>}
+      {authError && <AuthError>{authError}</AuthError>}
       <LoginButton onClick={handleSubmit}>로그인</LoginButton>
       <RightAlignedLink href="/auth/join">회원가입</RightAlignedLink>
     </div>
   );
 };
 
-export default connect(
-  (state) => ({
-    form: state.auth.getIn(["login", "form"]),
-    error: state.auth.getIn(["login", "error"]),
-    result: state.auth.get("result"),
-  }),
-  (dispatch) => ({
-    AuthActions: bindActionCreators(authActions, dispatch),
-    UserActions: bindActionCreators(userActions, dispatch),
-  })
-)(LoginContainer);
+export default LoginContainer;
