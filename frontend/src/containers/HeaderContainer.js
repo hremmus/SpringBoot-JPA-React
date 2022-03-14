@@ -1,13 +1,19 @@
 import { Button } from "@material-ui/core";
+import LoginButton from "components/Header/LoginButton";
 import storage from "lib/storage";
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import * as userActions from "redux/modules/user";
 import { logoutUser } from "services/AuthService";
 import Header from "../components/Header/Header";
-import LoginButton from "../components/Header/LoginButton";
 
-const HeaderContainer = ({ visible, children, user, UserActions }) => {
+const HeaderContainer = ({
+  visible,
+  children,
+  isLoggedIn,
+  loggedInfo,
+  UserActions,
+}) => {
   if (!visible) return null;
 
   const handleLogout = () => {
@@ -21,9 +27,9 @@ const HeaderContainer = ({ visible, children, user, UserActions }) => {
 
   return (
     <Header children={children}>
-      {user.get("logged") ? (
+      {isLoggedIn ? (
         <div>
-          {user.getIn(["loggedInfo", "nickname"])}님
+          {loggedInfo.nickname}님
           <Button onClick={handleLogout} size="small">
             로그아웃
           </Button>
@@ -38,7 +44,8 @@ const HeaderContainer = ({ visible, children, user, UserActions }) => {
 const mapStateToProps = (state) => ({
   visible: state.header.visible,
   children: state.header.children,
-  user: state.user,
+  isLoggedIn: state.user.isLoggedIn,
+  loggedInfo: state.user.loggedInfo,
 });
 
 const mapDispatchToProps = (dispatch) => ({
