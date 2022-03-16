@@ -3,12 +3,14 @@ import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import auth from "./auth";
 import header from "./header";
+import post from "./post";
 import user from "./user";
 
 const rootReducer = combineReducers({
   header,
   auth,
   user,
+  post,
 });
 
 const persistConfig = {

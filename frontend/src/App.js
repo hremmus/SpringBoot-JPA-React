@@ -2,20 +2,20 @@ import HeaderContainer from "containers/HeaderContainer";
 import storage from "lib/storage";
 import Auth from "pages/Auth";
 import Home from "pages/Home";
+import Posts from "pages/Posts";
 import { useEffect } from "react";
-import { connect } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Route, Routes } from "react-router-dom";
-import { bindActionCreators } from "redux";
-import * as userActions from "redux/modules/user";
+import { setLoggedInfo } from "redux/modules/user";
 
 function App() {
+  const dispatch = useDispatch();
   useEffect(() => {
     const initializeUserInfo = async () => {
       const loggedInfo = storage.get("loggedInfo"); // 로그인 정보를 로컬스토리지에서 가져옵니다.
       if (!loggedInfo) return; // 로그인 정보가 없다면 여기서 멈춥니다.
 
-      const { UserActions } = this.props;
-      UserActions.setLoggedInfo(loggedInfo);
+      dispatch(setLoggedInfo(loggedInfo));
     };
     initializeUserInfo();
   });
@@ -26,11 +26,10 @@ function App() {
       <Routes>
         <Route index element={<Home />} />
         <Route path="/auth/*" element={<Auth />} />
+        <Route path="/posts" element={<Posts />} />
       </Routes>
     </div>
   );
 }
 
-export default connect(null, (dispatch) => ({
-  UserActions: bindActionCreators(userActions, dispatch),
-}))(App);
+export default App;
