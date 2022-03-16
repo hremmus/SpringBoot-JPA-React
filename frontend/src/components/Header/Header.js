@@ -1,7 +1,6 @@
 import Bg from "assets/img/green-top.png";
 import { media } from "lib/styleUtils";
 import oc from "open-color";
-import React from "react";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
@@ -69,6 +68,7 @@ const HeaderContent = styled.div`
 
 // 로고
 const Logo = styled(Link)`
+  min-width: 200px;
   padding-bottom: 5px;
   font-size: 2rem;
   letter-spacing: 4px;
