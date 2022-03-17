@@ -6,7 +6,10 @@ import { getPosts } from "services/PostService";
 
 const PostListContainer = () => {
   const dispatch = useDispatch();
-  const posts = useSelector((state) => state.post.posts);
+  const { posts, isLoggedIn } = useSelector((state) => ({
+    posts: state.post.posts,
+    isLoggedIn: state.user.isLoggedIn,
+  }));
   useEffect(() => {
     getPosts({
       page: 0,
@@ -20,7 +23,7 @@ const PostListContainer = () => {
       .catch((error) => console.log(error));
   }, [dispatch]);
 
-  return <PostList posts={posts} />;
+  return <PostList posts={posts} showWriteButton={isLoggedIn} />;
 };
 
 export default PostListContainer;

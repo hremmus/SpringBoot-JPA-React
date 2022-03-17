@@ -3,6 +3,7 @@ import storage from "lib/storage";
 import Auth from "pages/Auth";
 import Home from "pages/Home";
 import Posts from "pages/Posts";
+import WritePost from "pages/WritePost";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { Route, Routes } from "react-router-dom";
@@ -27,6 +28,7 @@ function App() {
         <Route index element={<Home />} />
         <Route path="/auth/*" element={<Auth />} />
         <Route path="/posts" element={<Posts />} />
+        <Route path="/posts/write" element={<WritePost />} />
       </Routes>
     </div>
   );

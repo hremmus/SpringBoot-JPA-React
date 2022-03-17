@@ -1,4 +1,4 @@
-import { Grid } from "@material-ui/core";
+import { Button, Grid } from "@material-ui/core";
 import oc from "open-color";
 import styled from "styled-components";
 
@@ -11,7 +11,7 @@ const PostListBlock = styled.div`
 const WritePostButtonWrapper = styled.div`
   display: flex;
   justify-content: space-between;
-  margin-bottom: 3rem;
+  margin-bottom: 1rem;
 `;
 
 const PostItemBlock = styled.div`
@@ -43,7 +43,7 @@ const PostItem = ({ post }) => {
   );
 };
 
-const PostList = ({ posts }) => {
+const PostList = ({ posts, showWriteButton }) => {
   return (
     <PostListBlock>
       <Grid container spacing={2}>
@@ -51,7 +51,9 @@ const PostList = ({ posts }) => {
           category
         </Grid>
         <Grid item xs={10}>
-          <WritePostButtonWrapper>새 글 작성</WritePostButtonWrapper>
+          <WritePostButtonWrapper>
+            {showWriteButton && <Button href="/posts/write">글쓰기</Button>}
+          </WritePostButtonWrapper>
           {posts && (
             <div>
               {posts.map((post) => (
