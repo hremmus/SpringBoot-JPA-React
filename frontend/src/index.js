@@ -1,3 +1,7 @@
+import {
+  ThemeProvider,
+  unstable_createMuiStrictModeTheme,
+} from "@material-ui/core";
 import App from "App";
 import "index.css";
 import React from "react";
@@ -10,6 +14,7 @@ import { store } from "redux/store";
 import reportWebVitals from "reportWebVitals";
 
 const persistor = persistStore(store);
+const theme = unstable_createMuiStrictModeTheme();
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -17,7 +22,9 @@ root.render(
     <BrowserRouter>
       <Provider store={store}>
         <PersistGate loading={null} persistor={persistor}>
-          <App />
+          <ThemeProvider theme={theme}>
+            <App />
+          </ThemeProvider>
         </PersistGate>
       </Provider>
     </BrowserRouter>
