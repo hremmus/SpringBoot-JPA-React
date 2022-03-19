@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +34,7 @@ public class PostController {
   @PostMapping("/posts")
   @ResponseStatus(HttpStatus.CREATED)
   @AssignUserId
-  public Response create(@Valid @ModelAttribute PostCreateRequest request) {
+  public Response create(@Valid @RequestBody PostCreateRequest request) {
     return Response.success(postService.create(request));
   }
 
