@@ -11,7 +11,7 @@ import { VerticalAligner } from "lib/styleUtils";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { changeInput, initializeForm } from "redux/modules/post";
+import { changeInput, initialize } from "redux/modules/post";
 import { createPost } from "services/PostService";
 
 const PostWriteContainer = () => {
@@ -23,7 +23,7 @@ const PostWriteContainer = () => {
 
   useEffect(() => {
     return () => {
-      dispatch(initializeForm());
+      dispatch(initialize());
     };
   }, [dispatch]);
 

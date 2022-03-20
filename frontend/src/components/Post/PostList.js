@@ -1,5 +1,6 @@
-import { Button, Grid } from "@material-ui/core";
+import { Grid } from "@material-ui/core";
 import oc from "open-color";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 const PostListBlock = styled.div`
@@ -35,10 +36,18 @@ const PostItemBlock = styled.div`
 `;
 
 const PostItem = ({ post }) => {
+  const createdDate = new Date(post.createdDate);
+  const today = new Date();
+
   return (
     <PostItemBlock>
-      <h1>{post.title}</h1>
-      {post.nickname}, {post.createdDate}
+      <Link to={`/posts/${post.id}`}>{post.title}</Link>
+      {post.nickname},
+      {today.getDate() === createdDate.getDate() &&
+      today.getMonth() === createdDate.getMonth() &&
+      today.getFullYear() === createdDate.getFullYear()
+        ? createdDate.toLocaleTimeString()
+        : createdDate.toLocaleDateString()}
     </PostItemBlock>
   );
 };
@@ -52,7 +61,7 @@ const PostList = ({ posts, showWriteButton }) => {
         </Grid>
         <Grid item xs={10}>
           <WritePostButtonWrapper>
-            {showWriteButton && <Button href="/posts/write">글쓰기</Button>}
+            {showWriteButton && <Link to="/posts/write">글쓰기</Link>}
           </WritePostButtonWrapper>
           {posts && (
             <div>

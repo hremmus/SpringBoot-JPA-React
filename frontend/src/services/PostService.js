@@ -9,3 +9,7 @@ export const getPosts = (condition) => {
 export const createPost = ({ title, content, categoryId }) => {
   return axios.post(baseURL, { title, content, categoryId });
 };
+
+export const getPost = (id) => {
+  return axios.get(baseURL + `${id}`);
+};

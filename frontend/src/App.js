@@ -2,6 +2,7 @@ import HeaderContainer from "containers/HeaderContainer";
 import storage from "lib/storage";
 import Auth from "pages/Auth";
 import Home from "pages/Home";
+import Post from "pages/Post";
 import Posts from "pages/Posts";
 import WritePost from "pages/WritePost";
 import { useEffect } from "react";
@@ -29,6 +30,7 @@ function App() {
         <Route path="/auth/*" element={<Auth />} />
         <Route path="/posts" element={<Posts />} />
         <Route path="/posts/write" element={<WritePost />} />
+        <Route path="/posts/:postId" element={<Post />} />
       </Routes>
     </div>
   );
