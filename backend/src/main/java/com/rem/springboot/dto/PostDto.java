@@ -20,6 +20,7 @@ public class PostDto {
   private String title;
   private String content;
   private UserDto user;
+  private Long categoryId;
   private List<ImageDto> images;
 
   @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
@@ -29,7 +30,7 @@ public class PostDto {
 
   public static PostDto toDto(Post post) {
     return new PostDto(post.getId(), post.getTitle(), post.getContent(), UserDto.toDto(post.getUser()),
-        post.getImages().stream().map(i -> ImageDto.toDto(i)).collect(toList()),
+        post.getCategory().getId(), post.getImages().stream().map(i -> ImageDto.toDto(i)).collect(toList()),
         post.getCreatedDate(), post.getModifiedDate());
   }
 }

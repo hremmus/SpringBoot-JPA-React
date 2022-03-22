@@ -29,11 +29,17 @@ const PostContent = styled.div`
 `;
 
 const PostReader = ({ post }) => {
-  const { title, content, user, createdDate, modifiedDate } = post;
+  if (!post) {
+    return null;
+  }
+
+  const { title, content, user, categoryId, createdDate, modifiedDate } = post;
   return (
     <PostReaderBlock>
       <PostHead>
-        <h1>{title}</h1>
+        <h1>
+          [{categoryId}] {title}
+        </h1>
         <SubInfo
           nickname={user.nickname}
           createdDate={createdDate}

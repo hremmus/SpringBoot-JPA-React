@@ -16,7 +16,7 @@ export const readPost = createAction(READ_POST, (post) => post);
 
 const initialState = {
   posts: [],
-  post: { title: "", content: "", user: { nickname: "" }, categoryId: "" },
+  post: null,
 };
 
 const post = handleActions(
