@@ -7,7 +7,7 @@ const PostReaderBlock = styled.div`
   padding-top: 6rem;
   padding-left: 1rem;
   padding-right: 1rem;
-  margin: 0 auto; /* 중앙 정렬 */
+  margin: 0 auto; // 중앙 정렬
   margin-top: 0.5rem;
 `;
 
@@ -28,11 +28,7 @@ const PostContent = styled.div`
   color: ${oc.gray[8]};
 `;
 
-const PostReader = ({ post }) => {
-  if (!post) {
-    return null;
-  }
-
+const PostReader = ({ post, actionButtons }) => {
   const { title, content, user, categoryId, createdDate, modifiedDate } = post;
   return (
     <PostReaderBlock>
@@ -47,6 +43,7 @@ const PostReader = ({ post }) => {
           hasMarginTop
         />
       </PostHead>
+      {actionButtons}
       <PostContent>{content}</PostContent>
     </PostReaderBlock>
   );

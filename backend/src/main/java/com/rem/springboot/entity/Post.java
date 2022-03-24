@@ -99,4 +99,8 @@ public class Post extends EntityDate {
   private Optional<Image> convertImageIdToImage(Long id) {
     return images.stream().filter(i -> i.getId().equals(id)).findAny();
   }
+
+  public void updateCategory(Category category) {
+    this.category = category;
+  }
 }

@@ -13,3 +13,7 @@ export const createPost = ({ title, content, categoryId }) => {
 export const getPost = (id) => {
   return axios.get(baseURL + `${id}`);
 };
+
+export const updatePost = ({ id, title, content, categoryId }) => {
+  return axios.put(baseURL + `${id}`, { title, content, categoryId });
+};

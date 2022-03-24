@@ -58,6 +58,10 @@ public class PostServiceImpl {
   @PreAuthorize("@postGuard.check(#id)")
   public PostUpdateResponse update(Long id, PostUpdateRequest request) {
     Post post = postRepository.findById(id).orElseThrow(PostNotFoundException::new);
+    if (post.getCategory().getId() != request.getCategoryId()) {
+      Category updatedCategory = categoryRepository.findById(request.getCategoryId()).orElseThrow(CategoryNotFoundException::new);
+      post.updateCategory(updatedCategory);
+    }
     Post.ImageUpdateResult result = post.update(request);
     uploadImages(result.getAddedImages(), result.getAddedImageFiles());
     deleteImages(result.getDeletedImages());

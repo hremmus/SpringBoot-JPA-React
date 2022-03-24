@@ -28,12 +28,13 @@ class PostTest {
 
     // when
     MockMultipartFile cFile = new MockMultipartFile("c", "c.png", MediaType.IMAGE_PNG_VALUE, "cFile".getBytes());
-    PostUpdateRequest postUpdateRequest = new PostUpdateRequest("title update", "content update", List.of(cFile), List.of(a.getId()));
+    PostUpdateRequest postUpdateRequest = new PostUpdateRequest("title update", "content update", 1L, List.of(cFile), List.of(a.getId()));
     Post.ImageUpdateResult imageUpdateResult = post.update(postUpdateRequest);
 
     // then
     assertThat(post.getTitle()).isEqualTo(postUpdateRequest.getTitle());
     assertThat(post.getContent()).isEqualTo(postUpdateRequest.getContent());
+    assertThat(post.getCategory().getId()).isEqualTo(postUpdateRequest.getCategoryId());
 
     List<Image> resultImages = post.getImages();
     List<String> resultOriginNames = resultImages.stream().map(i -> i.getOriginName()).collect(toList());

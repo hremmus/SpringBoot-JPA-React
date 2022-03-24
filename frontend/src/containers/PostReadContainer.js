@@ -1,16 +1,20 @@
+import PostActionButtons from "components/Post/PostActionButtons";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
-import { initialize, readPost } from "redux/modules/post";
+import { useNavigate, useParams } from "react-router-dom";
+import { readPost, setOriginalPost, unloadPost } from "redux/modules/post";
 import { getPost } from "services/PostService";
 import PostReader from "./../components/Post/PostReader";
 
 const PostReadContainer = () => {
   const { postId } = useParams();
   const dispatch = useDispatch();
-  const { post } = useSelector((state) => ({
+  const navigate = useNavigate();
+  const { post, loggedInfo } = useSelector((state) => ({
     post: state.post.post,
+    loggedInfo: state.user.loggedInfo,
   }));
+
   useEffect(() => {
     getPost(postId)
       .then((response) => {
@@ -18,10 +22,30 @@ const PostReadContainer = () => {
       })
       .catch((error) => console.log(error));
 
-    return () => dispatch(initialize());
+    return () => {
+      dispatch(unloadPost());
+    };
   }, [dispatch, postId]);
 
-  return <PostReader post={post} />;
+  const onEdit = () => {
+    dispatch(setOriginalPost(post));
+    navigate("/posts/write");
+  };
+
+  if (!post) {
+    return null;
+  }
+
+  return (
+    <PostReader
+      post={post}
+      actionButtons={
+        (loggedInfo && loggedInfo.id) === (post && post.user.id) && (
+          <PostActionButtons onEdit={onEdit} />
+        )
+      }
+    />
+  );
 };
 
 export default PostReadContainer;

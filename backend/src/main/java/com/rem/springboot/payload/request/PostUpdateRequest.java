@@ -3,6 +3,7 @@ package com.rem.springboot.payload.request;
 import java.util.ArrayList;
 import java.util.List;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import org.springframework.web.multipart.MultipartFile;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -21,9 +22,13 @@ public class PostUpdateRequest {
   @NotBlank(message = "{postUpdateRequest.title.notBlank}")
   private String title;
 
-  @ApiModelProperty(value = "게시글 본문", notes = "본문을 입력하세요.", required = true, example = "mcontent")
+  @ApiModelProperty(value = "게시글 본문", notes = "본문을 입력하세요.", required = true, example = "content")
   @NotBlank(message = "{postUpdateRequest.content.notBlank}")
   private String content;
+
+  @ApiModelProperty(value = "게시글 카테고리", notes = "카테고리를 선택하세요.", required = true, example = "1")
+  @NotNull(message = "{postUpdateRequest.categoryId.notNull}")
+  private Long categoryId;
 
   @ApiModelProperty(value = "이미지 추가", notes = "이미지를 첨부하세요.")
   private List<MultipartFile> addedImages = new ArrayList<>();

@@ -115,7 +115,7 @@ class PostControllerTest {
 
     List<Long> deletedImages = List.of(1L, 2L);
 
-    PostUpdateRequest request = new PostUpdateRequest("title", "content", addedImages, deletedImages);
+    PostUpdateRequest request = new PostUpdateRequest("title", "content", 1L, addedImages, deletedImages);
 
     // when, then
     mockMvc.perform(
@@ -125,6 +125,7 @@ class PostControllerTest {
         .param("deletedImages", String.valueOf(deletedImages.get(0)), String.valueOf(deletedImages.get(1)))
         .param("title", request.getTitle())
         .param("content", request.getContent())
+        .param("categoryId", String.valueOf(request.getCategoryId()))
         .with(requestPostProcessor -> { requestPostProcessor.setMethod("PUT"); return requestPostProcessor; })
         .contentType(MediaType.MULTIPART_FORM_DATA))
     .andExpect(status().isOk());

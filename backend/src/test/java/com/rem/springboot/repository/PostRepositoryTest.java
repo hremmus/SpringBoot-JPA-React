@@ -19,6 +19,7 @@ import com.rem.springboot.entity.Category;
 import com.rem.springboot.entity.Image;
 import com.rem.springboot.entity.Post;
 import com.rem.springboot.entity.User;
+import com.rem.springboot.exception.CategoryNotFoundException;
 import com.rem.springboot.exception.PostNotFoundException;
 import com.rem.springboot.payload.request.PostUpdateRequest;
 
@@ -133,6 +134,7 @@ class PostRepositoryTest {
     // given
     Image a = new Image("a.jpg");
     Image b = new Image("b.png");
+    Category category = categoryRepository.save(new Category("category2", null));
     Post post = postRepository.save(new Post("title", "content", user, category, List.of(a, b)));
     em.flush();
     em.clear();
@@ -140,8 +142,9 @@ class PostRepositoryTest {
     // when
     MockMultipartFile cFile = new MockMultipartFile("c", "c.png", MediaType.IMAGE_PNG_VALUE, "cFile".getBytes());
     PostUpdateRequest postUpdateRequest = new PostUpdateRequest(
-        "title update", "content update", List.of(cFile), List.of(a.getId()));
+        "title update", "content update", 2L, List.of(cFile), List.of(a.getId()));
     Post foundPost = postRepository.findById(post.getId()).orElseThrow(PostNotFoundException::new);
+    foundPost.updateCategory(categoryRepository.findById(postUpdateRequest.getCategoryId()).orElseThrow(CategoryNotFoundException::new));
     foundPost.update(postUpdateRequest);
     em.flush();
     em.clear();
@@ -150,6 +153,7 @@ class PostRepositoryTest {
     Post result = postRepository.findById(post.getId()).orElseThrow(PostNotFoundException::new);
     assertThat(result.getTitle()).isEqualTo(postUpdateRequest.getTitle());
     assertThat(result.getContent()).isEqualTo(postUpdateRequest.getContent());
+    assertThat(result.getCategory().getId()).isEqualTo(postUpdateRequest.getCategoryId());
 
     List<Image> images = result.getImages();
     List<String> originNames = images.stream().map(i -> i.getOriginName()).collect(toList());
