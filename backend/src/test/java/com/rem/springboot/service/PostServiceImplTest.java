@@ -167,7 +167,7 @@ class PostServiceImplTest {
     given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
     MockMultipartFile cFile = new MockMultipartFile("c", "c.png", MediaType.IMAGE_PNG_VALUE, "c".getBytes());
 
-    PostUpdateRequest request = new PostUpdateRequest("title", "content", List.of(cFile), List.of(a.getId()));
+    PostUpdateRequest request = new PostUpdateRequest("title", "content", 1L, List.of(cFile), List.of(a.getId()));
 
     // when
     postService.update(1L, request);
@@ -188,7 +188,7 @@ class PostServiceImplTest {
     given(postRepository.findById(anyLong())).willReturn(Optional.empty());
 
     // when, then
-    assertThatThrownBy(() -> postService.update(1L, new PostUpdateRequest("title", "content", List.of(), List.of())))
+    assertThatThrownBy(() -> postService.update(1L, new PostUpdateRequest("title", "content", 1L, List.of(), List.of())))
     .isInstanceOf(PostNotFoundException.class);
   }
 
