@@ -3,7 +3,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { readPost, setOriginalPost, unloadPost } from "redux/modules/post";
-import { getPost } from "services/PostService";
+import { deletePost, getPost } from "services/PostService";
 import PostReader from "./../components/Post/PostReader";
 
 const PostReadContainer = () => {
@@ -32,6 +32,14 @@ const PostReadContainer = () => {
     navigate("/posts/write");
   };
 
+  const onRemove = () => {
+    deletePost(postId)
+      .then((response) => {
+        if (response.data.success) navigate("/posts");
+      })
+      .catch((error) => console.log(error));
+  };
+
   if (!post) {
     return null;
   }
@@ -41,7 +49,7 @@ const PostReadContainer = () => {
       post={post}
       actionButtons={
         (loggedInfo && loggedInfo.id) === (post && post.user.id) && (
-          <PostActionButtons onEdit={onEdit} />
+          <PostActionButtons onEdit={onEdit} onRemove={onRemove} />
         )
       }
     />
