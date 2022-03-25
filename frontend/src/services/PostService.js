@@ -17,3 +17,7 @@ export const getPost = (id) => {
 export const updatePost = ({ id, title, content, categoryId }) => {
   return axios.put(baseURL + `${id}`, { title, content, categoryId });
 };
+
+export const deletePost = (id) => {
+  return axios.delete(baseURL + `${id}`);
+};
