@@ -1,4 +1,6 @@
+import { AskModal } from "lib/styleUtils";
 import oc from "open-color";
+import { useState } from "react";
 import styled from "styled-components";
 
 const PostActionButtonsBlock = styled.div`
@@ -27,13 +29,38 @@ const ActionButton = styled.button`
 `;
 
 const PostActionButtons = ({ onEdit, onRemove }) => {
+  const [modal, setModal] = useState(false);
+
+  const onConfirm = () => {
+    setModal(false);
+    onRemove();
+  };
+
+  const onCancel = () => {
+    setModal(false);
+  };
+
   return (
-    <div>
+    <>
       <PostActionButtonsBlock>
         <ActionButton onClick={onEdit}>수정</ActionButton>
-        <ActionButton onClick={onRemove}>삭제</ActionButton>
+        <ActionButton
+          onClick={() => {
+            setModal(true);
+          }}
+        >
+          삭제
+        </ActionButton>
       </PostActionButtonsBlock>
-    </div>
+      <AskModal
+        visible={modal}
+        title="게시글 삭제"
+        description="게시글을 정말 삭제하시겠습니까?"
+        confirmText="삭제"
+        onConfirm={onConfirm}
+        onCancel={onCancel}
+      />
+    </>
   );
 };
 
