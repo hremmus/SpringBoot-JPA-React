@@ -1,5 +1,4 @@
 import {
-  Button,
   Container,
   FormControl,
   InputLabel,
@@ -10,6 +9,7 @@ import {
 import { VerticalAligner } from "lib/styleUtils";
 import { useNavigate } from "react-router-dom";
 import { createPost, updatePost } from "services/PostService";
+import WriteActionButtons from "./WriteActionButtons";
 
 const PostWriter = ({ handleChange, id, title, content, categoryId }) => {
   const navigate = useNavigate();
@@ -69,8 +69,13 @@ const PostWriter = ({ handleChange, id, title, content, categoryId }) => {
           variant="standard"
         />
       </VerticalAligner>
-      <Button onClick={handleSubmit}>{id ? `수정` : `쓰기`}</Button>
-      <Button onClick={() => navigate(-1)}>취소</Button>
+      <WriteActionButtons
+        handleSubmit={handleSubmit}
+        onCancel={() => {
+          navigate(-1);
+        }}
+        isEdit={id}
+      />
     </Container>
   );
 };
