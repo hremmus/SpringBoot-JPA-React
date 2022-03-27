@@ -2,14 +2,12 @@ import { produce } from "immer";
 import { createAction, handleActions } from "redux-actions";
 
 const INITIALIZE = "post/INITIALIZE";
-const LOAD_POSTS = "post/LOAD_POSTS";
 const CHANGE_INPUT = "post/CHANGE_INPUT";
 const READ_POST = "post/READ_POST";
 const UNLOAD_POST = "post/UNLOAD_POST";
 const SET_ORIGINAL_POST = "post/SET_ORIGINAL_POST";
 
 export const initialize = createAction(INITIALIZE);
-export const loadPosts = createAction(LOAD_POSTS, (posts) => posts);
 export const changeInput = createAction(CHANGE_INPUT, ({ key, value }) => ({
   key,
   value,
@@ -19,7 +17,6 @@ export const unloadPost = createAction(UNLOAD_POST);
 export const setOriginalPost = createAction(SET_ORIGINAL_POST, (post) => post);
 
 const initialState = {
-  posts: [],
   post: null,
   id: null,
   title: "",
@@ -30,10 +27,6 @@ const initialState = {
 const post = handleActions(
   {
     [INITIALIZE]: () => initialState,
-    [LOAD_POSTS]: (state, { payload: posts }) =>
-      produce(state, (draft) => {
-        draft.posts = posts;
-      }),
     [CHANGE_INPUT]: (state, { payload: { key, value } }) => ({
       ...state,
       [key]: value,

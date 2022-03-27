@@ -41,7 +41,9 @@ const PostItem = ({ post }) => {
 
   return (
     <PostItemBlock>
-      <Link to={`/posts/${post.id}`}>{post.title}</Link>
+      <h1>
+        <Link to={`/posts/${post.id}`}>{post.title}</Link>
+      </h1>
       {post.nickname},
       {today.getDate() === createdDate.getDate() &&
       today.getMonth() === createdDate.getMonth() &&

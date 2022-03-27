@@ -4,6 +4,7 @@ import storage from "redux-persist/lib/storage";
 import auth from "./auth";
 import header from "./header";
 import post from "./post";
+import posts from "./posts";
 import user from "./user";
 
 const rootReducer = combineReducers({
@@ -11,6 +12,7 @@ const rootReducer = combineReducers({
   auth,
   user,
   post,
+  posts,
 });
 
 const persistConfig = {
