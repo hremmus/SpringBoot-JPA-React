@@ -14,6 +14,7 @@ import lombok.Setter;
 @Setter
 public class PostSimpleDto {
   private Long id;
+  private Long categoryId;
   private String title;
   private String nickname;
 

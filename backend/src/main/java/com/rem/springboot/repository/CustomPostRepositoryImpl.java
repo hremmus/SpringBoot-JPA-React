@@ -44,8 +44,9 @@ public class CustomPostRepositoryImpl extends QuerydslRepositorySupport implemen
     return getQuerydsl().applyPagination(
         pageable,
         jpaQueryfactory
-        .select(constructor(PostSimpleDto.class, post.id, post.title, post.user.nickname, post.createdDate))
+        .select(constructor(PostSimpleDto.class, post.id, post.category.id, post.title, post.user.nickname, post.createdDate))
         .from(post)
+        .join(post.category)
         .join(post.user)
         .where(predicate)
         .orderBy(post.id.desc()))
