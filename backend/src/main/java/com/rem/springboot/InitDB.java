@@ -81,11 +81,26 @@ public class InitDB {
   }
 
   private void initPost() {
-    User user = userRepository.findAll().get(0);
-    Category category = categoryRepository.findAll().get(0);
-    IntStream.range(0, 100)
+    User user1 = userRepository.findAll().get(0);
+    User user2 = userRepository.findAll().get(1);
+    Category category1 = categoryRepository.findAll().get(0);
+    Category category2 = categoryRepository.findAll().get(1);
+    Category category3 = categoryRepository.findAll().get(2);
+    IntStream.range(0, 25)
     .forEach(i -> postRepository.save(
-        new Post("title" + i, "content" + i, user, category, List.of())));
+        new Post("title" + i, "content" + i, user1, category1, List.of())));
+    IntStream.range(0, 25)
+    .forEach(i -> postRepository.save(
+        new Post("title" + i, "content" + i, user1, category2, List.of())));
+    IntStream.range(0, 25)
+    .forEach(i -> postRepository.save(
+        new Post("title" + i, "content" + i, user1, category3, List.of())));
+    IntStream.range(0, 25)
+    .forEach(i -> postRepository.save(
+        new Post("title" + i, "content" + i, user2, category1, List.of())));
+    IntStream.range(0, 25)
+    .forEach(i -> postRepository.save(
+        new Post("title" + i, "content" + i, user2, category2, List.of())));
   }
 
   private void initComment() {
