@@ -8,8 +8,10 @@ import {
   TableHead,
   TableRow,
 } from "@material-ui/core";
+import oc from "open-color";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
+import CategoryList from "./CategoryList";
 
 const PostListBlock = styled.div`
   width: 1300px;
@@ -32,23 +34,47 @@ const PostLink = styled(Link)`
   text-decoration: none;
 `;
 
+const CategoryBlock = styled.div`
+  .category {
+    display: inline-block;
+    color: ${oc.cyan[7]};
+    &:hover {
+      color: ${oc.cyan[6]};
+    }
+    text-decoration: none;
+  }
+`;
+
+const Category = ({ categoryId }) => {
+  return (
+    <CategoryBlock>
+      <Link
+        className="category"
+        to={`/posts?categoryId=${categoryId}&page=0&size=20`}
+      >
+        {
+          {
+            1: `카테1`,
+            2: `카테2`,
+            3: `카테3`,
+          }[categoryId]
+        }
+      </Link>
+    </CategoryBlock>
+  );
+};
+
 const PostItem = ({ post }) => {
   const createdDate = new Date(post.createdDate);
   const today = new Date();
-  const category = post.categoryId;
+  const categoryId = post.categoryId;
   return (
     <TableRow>
       <TableCell className="postId" style={tdStyle} align="center">
         {post.id}
       </TableCell>
       <TableCell className="category" style={tdStyle} align="center">
-        {
-          {
-            1: `카테1`,
-            2: `카테2`,
-            3: `카테3`,
-          }[category]
-        }
+        <Category categoryId={categoryId} />
       </TableCell>
       <TableCell style={tdStyle} align="left">
         <PostLink to={`/posts/${post.id}`}>{post.title}</PostLink>
@@ -73,7 +99,7 @@ const PostList = ({ posts, showWriteButton }) => {
       <PostListBlock>
         <Grid container spacing={2}>
           <Grid item md={2}>
-            category
+            <CategoryList />
           </Grid>
           <Grid item md={10} xs={12}>
             <WritePostButtonWrapper>
