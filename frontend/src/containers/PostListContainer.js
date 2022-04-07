@@ -16,17 +16,18 @@ const PostListContainer = () => {
   }));
 
   useEffect(() => {
+    const categoryId = searchParams.get("categoryId") || null;
     getPosts({
       page: page,
       size: 20,
-      categoryId: null,
+      categoryId: categoryId,
       userId: null,
     })
       .then((response) => {
         dispatch(loadPosts(response.data.result.data));
       })
       .catch((error) => console.log(error));
-  }, [dispatch, page]);
+  }, [dispatch, searchParams, page]);
 
   return <PostList posts={posts} showWriteButton={isLoggedIn} />;
 };
