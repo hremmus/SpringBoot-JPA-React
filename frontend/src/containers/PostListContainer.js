@@ -1,4 +1,5 @@
 import PostList from "components/Post/PostList";
+import WriteButton from "components/Post/WriteButton";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
@@ -29,7 +30,11 @@ const PostListContainer = () => {
       .catch((error) => console.log(error));
   }, [dispatch, searchParams, page]);
 
-  return <PostList posts={posts} showWriteButton={isLoggedIn} />;
+  return (
+    <>
+      <WriteButton showWriteButton={isLoggedIn} /> <PostList posts={posts} />
+    </>
+  );
 };
 
 export default PostListContainer;

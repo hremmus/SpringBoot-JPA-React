@@ -1,29 +1,17 @@
 import {
-  Grid,
-  Paper,
+  Container,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
+  Typography,
+  makeStyles,
 } from "@material-ui/core";
 import oc from "open-color";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import CategoryList from "./CategoryList";
-
-const PostListBlock = styled.div`
-  width: 1300px;
-  padding-top: 6rem;
-  margin: 1rem auto;
-`;
-
-const WritePostButtonWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-`;
 
 const tdStyle = {
   padding: "6px 16px 6px 16px",
@@ -44,6 +32,13 @@ const CategoryBlock = styled.div`
     text-decoration: none;
   }
 `;
+
+const useStyles = makeStyles((theme) => ({
+  root: {
+    maxWidth: "100%",
+    backgroundColor: theme.palette.action.hover,
+  },
+}));
 
 const Category = ({ categoryId }) => {
   return (
@@ -93,47 +88,37 @@ const PostItem = ({ post }) => {
   );
 };
 
-const PostList = ({ posts, showWriteButton }) => {
-  return (
-    <>
-      <PostListBlock>
-        <Grid container spacing={2}>
-          <Grid item md={2}>
-            <CategoryList />
-          </Grid>
-          <Grid item md={10} xs={12}>
-            <WritePostButtonWrapper>
-              {showWriteButton && <Link to="/posts/write">글쓰기</Link>}
-            </WritePostButtonWrapper>
-            <TableContainer component={Paper}>
-              <Table>
-                <TableHead>
-                  <TableRow variant="head">
-                    <TableCell className="postId" align="center">
-                      글번호
-                    </TableCell>
-                    <TableCell className="category" align="center">
-                      카테고리
-                    </TableCell>
-                    <TableCell align="left">제목</TableCell>
-                    <TableCell className="writer" align="center">
-                      작성자
-                    </TableCell>
-                    <TableCell className="createdDate" align="center">
-                      작성일
-                    </TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {posts.map((post) => (
-                    <PostItem key={post.id} post={post} />
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Grid>
-        </Grid>
-      </PostListBlock>
+const PostList = ({ posts }) => {
+  const classes = useStyles();
+
+  return posts.length !== 0 ? (
+    <div className={classes.root}>
+      <TableContainer>
+        <Table>
+          <TableHead>
+            <TableRow variant="head">
+              <TableCell className="postId" align="center">
+                글번호
+              </TableCell>
+              <TableCell className="category" align="center">
+                카테고리
+              </TableCell>
+              <TableCell align="left">제목</TableCell>
+              <TableCell className="writer" align="center">
+                작성자
+              </TableCell>
+              <TableCell className="createdDate" align="center">
+                작성일
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {posts.map((post) => (
+              <PostItem key={post.id} post={post} />
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
       <style jsx="true">{`
         .postId {
           width: 80px;
@@ -148,7 +133,17 @@ const PostList = ({ posts, showWriteButton }) => {
           width: 160px;
         }
       `}</style>
-    </>
+    </div>
+  ) : (
+    <Container className={classes.root}>
+      <Typography
+        component="div"
+        align="center"
+        style={{ paddingTop: "15vh", height: "50vh" }}
+      >
+        게시글이 존재하지 않습니다.
+      </Typography>
+    </Container>
   );
 };
 

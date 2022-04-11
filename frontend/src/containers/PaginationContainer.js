@@ -45,18 +45,18 @@ const PaginationContainer = () => {
     }
   }, [page, limit, totalPageArray, setCurrentPageArray]);
 
-  if (!posts) return null;
-
   return (
-    <Pagination
-      categoryId={categoryId}
-      page={page}
-      totalPages={totalPages}
-      limit={limit}
-      hasNext={hasNext}
-      currentPageArray={currentPageArray}
-      size={size}
-    />
+    posts.length !== 0 && (
+      <Pagination
+        categoryId={categoryId}
+        page={page}
+        totalPages={totalPages}
+        limit={limit}
+        hasNext={hasNext}
+        currentPageArray={currentPageArray}
+        size={size}
+      />
+    )
   );
 };
 

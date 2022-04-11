@@ -19,6 +19,7 @@ const Top = styled.div`
   height: 45px;
   width: 100%;
   background: url(${Bg});
+  background-color: #f5f3f2;
   background-position: top bottom;
   background-repeat: repeat-x;
   background-size: 100% 100%;
