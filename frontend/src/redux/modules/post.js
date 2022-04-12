@@ -6,6 +6,7 @@ const CHANGE_INPUT = "post/CHANGE_INPUT";
 const READ_POST = "post/READ_POST";
 const UNLOAD_POST = "post/UNLOAD_POST";
 const SET_ORIGINAL_POST = "post/SET_ORIGINAL_POST";
+const LOAD_COMMENTS = "post/LOAD_COMMENTS";
 
 export const initialize = createAction(INITIALIZE);
 export const changeInput = createAction(CHANGE_INPUT, ({ key, value }) => ({
@@ -15,6 +16,7 @@ export const changeInput = createAction(CHANGE_INPUT, ({ key, value }) => ({
 export const readPost = createAction(READ_POST, (post) => post);
 export const unloadPost = createAction(UNLOAD_POST);
 export const setOriginalPost = createAction(SET_ORIGINAL_POST, (post) => post);
+export const loadComments = createAction(LOAD_COMMENTS);
 
 const initialState = {
   post: null,
@@ -22,6 +24,7 @@ const initialState = {
   title: "",
   content: "",
   categoryId: "",
+  comment: [],
 };
 
 const post = handleActions(
@@ -42,6 +45,10 @@ const post = handleActions(
       title: post.title,
       content: post.content,
       categoryId: post.categoryId,
+    }),
+    [LOAD_COMMENTS]: (state, action) => ({
+      ...state,
+      comments: action.payload,
     }),
   },
   initialState
