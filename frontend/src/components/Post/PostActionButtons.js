@@ -6,8 +6,7 @@ import styled from "styled-components";
 const PostActionButtonsBlock = styled.div`
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 2rem;
-  margin-top: -1.5rem;
+  margin: -1.9rem 0.2rem 2rem;
 `;
 
 const ActionButton = styled.button`
@@ -24,7 +23,7 @@ const ActionButton = styled.button`
     color: ${oc.cyan[7]};
   }
   & + & {
-    margin-left: 0.25rem;
+    margin-left: 0.5rem;
   }
 `;
 
