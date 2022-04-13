@@ -20,7 +20,8 @@ const useStyles = makeStyles((theme) => ({
     display: "inline",
   },
   nested: {
-    paddingLeft: theme.spacing(6),
+    paddingLeft: (props) =>
+      props === 0 ? theme.spacing(2) : theme.spacing(props * 4 + 2),
   },
 }));
 
@@ -28,10 +29,11 @@ const convertDate = (date) => {
   return date.toLocaleDateString() + " " + date.toLocaleTimeString();
 };
 
-const CommentItem = ({ key, comment, classes }) => {
+const CommentItem = ({ comment, classes }) => {
+  classes = useStyles(comment.depth);
   return (
     <>
-      <ListItem key={key} alignItems="flex-start">
+      <ListItem alignItems="flex-start" className={classes.nested}>
         <ListItemAvatar>
           <Avatar />
         </ListItemAvatar>
@@ -45,7 +47,7 @@ const CommentItem = ({ key, comment, classes }) => {
                 className={classes.inline}
                 color="textPrimary"
               >
-                {comment.user.nickname}
+                {comment.user.nickname} {"  c_id:   "} {comment.id}
               </Typography>
               {" — "}
               {comment.createdDate === comment.modifiedDate
@@ -55,55 +57,21 @@ const CommentItem = ({ key, comment, classes }) => {
           }
         />
       </ListItem>
-      <Divider variant="inset" component="li" />
-      {comment.children.map((child) => (
-        <>
-          <ListItem
-            key={child.id}
-            className={classes.nested}
-            alignItems="flex-start"
-          >
-            <ListItemAvatar>
-              <Avatar />
-            </ListItemAvatar>
-            <ListItemText
-              primary={child.content}
-              secondary={
-                <React.Fragment>
-                  <Typography
-                    component="span"
-                    variant="body2"
-                    className={classes.inline}
-                    color="textPrimary"
-                  >
-                    {child.user.nickname}
-                  </Typography>
-                  {" — "}
-                  {child.createdDate === child.modifiedDate
-                    ? convertDate(new Date(child.createdDate))
-                    : convertDate(new Date(child.modifiedDate))}
-                </React.Fragment>
-              }
-            />
-          </ListItem>
-          <Divider variant="inset" component="li" />
-        </>
-      ))}
+      <Divider variant="inset" component="div" />
     </>
   );
 };
 
 const CommentList = ({ comments }) => {
   const classes = useStyles();
-
   return (
     <List className={classes.root}>
-      <ListSubheader>
-        댓글 {document.getElementsByClassName("MuiListItem-root").length - 5}개
-      </ListSubheader>
-      {comments.map((comment) => (
-        <CommentItem key={comment.id} comment={comment} classes={classes} />
-      ))}
+      <ListSubheader>댓글 {comments.length}개</ListSubheader>
+      {comments.map((comment) => {
+        return (
+          <CommentItem key={comment.id} comment={comment} classes={classes} />
+        );
+      })}
     </List>
   );
 };
