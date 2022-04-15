@@ -1,5 +1,6 @@
 import { Grid } from "@material-ui/core";
 import CategoryContainer from "containers/CategoryContainer";
+import CommentWriteContainer from "containers/CommentWriteContainer";
 import PostReadContainer from "containers/PostReadContainer";
 import styled from "styled-components";
 
@@ -18,6 +19,7 @@ const Post = () => {
         </Grid>
         <Grid item md={10} xs={12}>
           <PostReadContainer />
+          <CommentWriteContainer />
         </Grid>
       </Grid>
     </PostReaderBlock>
