@@ -35,8 +35,7 @@ public class CommentController {
   @ResponseStatus(HttpStatus.CREATED)
   @AssignUserId
   public Response create(@Valid @RequestBody CommentCreateRequest request) {
-    commentService.create(request);
-    return Response.success();
+    return Response.success(commentService.create(request));
   }
 
   @ApiOperation("해당 게시글의 모든 댓글 조회")

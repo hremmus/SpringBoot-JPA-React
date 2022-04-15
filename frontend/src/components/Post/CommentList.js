@@ -14,7 +14,8 @@ import React from "react";
 const useStyles = makeStyles((theme) => ({
   root: {
     maxWidth: "100%",
-    backgroundColor: theme.palette.background.default,
+    backgroundColor: theme.palette.action.hover,
+    overflow: "auto", // scroll 시 subheader도 같이 넘어가도록
   },
   inline: {
     display: "inline",
@@ -47,7 +48,7 @@ const CommentItem = ({ comment, classes }) => {
                 className={classes.inline}
                 color="textPrimary"
               >
-                {comment.user.nickname} {"  c_id:   "} {comment.id}
+                {comment.user.nickname}
               </Typography>
               {" — "}
               {comment.createdDate === comment.modifiedDate
@@ -57,16 +58,19 @@ const CommentItem = ({ comment, classes }) => {
           }
         />
       </ListItem>
-      <Divider variant="inset" component="div" />
+      <Divider variant="middle" component="div" />
     </>
   );
 };
 
 const CommentList = ({ comments }) => {
   const classes = useStyles();
+
   return (
     <List className={classes.root}>
-      <ListSubheader>댓글 {comments.length}개</ListSubheader>
+      <ListSubheader style={{ backgroundColor: "transparent" }}>
+        댓글 {comments.length}개
+      </ListSubheader>
       {comments.map((comment) => {
         return (
           <CommentItem key={comment.id} comment={comment} classes={classes} />

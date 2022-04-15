@@ -3,6 +3,7 @@ import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import auth from "./auth";
 import categories from "./categories";
+import comment from "./comment";
 import header from "./header";
 import post from "./post";
 import posts from "./posts";
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
   post,
   posts,
   categories,
+  comment,
 });
 
 const persistConfig = {

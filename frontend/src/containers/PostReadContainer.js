@@ -4,12 +4,8 @@ import PostReader from "components/Post/PostReader";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  loadComments,
-  readPost,
-  setOriginalPost,
-  unloadPost,
-} from "redux/modules/post";
+import { loadComments, unloadComment } from "redux/modules/comment";
+import { readPost, setOriginalPost, unloadPost } from "redux/modules/post";
 import { getComments } from "services/CommentService";
 import { deletePost, getPost } from "services/PostService";
 
@@ -20,7 +16,7 @@ const PostReadContainer = () => {
   const { post, loggedInfo, comments } = useSelector((state) => ({
     post: state.post.post,
     loggedInfo: state.user.loggedInfo,
-    comments: state.post.comments,
+    comments: state.comment.comments,
   }));
 
   useEffect(() => {
@@ -40,6 +36,7 @@ const PostReadContainer = () => {
 
     return () => {
       dispatch(unloadPost());
+      dispatch(unloadComment());
     };
   }, [dispatch, postId]);
 
