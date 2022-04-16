@@ -9,13 +9,17 @@ import {
   Typography,
   makeStyles,
 } from "@material-ui/core";
+import CommentReplyContainer from "containers/CommentReplyContainer";
 import React from "react";
+import { useDispatch } from "react-redux";
+import { toggleSwitch } from "redux/modules/comment";
 
 const useStyles = makeStyles((theme) => ({
   root: {
     maxWidth: "100%",
     backgroundColor: theme.palette.action.hover,
-    overflow: "auto", // scroll 시 subheader도 같이 넘어가도록
+    overflow: "clip", // scroll 시 subheader도 같이 넘어가도록
+    display: "flow-root",
   },
   inline: {
     display: "inline",
@@ -30,8 +34,10 @@ const convertDate = (date) => {
   return date.toLocaleDateString() + " " + date.toLocaleTimeString();
 };
 
-const CommentItem = ({ comment, classes }) => {
+const CommentItem = ({ comment, shownReplyInput, classes }) => {
   classes = useStyles(comment.depth);
+  const dispatch = useDispatch();
+
   return (
     <>
       <ListItem alignItems="flex-start" className={classes.nested}>
@@ -40,6 +46,9 @@ const CommentItem = ({ comment, classes }) => {
         </ListItemAvatar>
         <ListItemText
           primary={comment.content}
+          onClick={() => {
+            dispatch(toggleSwitch(comment.id));
+          }}
           secondary={
             <React.Fragment>
               <Typography
@@ -59,11 +68,14 @@ const CommentItem = ({ comment, classes }) => {
         />
       </ListItem>
       <Divider variant="middle" component="div" />
+      {shownReplyInput[comment.id] && (
+        <CommentReplyContainer parentId={comment.id} />
+      )}
     </>
   );
 };
 
-const CommentList = ({ comments }) => {
+const CommentList = ({ comments, shownReplyInput }) => {
   const classes = useStyles();
 
   return (
@@ -73,7 +85,12 @@ const CommentList = ({ comments }) => {
       </ListSubheader>
       {comments.map((comment) => {
         return (
-          <CommentItem key={comment.id} comment={comment} classes={classes} />
+          <CommentItem
+            key={comment.id}
+            comment={comment}
+            shownReplyInput={shownReplyInput}
+            classes={classes}
+          />
         );
       })}
     </List>
