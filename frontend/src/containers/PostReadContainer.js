@@ -13,14 +13,14 @@ const PostReadContainer = () => {
   const { postId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { post, loggedInfo, comments, shownReplyInput } = useSelector(
-    (state) => ({
+  const { post, loggedInfo, comments, shownReplyInput, shownUpdateInput } =
+    useSelector((state) => ({
       post: state.post.post,
       loggedInfo: state.user.loggedInfo,
       comments: state.comment.comments,
       shownReplyInput: state.comment.shownReplyInput,
-    })
-  );
+      shownUpdateInput: state.comment.shownUpdateInput,
+    }));
 
   useEffect(() => {
     getPost(postId)
@@ -72,7 +72,12 @@ const PostReadContainer = () => {
           )
         }
       />
-      <CommentList comments={comments} shownReplyInput={shownReplyInput} />
+      <CommentList
+        comments={comments}
+        shownReplyInput={shownReplyInput}
+        shownUpdateInput={shownUpdateInput}
+        loggedInfo={loggedInfo}
+      />
     </>
   );
 };

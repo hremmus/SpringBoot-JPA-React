@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Button,
   Divider,
   List,
   ListItem,
@@ -12,7 +13,7 @@ import {
 import CommentReplyContainer from "containers/CommentReplyContainer";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { toggleSwitch } from "redux/modules/comment";
+import { setOriginalComment, toggleSwitch } from "redux/modules/comment";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -34,9 +35,19 @@ const convertDate = (date) => {
   return date.toLocaleDateString() + " " + date.toLocaleTimeString();
 };
 
-const CommentItem = ({ comment, shownReplyInput, classes }) => {
+const CommentItem = ({
+  comment,
+  shownReplyInput,
+  shownUpdateInput,
+  loggedInfo,
+  classes,
+}) => {
   classes = useStyles(comment.depth);
   const dispatch = useDispatch();
+
+  const onEdit = () => {
+    dispatch(setOriginalComment(comment));
+  };
 
   return (
     <>
@@ -66,16 +77,34 @@ const CommentItem = ({ comment, shownReplyInput, classes }) => {
             </React.Fragment>
           }
         />
+        {(loggedInfo && loggedInfo.id) === comment.user.id && (
+          <Button
+            onClick={() => {
+              onEdit();
+            }}
+          >
+            수정
+          </Button>
+        )}
       </ListItem>
       <Divider variant="middle" component="div" />
       {shownReplyInput[comment.id] && (
-        <CommentReplyContainer parentId={comment.id} />
+        <CommentReplyContainer
+          parentId={comment.id}
+          parentNickname={comment.user.nickname}
+        />
       )}
+      {shownUpdateInput[comment.id] && <CommentReplyContainer />}
     </>
   );
 };
 
-const CommentList = ({ comments, shownReplyInput }) => {
+const CommentList = ({
+  comments,
+  shownReplyInput,
+  shownUpdateInput,
+  loggedInfo,
+}) => {
   const classes = useStyles();
 
   return (
@@ -89,6 +118,8 @@ const CommentList = ({ comments, shownReplyInput }) => {
             key={comment.id}
             comment={comment}
             shownReplyInput={shownReplyInput}
+            shownUpdateInput={shownUpdateInput}
+            loggedInfo={loggedInfo}
             classes={classes}
           />
         );
