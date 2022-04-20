@@ -9,3 +9,7 @@ export const getComments = (condition) => {
 export const createComment = ({ content, postId, parentId }) => {
   return axios.post(baseURL, { content, postId, parentId });
 };
+
+export const updateComment = ({ id, content }) => {
+  return axios.patch(baseURL + `${id}`, { content });
+};
