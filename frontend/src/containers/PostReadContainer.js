@@ -73,6 +73,7 @@ const PostReadContainer = () => {
         }
       />
       <CommentList
+        postId={post.id}
         comments={comments}
         shownReplyInput={shownReplyInput}
         shownUpdateInput={shownUpdateInput}
