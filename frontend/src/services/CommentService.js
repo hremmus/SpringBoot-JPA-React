@@ -13,3 +13,7 @@ export const createComment = ({ content, postId, parentId }) => {
 export const updateComment = ({ id, content }) => {
   return axios.patch(baseURL + `${id}`, { content });
 };
+
+export const deleteComment = ({ id }) => {
+  return axios.delete(baseURL + `${id}`);
+};
