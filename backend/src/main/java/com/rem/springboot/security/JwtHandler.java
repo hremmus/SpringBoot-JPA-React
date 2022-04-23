@@ -16,21 +16,23 @@ public class JwtHandler {
 
   public String generateToken(String key, Map<String, Object> privateClaims, long maxAgeSeconds) {
     Date now = new Date();
-    return type + Jwts.builder().addClaims(privateClaims)
-        .addClaims(Map.of(Claims.ISSUED_AT, now, Claims.EXPIRATION,
-            new Date(now.getTime() + maxAgeSeconds * 1000L)))
+    return type + Jwts.builder().setIssuedAt(now)
+        .setExpiration(new Date(now.getTime() + maxAgeSeconds * 1000L)).addClaims(privateClaims)
         .signWith(SignatureAlgorithm.HS256, key.getBytes()).compact();
   }
 
   public ResponseCookie generateJwtCookie(String token) {
     return ResponseCookie.from("refreshToken", token.replace(type, ""))
-        .path("/api").maxAge(24 * 60 * 60).httpOnly(true).build();
+        .path("/api").maxAge(24 * 60 * 60 * 7).httpOnly(true).build();
   }
 
   public Optional<Claims> parse(String key, String token) {
     try {
+      String target = token;
+      if (token.contains(type))
+        target = untype(token);
       return Optional
-          .of(Jwts.parser().setSigningKey(key.getBytes()).parseClaimsJws(untype(token)).getBody());
+          .of(Jwts.parser().setSigningKey(key.getBytes()).parseClaimsJws(target).getBody());
     } catch (JwtException e) {
       return Optional.empty();
     }

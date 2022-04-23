@@ -1,19 +1,19 @@
-import axios from "axios";
+import api from "services";
 
-const baseURL = "http://localhost:8080/api/comments/";
+const baseURL = "/comments/";
 
 export const getComments = (condition) => {
-  return axios.get(baseURL, { params: condition });
+  return api.get(baseURL, { params: condition });
 };
 
 export const createComment = ({ content, postId, parentId }) => {
-  return axios.post(baseURL, { content, postId, parentId });
+  return api.post(baseURL, { content, postId, parentId });
 };
 
 export const updateComment = ({ id, content }) => {
-  return axios.patch(baseURL + `${id}`, { content });
+  return api.patch(baseURL + `${id}`, { content });
 };
 
 export const deleteComment = ({ id }) => {
-  return axios.delete(baseURL + `${id}`);
+  return api.delete(baseURL + `${id}`);
 };

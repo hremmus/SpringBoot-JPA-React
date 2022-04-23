@@ -1,11 +1,11 @@
 import { createAction, handleActions } from "redux-actions";
 
 const SET_LOGGED_INFO = "user/SET_LOGGED_INFO"; // 로그인 정보 설정
-const SET_VALIDATED = "user/SET_VALIDATED"; // validated 값 설정
+const SET_ACCESS_TOKEN = "user/SET_ACCESS_TOKEN"; // 액세스 토큰 설정
 const LOGOUT = "user/LOGOUT"; // 로그아웃
 
 export const setLoggedInfo = createAction(SET_LOGGED_INFO); // loggedInfo
-export const setValidated = createAction(SET_VALIDATED); // validated
+export const setAccessToken = createAction(SET_ACCESS_TOKEN); // accessToken
 export const logout = createAction(LOGOUT); // logout
 
 const initialState = {
@@ -15,8 +15,8 @@ const initialState = {
     email: null,
     nickname: null,
   },
+  accessToken: null,
   isLoggedIn: false, // 현재 로그인 중인지 알려 준다
-  validated: false, // 이 값은 현재 로그인 중인지 아닌지 한번 서버 측에 검증했음을 의미
 };
 
 export default handleActions(
@@ -26,9 +26,13 @@ export default handleActions(
       loggedInfo,
       isLoggedIn: true,
     }),
-    [SET_VALIDATED]: (state, action) => {},
+    [SET_ACCESS_TOKEN]: (state, { payload: accessToken }) => ({
+      ...state,
+      accessToken,
+    }),
     [LOGOUT]: (state) => ({
       ...state,
+      accessToken: null,
       loggedInfo: null,
       isLoggedIn: false,
     }),

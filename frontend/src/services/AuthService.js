@@ -1,16 +1,16 @@
-import axios from "axios";
+import api from "services";
 
-const baseURL = "http://localhost:8080/api/auth";
+const baseURL = "/auth";
 
 export const loginUser = ({ email, password }) => {
-  return axios.post(baseURL + "/signin/", {
+  return api.post(baseURL + "/signin/", {
     email,
     password,
   });
 };
 
 export const joinUser = ({ email, password, nickname }) => {
-  return axios.post(baseURL + "/signup/", {
+  return api.post(baseURL + "/signup/", {
     email,
     password,
     nickname,
@@ -18,5 +18,9 @@ export const joinUser = ({ email, password, nickname }) => {
 };
 
 export const logoutUser = () => {
-  return axios.get(baseURL + "/signout/");
+  return api.get(baseURL + "/signout/");
+};
+
+export const refreshToken = () => {
+  return api.post(baseURL + "/refreshtoken/", null, { withCredentials: true });
 };
