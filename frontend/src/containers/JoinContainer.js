@@ -38,17 +38,15 @@ const JoinContainer = (props) => {
       return;
     }
 
-    dispatch(
-      joinUser(form)
-        .then((response) => {
-          if (response.data.success) {
-            navigate("/");
-          }
-        })
-        .catch((error) => {
-          dispatch(setError(error.response.data.result.message));
-        })
-    );
+    joinUser(form)
+      .then((response) => {
+        if (response.data.success) {
+          navigate("/");
+        }
+      })
+      .catch((error) => {
+        dispatch(setError(error.response.data.result.message));
+      });
   };
 
   return (

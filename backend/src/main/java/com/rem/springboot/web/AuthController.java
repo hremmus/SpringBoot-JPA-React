@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -64,7 +65,7 @@ public class AuthController {
   @ApiOperation(value = "토큰 재발급", notes="리프레시 토큰을 넘겨 받아 새 액세스 토큰을 발급한다.")
   @PostMapping("/refreshtoken")
   @ResponseStatus(HttpStatus.OK)
-  public Response refreshToken(@ApiIgnore @RequestHeader("Authorization") String refreshToken) {
+  public Response refreshToken(@ApiIgnore @CookieValue("refreshToken") String refreshToken) {
     return success(authService.refreshToken(refreshToken));
   }
 

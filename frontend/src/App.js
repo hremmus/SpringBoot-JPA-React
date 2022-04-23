@@ -6,21 +6,62 @@ import Post from "pages/Post";
 import Posts from "pages/Posts";
 import WritePost from "pages/WritePost";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { Route, Routes } from "react-router-dom";
-import { setLoggedInfo } from "redux/modules/user";
+import { useDispatch, useSelector } from "react-redux";
+import { Route, Routes, useNavigate } from "react-router-dom";
+import { logout, setAccessToken, setLoggedInfo } from "redux/modules/user";
+import api from "services";
+import { refreshToken } from "services/AuthService";
 
 function App() {
   const dispatch = useDispatch();
-  useEffect(() => {
-    const initializeUserInfo = async () => {
-      const loggedInfo = storage.get("loggedInfo"); // 로그인 정보를 로컬스토리지에서 가져옵니다.
-      if (!loggedInfo) return; // 로그인 정보가 없다면 여기서 멈춥니다.
+  const navigate = useNavigate();
+  const { accessToken } = useSelector(({ user }) => ({
+    accessToken: user.accessToken,
+  }));
 
-      dispatch(setLoggedInfo(loggedInfo));
-    };
-    initializeUserInfo();
-  });
+  useEffect(() => {
+    const loggedInfo = storage.get("loggedInfo");
+    if (!loggedInfo) return;
+    dispatch(setLoggedInfo(loggedInfo));
+
+    api.interceptors.request.use(
+      (config) => {
+        if (config.headers["Authorization"] === undefined)
+          config.headers["Authorization"] = accessToken;
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
+
+    api.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const {
+          config,
+          response: { status },
+        } = error;
+        const prevRequest = config;
+        if (status === 401 && !prevRequest.sent) {
+          prevRequest.sent = true;
+          await refreshToken()
+            .then((response) => {
+              config.headers[
+                "Authorization"
+              ] = `${response.data.result.data.accessToken}`;
+              dispatch(setAccessToken(response.data.result.data.accessToken));
+            })
+            .catch((error) => {
+              console.log(error);
+              storage.remove("loggedInfo");
+              dispatch(logout());
+              navigate("/auth/login?expired");
+            });
+          return api(prevRequest);
+        }
+        return Promise.reject(error);
+      }
+    );
+  }, [dispatch, navigate, accessToken]);
 
   return (
     <div>

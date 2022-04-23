@@ -1,26 +1,25 @@
-import { configureStore } from "@reduxjs/toolkit";
-import {
-  FLUSH,
-  PAUSE,
-  PERSIST,
-  persistStore,
-  PURGE,
-  REGISTER,
-  REHYDRATE,
-} from "redux-persist";
-import rootReducer from "./modules/index";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import auth from "redux/modules/auth";
+import categories from "redux/modules/categories";
+import comment from "redux/modules/comment";
+import header from "redux/modules/header";
+import post from "redux/modules/post";
+import posts from "redux/modules/posts";
+import user from "redux/modules/user";
+
+const rootReducer = combineReducers({
+  header,
+  auth,
+  user,
+  post,
+  posts,
+  categories,
+  comment,
+});
 
 export const store = configureStore(
   {
     reducer: rootReducer,
-    middleware: (getDefaultMiddleware) =>
-      getDefaultMiddleware({
-        serializableCheck: {
-          ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-        },
-      }),
   },
   window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__
 );
-
-export const persistor = persistStore(store);

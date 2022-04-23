@@ -1,7 +1,7 @@
-import axios from "axios";
+import api from "services";
 
-const baseURL = "http://localhost:8080/api/categories/";
+const baseURL = "/categories/";
 
 export const getCategories = () => {
-  return axios.get(baseURL);
+  return api.get(baseURL);
 };

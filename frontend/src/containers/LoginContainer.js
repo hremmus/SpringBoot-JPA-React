@@ -3,16 +3,20 @@ import LoginButton from "components/Auth/AuthButton";
 import AuthError from "components/Auth/AuthError";
 import InputWithLabel from "components/Auth/InputWithLabel";
 import RightAlignedLink from "components/Auth/RightAlignedLink";
+import storage from "lib/storage";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { setLoggedInfo } from "redux/modules/user";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { setError } from "redux/modules/auth";
+import { setAccessToken } from "redux/modules/user";
 import { loginUser } from "services/AuthService";
-import { changeInput, initializeForm, setError } from "./../redux/modules/auth";
+import { changeInput, initializeForm } from "./../redux/modules/auth";
 
 const LoginContainer = (props) => {
+  const [searchParams] = useSearchParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const { form, authError } = useSelector(({ auth }) => ({
     form: auth.login,
     authError: auth.authError,
@@ -20,7 +24,16 @@ const LoginContainer = (props) => {
 
   useEffect(() => {
     dispatch(initializeForm("login"));
-  }, [dispatch]);
+
+    /* Iterator 객체로 받은 keys를 꺼내어 querystring에 expired라는 key가 존재하는 지 찾음 */
+    for (const keys of searchParams.keys()) {
+      const param = keys;
+      if (param === "expired")
+        dispatch(
+          setError("리프레시 토큰이 만료되었습니다. 다시 로그인해주세요.")
+        );
+    }
+  }, [dispatch, searchParams]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -43,7 +56,8 @@ const LoginContainer = (props) => {
           axios.defaults.headers.common[
             "Authorization"
           ] = `${response.data.result.data.accessToken}`;
-          dispatch(setLoggedInfo(response.data.result.data.user));
+          dispatch(setAccessToken(response.data.result.data.accessToken));
+          storage.set("loggedInfo", response.data.result.data.user);
         }
 
         navigate("/");
