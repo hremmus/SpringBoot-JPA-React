@@ -6,8 +6,9 @@ export const getPosts = (condition) => {
   return api.get(baseURL, { params: condition });
 };
 
-export const createPost = ({ title, content, categoryId }) => {
-  return api.post(baseURL, { title, content, categoryId });
+export const createPost = (request) => {
+  // HTTP Header의 Content-Type이 Application/json으로 되어 있지만 MultipartFile이 전송된다.
+  return api.post(baseURL, request);
 };
 
 export const getPost = (id) => {
