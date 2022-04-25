@@ -10,7 +10,9 @@ import {
 } from "@material-ui/core";
 import { PhotoCamera } from "@material-ui/icons";
 import { VerticalAligner } from "lib/styleUtils";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { changeInput } from "redux/modules/post";
 import { createPost, updatePost } from "services/PostService";
 import WriteActionButtons from "./WriteActionButtons";
 
@@ -18,18 +20,44 @@ const useStyles = makeStyles((theme) => ({
   input: {
     display: "none",
   },
+  imagePreview: {
+    width: "250px",
+    border: "solid 2px lightgray",
+    borderRadius: "5px",
+  },
 }));
 
-const PostWriter = ({ handleChange, id, title, content, categoryId }) => {
+const PostWriter = ({ id, title, content, categoryId, dispatch }) => {
   const classes = useStyles();
   const navigate = useNavigate();
 
   const formData = new FormData();
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    dispatch(
+      changeInput({
+        key: name,
+        value,
+      })
+    );
+  };
 
   const handleSubmit = (e) => {
+    e.preventDefault(); // refresh prevent
+
     formData.append("title", title);
     formData.append("content", content);
     formData.append("categoryId", categoryId);
+
+    if (selectedImages.length > 0) {
+      selectedImages.forEach((image) => {
+        formData.append("images", image);
+      });
+    }
     // for (const keyValue of formData) console.log(keyValue);
 
     if (id) {
@@ -48,11 +76,27 @@ const PostWriter = ({ handleChange, id, title, content, categoryId }) => {
         }
       })
       .catch((error) => alert(error.response.data.result.message));
+
+    // URL.createObjectURL()을 통해 생성한 Blob URL을 브라우저가 더이상 메모리에 들고 있지 않아도 된다고 알림
+    imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
+    setImagePreviews([]);
   };
 
   const handleImageChange = (e) => {
-    const image = e.target.files[0];
-    formData.append("images", image);
+    const files = e.target.files;
+    const updatedImages = Array.from(files);
+
+    /*
+     해당 메소드에서 URL.createObjectURL(image)과 formData.append("images", image)를 실행하고
+     handleSubmit 호출 시, formData에 images 객체가 사라지는 문제가 발생
+    => 폼 제출 시 images를 같이 append하는 것으로 변경, 컴포넌트 내에서만 사용할 배열을 생성하여 useState로 이미지 객체들을 관리
+    */
+    setSelectedImages((prevImages) => [...prevImages, ...updatedImages]);
+
+    const updatedPreviews = Array.from(files).map((file) =>
+      URL.createObjectURL(file)
+    );
+    setImagePreviews((previews) => [...previews, ...updatedPreviews]);
   };
 
   return (
@@ -109,6 +153,17 @@ const PostWriter = ({ handleChange, id, title, content, categoryId }) => {
             <PhotoCamera />
           </IconButton>
         </label>
+        <div>
+          {imagePreviews &&
+            imagePreviews.map((imageUrl, index) => (
+              <img
+                key={index}
+                src={imageUrl}
+                className={classes.imagePreview}
+                alt="preview-img"
+              />
+            ))}
+        </div>
       </VerticalAligner>
       <WriteActionButtons
         handleSubmit={handleSubmit}

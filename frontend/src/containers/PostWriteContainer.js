@@ -1,7 +1,7 @@
 import PostWriter from "components/Post/PostWriter";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { changeInput, initialize } from "redux/modules/post";
+import { initialize } from "redux/modules/post";
 
 const PostWriteContainer = () => {
   const dispatch = useDispatch();
@@ -18,24 +18,13 @@ const PostWriteContainer = () => {
     };
   }, [dispatch]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    dispatch(
-      changeInput({
-        key: name,
-        value,
-      })
-    );
-  };
-
   return (
     <PostWriter
       id={id}
       title={title}
       content={content}
       categoryId={categoryId}
-      handleChange={handleChange}
+      dispatch={dispatch}
     />
   );
 };
