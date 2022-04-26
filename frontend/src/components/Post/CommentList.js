@@ -26,6 +26,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.action.hover,
     overflow: "clip", // scroll 시 subheader도 같이 넘어가도록
     display: "flow-root",
+    marginTop: "16px",
   },
   inline: {
     display: "inline",
