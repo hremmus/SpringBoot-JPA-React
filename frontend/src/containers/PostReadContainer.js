@@ -1,6 +1,7 @@
 import CommentList from "components/Post/CommentList";
 import PostActionButtons from "components/Post/PostActionButtons";
 import PostReader from "components/Post/PostReader";
+import UploadedImageList from "components/Post/UploadedImageList";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
@@ -54,11 +55,7 @@ const PostReadContainer = () => {
       .catch((error) => console.log(error));
   };
 
-  if (!post) {
-    return null;
-  }
-
-  if (!comments) {
+  if (!post || !comments) {
     return null;
   }
 
@@ -72,6 +69,7 @@ const PostReadContainer = () => {
           )
         }
       />
+      {post.images && <UploadedImageList images={post.images} />}
       <CommentList
         postId={post.id}
         comments={comments}

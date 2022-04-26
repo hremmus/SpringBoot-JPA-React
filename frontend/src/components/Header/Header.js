@@ -10,7 +10,9 @@ const Positioner = styled.div`
   flex-direction: column;
   position: fixed;
   top: 0px;
+  left: 0px;
   width: 100%;
+  z-index: 9999;
 `;
 
 // Top
@@ -19,7 +21,7 @@ const Top = styled.div`
   height: 45px;
   width: 100%;
   background: url(${Bg});
-  background-color: #f5f3f2;
+  background-color: hsla(15, 14%, 95%, 0.85);
   background-position: top bottom;
   background-repeat: repeat-x;
   background-size: 100% 100%;
