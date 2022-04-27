@@ -8,7 +8,7 @@ import {
   TextField,
   makeStyles,
 } from "@material-ui/core";
-import { PhotoCamera } from "@material-ui/icons";
+import { Clear, PhotoCamera } from "@material-ui/icons";
 import { VerticalAligner } from "lib/styleUtils";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -20,10 +20,44 @@ const useStyles = makeStyles((theme) => ({
   input: {
     display: "none",
   },
-  imagePreview: {
-    width: "250px",
+  imagePreviewContainer: {
+    display: "flex",
+    flexWrap: "wrap",
+    marginTop: theme.spacing(2),
+  },
+  imagePreviewWrapper: {
+    position: "relative", // deleteButton을 범위 내에 위치시킴
+    flexBasis: "32.3%",
+    maxWidth: "32.3%",
     border: "solid 2px lightgray",
     borderRadius: "5px",
+    boxSizing: "border-box", // 크기에 테두리 포함
+    marginBottom: theme.spacing(2),
+    marginRight: theme.spacing(1),
+    padding: theme.spacing(1),
+
+    "& img": {
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
+    },
+
+    "&:hover": {
+      "& $deleteButton": {
+        opacity: 1,
+        zIndex: 1,
+      },
+    },
+  },
+  deleteButton: {
+    position: "absolute", // deleteButton을 상위 div에 고정
+    top: 5,
+    right: 5,
+    // hover하기 전엔 뜨지 않음
+    cursor: "pointer",
+    opacity: 0,
+    zIndex: 0,
+    transition: "opacity 0.3s",
   },
 }));
 
@@ -99,6 +133,16 @@ const PostWriter = ({ id, title, content, categoryId, dispatch }) => {
     setImagePreviews((previews) => [...previews, ...updatedPreviews]);
   };
 
+  const deleteImage = (index) => {
+    const tempFileList = [...selectedImages];
+    tempFileList.splice(index, 1); // state, deleteCount
+    setSelectedImages(tempFileList);
+
+    const tempPreviewList = [...imagePreviews];
+    tempPreviewList.splice(index, 1); // state, deleteCount
+    setImagePreviews(tempPreviewList);
+  };
+
   return (
     <Container maxWidth="md" style={{ paddingTop: "6.5rem" }}>
       <VerticalAligner>
@@ -153,15 +197,20 @@ const PostWriter = ({ id, title, content, categoryId, dispatch }) => {
             <PhotoCamera />
           </IconButton>
         </label>
-        <div>
+        <div className={classes.imagePreviewContainer}>
           {imagePreviews &&
             imagePreviews.map((imageUrl, index) => (
-              <img
-                key={index}
-                src={imageUrl}
-                className={classes.imagePreview}
-                alt="preview-img"
-              />
+              <div key={index} className={classes.imagePreviewWrapper}>
+                <img src={imageUrl} alt="preview-img" />
+                <div
+                  className={classes.deleteButton}
+                  onClick={() => {
+                    deleteImage(index);
+                  }}
+                >
+                  <Clear fontSize="large" color="error" />
+                </div>
+              </div>
             ))}
         </div>
       </VerticalAligner>
