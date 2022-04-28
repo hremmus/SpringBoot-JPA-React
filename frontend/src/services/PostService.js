@@ -15,8 +15,8 @@ export const getPost = (id) => {
   return api.get(baseURL + `${id}`);
 };
 
-export const updatePost = ({ id, title, content, categoryId }) => {
-  return api.put(baseURL + `${id}`, { title, content, categoryId });
+export const updatePost = (id, request) => {
+  return api.put(baseURL + `${id}`, request);
 };
 
 export const deletePost = (id) => {

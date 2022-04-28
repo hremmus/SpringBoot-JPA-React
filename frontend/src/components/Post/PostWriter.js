@@ -61,13 +61,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const PostWriter = ({ id, title, content, categoryId, dispatch }) => {
+const PostWriter = ({ id, title, content, categoryId, images, dispatch }) => {
   const classes = useStyles();
   const navigate = useNavigate();
 
   const formData = new FormData();
   const [selectedImages, setSelectedImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
+
+  const [loadedImages, setDeleteImage] = useState([...images]);
+  const [deletedImageIds, setDeletedImageIds] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -86,30 +89,41 @@ const PostWriter = ({ id, title, content, categoryId, dispatch }) => {
     formData.append("title", title);
     formData.append("content", content);
     formData.append("categoryId", categoryId);
-
-    if (selectedImages.length > 0) {
-      selectedImages.forEach((image) => {
-        formData.append("images", image);
-      });
-    }
     // for (const keyValue of formData) console.log(keyValue);
 
+    if (!id) {
+      if (selectedImages.length > 0) {
+        selectedImages.forEach((image) => {
+          formData.append("images", image);
+        });
+      }
+
+      createPost(formData)
+        .then((response) => {
+          if (response.data.success) {
+            navigate("/posts");
+          }
+        })
+        .catch((error) => alert(error.response.data.result.message));
+    }
+
     if (id) {
-      updatePost({ id, title, content, categoryId })
+      if (selectedImages.length > 0) {
+        selectedImages.forEach((image) => {
+          formData.append("addedImages", image);
+        });
+      }
+      if (deletedImageIds.length > 0) {
+        formData.append("deletedImages", deletedImageIds);
+      }
+
+      updatePost(id, formData)
         .then((response) => {
           if (response.data.success) navigate(`/posts/${id}`);
         })
         .catch((error) => console.log(error));
       return;
     }
-
-    createPost(formData)
-      .then((response) => {
-        if (response.data.success) {
-          navigate("/posts");
-        }
-      })
-      .catch((error) => alert(error.response.data.result.message));
 
     // URL.createObjectURL()을 통해 생성한 Blob URL을 브라우저가 더이상 메모리에 들고 있지 않아도 된다고 알림
     imagePreviews.forEach((preview) => URL.revokeObjectURL(preview));
@@ -133,7 +147,7 @@ const PostWriter = ({ id, title, content, categoryId, dispatch }) => {
     setImagePreviews((previews) => [...previews, ...updatedPreviews]);
   };
 
-  const deleteImage = (index) => {
+  const deleteTempImage = (index) => {
     const tempFileList = [...selectedImages];
     tempFileList.splice(index, 1); // state, deleteCount
     setSelectedImages(tempFileList);
@@ -141,6 +155,15 @@ const PostWriter = ({ id, title, content, categoryId, dispatch }) => {
     const tempPreviewList = [...imagePreviews];
     tempPreviewList.splice(index, 1); // state, deleteCount
     setImagePreviews(tempPreviewList);
+  };
+
+  const deleteImage = (id) => {
+    setDeletedImageIds((prevIds) => [...prevIds, id]);
+    setDeleteImage(
+      loadedImages.filter(
+        (image) => image.id !== id // id가 일치하지 않는 원소들을 추출해서 새 배열을 만듦
+      )
+    );
   };
 
   return (
@@ -205,7 +228,21 @@ const PostWriter = ({ id, title, content, categoryId, dispatch }) => {
                 <div
                   className={classes.deleteButton}
                   onClick={() => {
-                    deleteImage(index);
+                    deleteTempImage(index);
+                  }}
+                >
+                  <Clear fontSize="large" color="error" />
+                </div>
+              </div>
+            ))}
+          {loadedImages &&
+            loadedImages.map((loadedImage) => (
+              <div key={loadedImage.id} className={classes.imagePreviewWrapper}>
+                <img src={`/img/` + loadedImage.uniqueName} alt="preview-img" />
+                <div
+                  className={classes.deleteButton}
+                  onClick={() => {
+                    deleteImage(loadedImage.id);
                   }}
                 >
                   <Clear fontSize="large" color="error" />
