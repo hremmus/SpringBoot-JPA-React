@@ -22,6 +22,7 @@ const initialState = {
   title: "",
   content: "",
   categoryId: "",
+  images: [],
 };
 
 const post = handleActions(
@@ -42,6 +43,7 @@ const post = handleActions(
       title: post.title,
       content: post.content,
       categoryId: post.categoryId,
+      images: post.images,
     }),
   },
   initialState
