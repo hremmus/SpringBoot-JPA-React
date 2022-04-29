@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 const ButtonBlock = styled.div`
-  width: 125px;
+  padding: 0px 45px;
+  width: 15px;
   position: relative;
 `;
 
