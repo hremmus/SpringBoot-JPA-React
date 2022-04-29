@@ -2,11 +2,12 @@ import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 const NavContainer = styled.div`
-  width: 250px;
-  display: flex;
+  width: 200px;
+  margin-left: auto;
 `;
 
 const Ul = styled.ul`
+  display: flex;
   width: 100%;
   padding: 0 7%;
   list-style: none;
@@ -14,7 +15,6 @@ const Ul = styled.ul`
 `;
 
 const Li = styled.li`
-  float: left;
   padding: 0 0 4px 0;
   margin-right: 40px;
 `;
