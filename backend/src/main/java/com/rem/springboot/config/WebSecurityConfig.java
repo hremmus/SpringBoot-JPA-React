@@ -29,37 +29,34 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
   @Override
   public void configure(WebSecurity webSecurity) {
-    webSecurity
-    .ignoring().antMatchers("/h2-console/**", "/favicon.ico");
+    webSecurity.ignoring().antMatchers("/h2-console/**", "/favicon.ico");
 
-    webSecurity
-    .ignoring().mvcMatchers("/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**");
+    webSecurity.ignoring().mvcMatchers("/swagger-ui/**", "/swagger-resources/**",
+        "/v3/api-docs/**");
   }
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
-    http
-    .cors().configurationSource(corsConfigurationSource()).and().csrf().disable()
-    .exceptionHandling()
-    .authenticationEntryPoint(new AuthenticationEntryPointImpl())
-    .accessDeniedHandler(new AccessDeniedHandlerImpl()).and()
-    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-    .authorizeRequests()
-    .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-    .antMatchers(HttpMethod.GET, "/image/**").permitAll()
-    .antMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
-    .antMatchers(HttpMethod.DELETE, "/api/user/{id}/**").authenticated()
-    .antMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
-    .antMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
-    .antMatchers(HttpMethod.POST, "/api/posts/**").authenticated()
-    .antMatchers(HttpMethod.PUT, "/api/posts/{id}").authenticated()
-    .antMatchers(HttpMethod.DELETE, "/api/posts/{id}").authenticated()
-    .antMatchers(HttpMethod.POST, "/api/comments/**").authenticated()
-    .antMatchers(HttpMethod.PATCH, "/api/comments/{id}").authenticated()
-    .antMatchers(HttpMethod.DELETE, "/api/comments/{id}").authenticated()
-    .antMatchers(HttpMethod.GET, "/api/**").permitAll()
-    .anyRequest().hasAnyRole("ADMIN").and()
-    .addFilterBefore(new AuthTokenFilter(userDetailsService), UsernamePasswordAuthenticationFilter.class);
+    http.cors().configurationSource(corsConfigurationSource()).and().csrf().disable()
+        .exceptionHandling().authenticationEntryPoint(new AuthenticationEntryPointImpl())
+        .accessDeniedHandler(new AccessDeniedHandlerImpl()).and().sessionManagement()
+        .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
+        .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+        .antMatchers(HttpMethod.GET, "/image/**").permitAll()
+        .antMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+        .antMatchers(HttpMethod.DELETE, "/api/user/{id}/**").authenticated()
+        .antMatchers(HttpMethod.POST, "/api/settings/{id}/location/**").authenticated()
+        .antMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
+        .antMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
+        .antMatchers(HttpMethod.POST, "/api/posts/**").authenticated()
+        .antMatchers(HttpMethod.PUT, "/api/posts/{id}").authenticated()
+        .antMatchers(HttpMethod.DELETE, "/api/posts/{id}").authenticated()
+        .antMatchers(HttpMethod.POST, "/api/comments/**").authenticated()
+        .antMatchers(HttpMethod.PATCH, "/api/comments/{id}").authenticated()
+        .antMatchers(HttpMethod.DELETE, "/api/comments/{id}").authenticated()
+        .antMatchers(HttpMethod.GET, "/api/**").permitAll().anyRequest().hasAnyRole("ADMIN").and()
+        .addFilterBefore(new AuthTokenFilter(userDetailsService),
+            UsernamePasswordAuthenticationFilter.class);
   }
 
   @Bean

@@ -76,7 +76,8 @@ public class ExceptionAdvice {
 
   @ExceptionHandler(CannotConvertHierarchicalStructureException.class)
   @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-  public Response cannotConvertNestedStructureException(CannotConvertHierarchicalStructureException e) {
+  public Response cannotConvertNestedStructureException(
+      CannotConvertHierarchicalStructureException e) {
     log.error("e = {}", e.getMessage());
     return Response.failure(-1011, "계층형 구조 변환에 실패하였습니다.");
   }
@@ -104,5 +105,11 @@ public class ExceptionAdvice {
   @ResponseStatus(HttpStatus.NOT_FOUND)
   public Response commentNotFoundException() {
     return Response.failure(-1015, "존재하지 않는 댓글입니다.");
+  }
+
+  @ExceptionHandler(LocationNotFoundException.class)
+  @ResponseStatus(HttpStatus.NOT_FOUND)
+  public Response locationNotFoundException() {
+    return Response.failure(-1016, "존재하지 않는 지역입니다.");
   }
 }

@@ -7,9 +7,11 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -55,6 +57,14 @@ public class User extends EntityDate {
   @Setter
   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private Set<UserRole> roles = new HashSet<>();
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @ToString.Exclude
+  private Location location;
+
+  public void updateLocation(Location location) {
+    this.location = location;
+  }
 
   private String refreshToken;
 
