@@ -1,4 +1,6 @@
+import { Grid } from "@material-ui/core";
 import HeaderContainer from "containers/HeaderContainer";
+import LeftSidebarContainer from "containers/LeftSidebarContainer";
 import storage from "lib/storage";
 import Auth from "pages/Auth";
 import Home from "pages/Home";
@@ -8,6 +10,7 @@ import WritePost from "pages/WritePost";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, Routes, useNavigate } from "react-router-dom";
+import { isLoaded, isLoading } from "redux/modules/loading";
 import { logout, setAccessToken, setLoggedInfo } from "redux/modules/user";
 import api from "services";
 import { refreshToken } from "services/AuthService";
@@ -21,21 +24,32 @@ function App() {
 
   useEffect(() => {
     const loggedInfo = storage.get("loggedInfo");
-    if (!loggedInfo) return;
-    dispatch(setLoggedInfo(loggedInfo));
+    if (loggedInfo) dispatch(setLoggedInfo(loggedInfo));
 
     api.interceptors.request.use(
       (config) => {
+        // 로딩 호출
+        dispatch(isLoading());
         if (config.headers["Authorization"] === undefined)
           config.headers["Authorization"] = accessToken;
         return config;
       },
-      (error) => Promise.reject(error)
+      (error) => {
+        // 실패 시 로딩 종료
+        dispatch(isLoaded());
+        return Promise.reject(error);
+      }
     );
 
     api.interceptors.response.use(
-      (response) => response,
+      (response) => {
+        // 완료 시 로딩 종료
+        dispatch(isLoaded());
+        return response;
+      },
       async (error) => {
+        // 실패 시 로딩 종료
+        dispatch(isLoaded());
         const {
           config,
           response: { status },
@@ -63,17 +77,26 @@ function App() {
     );
   }, [dispatch, navigate, accessToken]);
 
+  const isHomePage = window.location.pathname === "/";
+
   return (
-    <div>
+    <>
       <HeaderContainer />
-      <Routes>
-        <Route index element={<Home />} />
-        <Route path="/auth/*" element={<Auth />} />
-        <Route path="/posts" element={<Posts />} />
-        <Route path="/posts/write" element={<WritePost />} />
-        <Route path="/posts/:postId" element={<Post />} />
-      </Routes>
-    </div>
+      <Grid container>
+        <LeftSidebarContainer />
+        <Grid item xs={10}>
+          <Grid xs={12} lg={isHomePage ? 12 : 10}>
+            <Routes>
+              <Route path="/auth/*" element={<Auth />} />
+              <Route index element={<Home />} />
+              <Route path="/posts" element={<Posts />} />
+              <Route path="/posts/write" element={<WritePost />} />
+              <Route path="/posts/:postId" element={<Post />} />
+            </Routes>
+          </Grid>
+        </Grid>
+      </Grid>
+    </>
   );
 }
 

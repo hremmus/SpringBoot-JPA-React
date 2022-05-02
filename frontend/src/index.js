@@ -3,6 +3,7 @@ import {
   unstable_createMuiStrictModeTheme,
 } from "@material-ui/core";
 import App from "App";
+import Spinner from "components/Spinner";
 import "index.css";
 import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
@@ -16,6 +17,7 @@ ReactDOM.render(
   <BrowserRouter>
     <Provider store={store}>
       <ThemeProvider theme={theme}>
+        <Spinner />
         <App />
       </ThemeProvider>
     </Provider>

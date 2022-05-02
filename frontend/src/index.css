@@ -1,4 +1,17 @@
-@import url("https://fonts.googleapis.com/css2?family=Neuton:wght@800&display=swap");
+@font-face {
+  font-family: "Berold Regular";
+  src: url("./assets/font/Berold regular.otf") format("opentype");
+}
+
+@font-face {
+  font-family: "Goldplay";
+  src: url("./assets/font/Goldplay-Medium.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Kopub Dotum Light";
+  src: url("./assets/font/KoPubWorld Dotum_Pro Light.otf") format("opentype");
+}
 
 body {
   margin: 0;
