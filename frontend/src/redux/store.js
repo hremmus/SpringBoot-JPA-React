@@ -3,6 +3,7 @@ import auth from "redux/modules/auth";
 import categories from "redux/modules/categories";
 import comment from "redux/modules/comment";
 import header from "redux/modules/header";
+import loading from "redux/modules/loading";
 import post from "redux/modules/post";
 import posts from "redux/modules/posts";
 import user from "redux/modules/user";
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
   posts,
   categories,
   comment,
+  loading,
 });
 
 export const store = configureStore(
