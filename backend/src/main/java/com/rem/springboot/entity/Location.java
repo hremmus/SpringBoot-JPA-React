@@ -15,26 +15,37 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Location {
-  public Location(String province, String city) {
-    this.province = province;
-    this.city = city;
+  public Location(String global, String local, double latitude, double longitude) {
+    this.global = global;
+    this.local = local;
+    this.latitude = latitude;
+    this.longitude = longitude;
   }
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @Column(nullable = true)
-  private String province;
+  @Column(nullable = false)
+  private String global;
 
   @Column(nullable = false)
-  private String city;
+  private String local;
+
+  @Column(nullable = false)
+  private double latitude;
+
+  @Column(nullable = false)
+  private double longitude;
 
   public static Location map(String line) {
     String[] split = line.split(",");
     Location location = new Location();
-    if (!split[1].equals("none")) location.province = split[1];
-    location.city = split[0];
+    location.global = split[0];
+    location.local = split[1];
+    location.latitude = Double.parseDouble(split[2]);
+    location.longitude = Double.parseDouble(split[3]);
+
     return location;
   }
 }

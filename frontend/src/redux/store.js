@@ -4,6 +4,8 @@ import categories from "redux/modules/categories";
 import comment from "redux/modules/comment";
 import header from "redux/modules/header";
 import loading from "redux/modules/loading";
+import location from "redux/modules/location";
+import menu from "redux/modules/menu";
 import post from "redux/modules/post";
 import posts from "redux/modules/posts";
 import user from "redux/modules/user";
@@ -16,7 +18,9 @@ const rootReducer = combineReducers({
   posts,
   categories,
   comment,
+  location,
   loading,
+  menu,
 });
 
 export const store = configureStore(

@@ -12,10 +12,13 @@ import lombok.Setter;
 @Setter
 public class LocationDto {
   private Long id;
-  private String province;
-  private String city;
+  private String global;
+  private String local;
+  private double latitude;
+  private double longitude;
 
   public static LocationDto toDto(Location location) {
-    return new LocationDto(location.getId(), location.getProvince(), location.getCity());
+    return new LocationDto(location.getId(), location.getGlobal(), location.getLocal(),
+        location.getLatitude(), location.getLongitude());
   }
 }

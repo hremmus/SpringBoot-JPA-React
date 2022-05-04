@@ -2,6 +2,21 @@ import oc from "open-color";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
+const AuthWrapper = ({ children }) => (
+  <Positioner>
+    <FormBox>
+      <Header>
+        <Logo to="/">Move in waves</Logo>
+      </Header>
+      <Container>
+        <Content>{children}</Content>
+      </Container>
+    </FormBox>
+  </Positioner>
+);
+
+export default AuthWrapper;
+
 // 중앙 고정
 const Positioner = styled.div`
   position: absolute;
@@ -26,10 +41,10 @@ const Header = styled.div`
 // 로고
 const Logo = styled(Link)`
   padding-bottom: 5px;
-  font-size: 3rem;
-  letter-spacing: 4px;
-  color: ${oc.green[9]};
-  font-family: "Neuton";
+  font-family: "Berold Regular";
+  font-size: calc(1.8rem + 1vw);
+  letter-spacing: 2px;
+  color: ${oc.gray[8]};
   text-decoration: none;
 `;
 
@@ -46,18 +61,3 @@ const Content = styled.div`
   padding: 25px 15px;
   margin: 15px 30px 15px;
 `;
-
-const AuthWrapper = ({ children }) => (
-  <Positioner>
-    <FormBox>
-      <Header>
-        <Logo to="/">vegeable</Logo>
-      </Header>
-      <Container>
-        <Content>{children}</Content>
-      </Container>
-    </FormBox>
-  </Positioner>
-);
-
-export default AuthWrapper;
