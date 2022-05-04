@@ -13,6 +13,12 @@
   src: url("./assets/font/KoPubWorld Dotum_Pro Light.otf") format("opentype");
 }
 
+@font-face {
+  font-family: "NIXGONM-Vb";
+  src: url("https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/NIXGONM-Vb.woff")
+    format("woff");
+}
+
 body {
   margin: 0;
   padding: 0;

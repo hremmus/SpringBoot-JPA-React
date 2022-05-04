@@ -4,6 +4,7 @@ import LeftSidebarContainer from "containers/LeftSidebarContainer";
 import storage from "lib/storage";
 import Auth from "pages/Auth";
 import Home from "pages/Home";
+import Locations from "pages/Locations";
 import Post from "pages/Post";
 import Posts from "pages/Posts";
 import WritePost from "pages/WritePost";
@@ -92,6 +93,7 @@ function App() {
               <Route path="/posts" element={<Posts />} />
               <Route path="/posts/write" element={<WritePost />} />
               <Route path="/posts/:postId" element={<Post />} />
+              <Route path="/location/:global" element={<Locations />} />
             </Routes>
           </Grid>
         </Grid>
