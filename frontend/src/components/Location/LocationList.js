@@ -1,26 +1,12 @@
-import { Box } from "@material-ui/core";
-import { ReactComponent as CamOff } from "assets/svg/camera-off.svg";
 import oc from "open-color";
 import styled from "styled-components";
 import GradeChip from "./GradeChip";
+import WebCam from "./WebCam";
 
 const LocationList = ({ location }) => {
   return (
     <CardWrapper key={location.id}>
-      <Box
-        display="flex"
-        position="relative"
-        height="170px"
-        bgcolor={oc.gray[2]}
-        justifyContent="center"
-        alignItems="center"
-        fontFamily="Kopub Dotum Light"
-      >
-        <CamOffStyled />
-        <span>
-          <b>준비중</b>입니다
-        </span>
-      </Box>
+      <WebCam latitude={location.latitude} longitude={location.longitude} />
       <CardContent>
         <div className="align">
           <GradeChip grade="초급" />
@@ -39,11 +25,6 @@ const CardWrapper = styled.div`
   overflow: hidden;
   background-color: #ffffff;
   border-radius: 25% 10%;
-`;
-
-const CamOffStyled = styled(CamOff)`
-  margin-right: 0.5rem;
-  stroke: #3a3c42;
 `;
 
 const CardContent = styled.div`
