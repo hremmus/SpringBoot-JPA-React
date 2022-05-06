@@ -1,31 +1,19 @@
 import oc from "open-color";
 import styled from "styled-components";
 import GradeChip from "./GradeChip";
-import WebCam from "./WebCam";
 
 const LocationList = ({ location }) => {
   return (
-    <CardWrapper key={location.id}>
-      <WebCam latitude={location.latitude} longitude={location.longitude} />
-      <CardContent>
-        <div className="align">
-          <GradeChip grade="초급" />
-          <div className="text">{location.local}</div>
-        </div>
-      </CardContent>
-    </CardWrapper>
+    <CardContent>
+      <div className="align">
+        <GradeChip grade="초급" />
+        <div className="text">{location.local}</div>
+      </div>
+    </CardContent>
   );
 };
 
 export default LocationList;
-
-const CardWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background-color: #ffffff;
-  border-radius: 25% 10%;
-`;
 
 const CardContent = styled.div`
   display: flex;
