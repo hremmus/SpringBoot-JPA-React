@@ -15,34 +15,39 @@ const convert = ({ title, urls, images }) => {
 };
 
 const WebCam = ({ latitude, longitude }) => {
-  const [webcams, setWebcams] = useState([]);
-
+  const [webcam, setWebcam] = useState(null);
   useEffect(() => {
+    let isMounted = true;
+
     getWebCams(latitude, longitude)
       .then((response) => {
         const { webcams } = response.data;
-        if (webcams.length > 0) {
-          setWebcams(webcams.map(convert));
+        if (isMounted && webcams.length > 0) {
+          setWebcam(webcams.map(convert)[0]);
+        } else {
+          setWebcam(null);
         }
       })
       .catch((error) => console.log(error));
+
+    return () => {
+      isMounted = false;
+    };
   }, [latitude, longitude]);
 
   return (
     <>
-      {webcams.length > 0 ? (
-        webcams.map((webcam, index) => (
-          <WebCamWrapper key={index}>
-            <WebCamImage src={webcam.image} alt={webcam.name} />
-            <WebCamLink
-              href={webcam.source}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              View WebCam
-            </WebCamLink>
-          </WebCamWrapper>
-        ))
+      {webcam ? (
+        <WebCamWrapper>
+          <WebCamImage src={webcam.image} alt={webcam.name} />
+          <WebCamLink
+            href={webcam.source}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            View WebCam
+          </WebCamLink>
+        </WebCamWrapper>
       ) : (
         <Box
           display="flex"

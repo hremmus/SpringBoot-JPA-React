@@ -1,16 +1,17 @@
 import { Box } from "@material-ui/core";
 import GlobalLocation from "components/Location/GlobalLocation";
 import LocationList from "components/Location/LocationList";
+import WebCam from "components/Location/WebCam";
 import { media } from "lib/styleUtils";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { loadLocations } from "redux/modules/location";
-import { initialize, setMenu } from "redux/modules/menu";
+import { setMenu } from "redux/modules/menu";
 import { getLocations } from "services/LocationService";
 import styled from "styled-components";
 
-const menu = [
+const menuData = [
   { name: "양양 yangyang", link: "/location/yangyang" },
   { name: "제주 jeju", link: "/location/jeju" },
   { name: "고성 goseong", link: "/location/goseong" },
@@ -60,46 +61,49 @@ const globalLocationData = [
 
 const LocationListContainer = () => {
   const { pathname } = useLocation();
-  const { locations } = useSelector(({ location }) => ({
-    locations: location.locations,
-  }));
+  const menu = useSelector((state) => state.menu.menu);
+  const locations = useSelector((state) => state.location.locations);
 
   const dispatch = useDispatch();
   const [selectedGlobalLocation, setSelectedGlobalLocation] = useState({});
 
   useEffect(() => {
-    dispatch(setMenu(menu));
+    dispatch(setMenu(menuData));
+  }, [dispatch]);
 
+  useEffect(() => {
     let requestData;
-    for (const item of menu) {
-      if (pathname === item.link) {
-        requestData = item.name.substring(0, 2); // 한글명으로 요청
-        break;
-      }
+    const selectedMenuItem = menu.find((item) => item.link === pathname);
+    if (selectedMenuItem) {
+      requestData = selectedMenuItem.name.substring(0, 2); // 한글명으로 요청
     }
+
+    const selectedGlobalData = globalLocationData.find(
+      (element) => element.title === requestData
+    );
+    setSelectedGlobalLocation(selectedGlobalData || {});
 
     getLocations(requestData)
       .then((response) => {
         dispatch(loadLocations(response.data.result.data.locationList));
       })
       .catch((error) => console.log(error));
+  }, [dispatch, menu, pathname]);
 
-    setSelectedGlobalLocation(
-      globalLocationData.find((element) => element.title === requestData)
-    );
-
-    return () => {
-      dispatch(initialize());
-    };
-  }, [dispatch, pathname]);
-
+  if (!locations) return;
   return (
     <>
       <GlobalLocation selectedGlobalLocation={selectedGlobalLocation} />
       <Box paddingY="1rem">
         <CardGrid>
-          {locations.map((location) => (
-            <LocationList location={location} />
+          {locations.map((location, index) => (
+            <CardWrapper>
+              <WebCam
+                latitude={location.latitude}
+                longitude={location.longitude}
+              />
+              <LocationList location={location} />
+            </CardWrapper>
           ))}
         </CardGrid>
       </Box>
@@ -122,4 +126,12 @@ const CardGrid = styled.div`
   ${media.tablet`
     grid-template-columns: repeat(1, 1fr);
   `}
+`;
+
+const CardWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #ffffff;
+  border-radius: 25% 10%;
 `;
