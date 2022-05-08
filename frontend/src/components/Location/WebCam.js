@@ -1,40 +1,9 @@
 import { Box } from "@material-ui/core";
 import { ReactComponent as CamOff } from "assets/svg/camera-off.svg";
 import oc from "open-color";
-import { useEffect, useState } from "react";
-import { getWebCams } from "services/ForecastService";
 import styled from "styled-components";
 
-const convert = ({ title, urls, images }) => {
-  const name = title.replace(/'/g, "&apos;");
-  return {
-    name,
-    source: urls.detail,
-    image: images.current.preview,
-  };
-};
-
-const WebCam = ({ latitude, longitude }) => {
-  const [webcam, setWebcam] = useState(null);
-  useEffect(() => {
-    let isMounted = true;
-
-    getWebCams(latitude, longitude)
-      .then((response) => {
-        const { webcams } = response.data;
-        if (isMounted && webcams.length > 0) {
-          setWebcam(webcams.map(convert)[0]);
-        } else {
-          setWebcam(null);
-        }
-      })
-      .catch((error) => console.log(error));
-
-    return () => {
-      isMounted = false;
-    };
-  }, [latitude, longitude]);
-
+const WebCam = ({ webcam }) => {
   return (
     <>
       {webcam ? (

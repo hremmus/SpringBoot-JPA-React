@@ -1,13 +1,14 @@
 import { Box } from "@material-ui/core";
 import GlobalLocation from "components/Location/GlobalLocation";
-import LocationList from "components/Location/LocationList";
+import LocationCard from "components/Location/LocationCard";
 import WebCam from "components/Location/WebCam";
 import { media } from "lib/styleUtils";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { loadLocations } from "redux/modules/location";
+import { loadLocations, setWebcam } from "redux/modules/location";
 import { setMenu } from "redux/modules/menu";
+import { getWebCam } from "services/ForecastService";
 import { getLocations } from "services/LocationService";
 import styled from "styled-components";
 
@@ -59,6 +60,15 @@ const globalLocationData = [
   },
 ];
 
+const convert = ({ title, urls, images }) => {
+  const name = title.replace(/'/g, "&apos;");
+  return {
+    name,
+    source: urls.detail,
+    image: images.current.preview,
+  };
+};
+
 const LocationListContainer = () => {
   const { pathname } = useLocation();
   const menu = useSelector((state) => state.menu.menu);
@@ -83,12 +93,48 @@ const LocationListContainer = () => {
     );
     setSelectedGlobalLocation(selectedGlobalData || {});
 
-    getLocations(requestData)
-      .then((response) => {
+    const fetchLocationsData = async () => {
+      try {
+        const response = await getLocations(requestData);
         dispatch(loadLocations(response.data.result.data.locationList));
-      })
-      .catch((error) => console.log(error));
+      } catch (error) {
+        console.error("error fetcing locations:", error);
+      }
+    };
+
+    fetchLocationsData();
   }, [dispatch, menu, pathname]);
+
+  useEffect(() => {
+    if (locations.length > 0) {
+      const fetchWebcamData = async () => {
+        try {
+          // 배열을 Promise.all의 매개변수로 하여 호출하면, 모든 약속의 이행 결과(response.data)를 새 배열에 담아서 반환
+          // 일련의 비동기 작업 여러 개가 모두 이행 or 하나라도 거부되는 경우를 다룸
+          // 장점: 비동기 작업의 동시 실행 = 병렬 처리가 가능 => 시간 단축, 오류 처리 간소화
+          const promises = locations.map(async (location) => {
+            if (!location.webcam) {
+              const { id, latitude, longitude } = location;
+              const response = await getWebCam(latitude, longitude);
+
+              if (response.data.webcams.length > 0) {
+                dispatch(setWebcam(id, convert(response.data.webcams[0])));
+              }
+
+              return response.data; // 응답 데이터, 데이터 속성을 포함
+            }
+          });
+
+          // await가 앞에 있으면 배열의 모든 promise가 처리될 때까지 기다림 (다음 코드의 실행을 차단)
+          await Promise.all(promises); // 각 location의 response.data가 배열로 수집됨
+        } catch (error) {
+          console.error("error fetching webcam:", error);
+        }
+      };
+
+      fetchWebcamData();
+    }
+  }, [dispatch, locations]);
 
   if (!locations) return;
   return (
@@ -96,13 +142,10 @@ const LocationListContainer = () => {
       <GlobalLocation selectedGlobalLocation={selectedGlobalLocation} />
       <Box paddingY="1rem">
         <CardGrid>
-          {locations.map((location, index) => (
-            <CardWrapper>
-              <WebCam
-                latitude={location.latitude}
-                longitude={location.longitude}
-              />
-              <LocationList location={location} />
+          {locations.map((location) => (
+            <CardWrapper key={location.id}>
+              <WebCam webcam={location.webcam} />
+              <LocationCard local={location.local} />
             </CardWrapper>
           ))}
         </CardGrid>

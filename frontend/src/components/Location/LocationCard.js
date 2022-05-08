@@ -2,18 +2,18 @@ import oc from "open-color";
 import styled from "styled-components";
 import GradeChip from "./GradeChip";
 
-const LocationList = ({ location }) => {
+const LocationCard = ({ local }) => {
   return (
     <CardContent>
       <div className="align">
         <GradeChip grade="초급" />
-        <div className="text">{location.local}</div>
+        <div className="text">{local}</div>
       </div>
     </CardContent>
   );
 };
 
-export default LocationList;
+export default LocationCard;
 
 const CardContent = styled.div`
   display: flex;
