@@ -19,7 +19,9 @@ const LeftSidebarContainer = () => {
       <CategoryList>
         {menu.map((item, index) => (
           <CategoryListItem key={index}>
-            <StyledLink to={item.link}>{item.name}</StyledLink>
+            <StyledLink to={item.link} state={item.state}>
+              {item.name}
+            </StyledLink>
           </CategoryListItem>
         ))}
       </CategoryList>

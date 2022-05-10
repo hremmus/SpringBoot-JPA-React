@@ -1,11 +1,25 @@
-import { Box, Chip, Grid, Typography } from "@material-ui/core";
+import { Box, Grid, Typography } from "@material-ui/core";
+import GangneungPNG from "assets/img/gangneung.png";
+import GoseongPNG from "assets/img/goseong.png";
+import JejuPNG from "assets/img/jeju.png";
 import BackgroundJPG from "assets/img/main-background.jpg";
+import NamhaePNG from "assets/img/namhae.png";
+import PohangPNG from "assets/img/pohang.png";
 import WavePNG from "assets/img/wave-icon.png";
-import YangyangPNG from "assets/img/yangyang.PNG";
+import YangyangPNG from "assets/img/yangyang.png";
+import LocationListItem from "components/Home/LocationListItem";
 import { media } from "lib/styleUtils";
 import oc from "open-color";
-import { Link } from "react-router-dom";
 import styled from "styled-components";
+
+const LocationThumbnails = [
+  { url: "/location/yangyang", image: YangyangPNG, name: "양양" },
+  { url: "/location/jeju", image: JejuPNG, name: "제주" },
+  { url: "/location/goseong", image: GoseongPNG, name: "고성" },
+  { url: "/location/gangneung", image: GangneungPNG, name: "강릉" },
+  { url: "/location/pohang", image: PohangPNG, name: "포항" },
+  { url: "/location/namhae", image: NamhaePNG, name: "남해" },
+];
 
 const Home = () => {
   return (
@@ -53,22 +67,14 @@ const Home = () => {
             </Typography>
           </Box>
           <Box display="flex" margin="1vh 0 0 1vh">
-            <Link to="/location/yangyang">
-              <LocationItem>
-                <LocationImage src={YangyangPNG} alt="" />
-                <LocationName
-                  label="양양"
-                  size="small"
-                  variant="outlined"
-                  className="name"
-                />
-              </LocationItem>
-            </Link>
-            <LocationItem></LocationItem>
-            <LocationItem></LocationItem>
-            <LocationItem></LocationItem>
-            <LocationItem></LocationItem>
-            <LocationItem></LocationItem>
+            {LocationThumbnails.map((item, index) => (
+              <LocationListItem
+                key={index}
+                url={item.url}
+                image={item.image}
+                name={item.name}
+              />
+            ))}
           </Box>
         </Grid>
         <WallpaperContainer>
@@ -117,46 +123,4 @@ const WallpaperImage = styled.img`
     width: 100%;
     right: 0;
   `}
-`;
-
-const LocationItem = styled(Box)`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 200px;
-  height: 200px;
-  margin: 8px;
-  padding: 8px;
-  border-radius: 18px;
-  border: 1px solid ${oc.gray[2]};
-  background: hsla(15, 14%, 95%, 0.35);
-  position: relative; // 자식 요소 Chip의 위치 지정을 위해 쓰임
-  overflow: hidden; // 자식 요소 img 확대(scale) 시 테두리를 벗어나지 않도록 함
-
-  &:hover {
-    .name {
-      opacity: 1;
-    }
-  }
-`;
-
-const LocationName = styled(Chip)`
-  position: absolute;
-  top: 5%;
-  left: 5%;
-  opacity: 0;
-`;
-
-const LocationImage = styled.img`
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 18px;
-  opacity: 0.9;
-
-  transition: transform 0.3s ease;
-  &:hover {
-    transform: scale(1.3);
-    opacity: 0.6;
-  }
 `;

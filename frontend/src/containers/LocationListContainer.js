@@ -7,18 +7,18 @@ import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { loadLocations, setWebcam } from "redux/modules/location";
-import { setMenu } from "redux/modules/menu";
+import { initialize, setMenu } from "redux/modules/menu";
 import { getWebCam } from "services/ForecastService";
 import { getLocations } from "services/LocationService";
 import styled from "styled-components";
 
 const menuData = [
-  { name: "양양 yangyang", link: "/location/yangyang" },
-  { name: "제주 jeju", link: "/location/jeju" },
-  { name: "고성 goseong", link: "/location/goseong" },
-  { name: "강릉 gangneung", link: "/location/gangeung" },
-  { name: "포항 pohang", link: "/location/pohang" },
-  { name: "남해 namhae", link: "/location/namhae" },
+  { name: "양양 yangyang", link: "/location/yangyang", state: "양양" },
+  { name: "제주 jeju", link: "/location/jeju", state: "제주" },
+  { name: "고성 goseong", link: "/location/goseong", state: "고성" },
+  { name: "강릉 gangneung", link: "/location/gangeung", state: "강릉" },
+  { name: "포항 pohang", link: "/location/pohang", state: "포항" },
+  { name: "남해 namhae", link: "/location/namhae", state: "남해" },
 ];
 
 const globalLocationData = [
@@ -70,8 +70,7 @@ const convert = ({ title, urls, images }) => {
 };
 
 const LocationListContainer = () => {
-  const { pathname } = useLocation();
-  const menu = useSelector((state) => state.menu.menu);
+  const { state } = useLocation();
   const locations = useSelector((state) => state.location.locations);
 
   const dispatch = useDispatch();
@@ -79,12 +78,16 @@ const LocationListContainer = () => {
 
   useEffect(() => {
     dispatch(setMenu(menuData));
+
+    return () => {
+      dispatch(initialize());
+    };
   }, [dispatch]);
 
   const fetchLocationsData = useCallback(
-    async (requestData) => {
+    async (global) => {
       try {
-        const response = await getLocations(requestData);
+        const response = await getLocations(global);
         dispatch(loadLocations(response.data.result.data.locationList));
       } catch (error) {
         console.error("error fetcing locations:", error);
@@ -94,19 +97,13 @@ const LocationListContainer = () => {
   );
 
   useEffect(() => {
-    let requestData;
-    const selectedMenuItem = menu.find((item) => item.link === pathname);
-    if (selectedMenuItem) {
-      requestData = selectedMenuItem.name.substring(0, 2); // 한글명으로 요청
-    }
-
     const selectedGlobalData = globalLocationData.find(
-      (element) => element.title === requestData
+      (element) => element.title === state
     );
     setSelectedGlobalLocation(selectedGlobalData || {});
 
-    fetchLocationsData(requestData);
-  }, [menu, pathname, fetchLocationsData]);
+    fetchLocationsData(state);
+  }, [state, fetchLocationsData]);
 
   const fetchWebcamData = useCallback(async () => {
     if (locations.length > 0) {
