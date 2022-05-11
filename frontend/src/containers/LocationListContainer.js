@@ -1,4 +1,5 @@
 import { Box } from "@material-ui/core";
+import ForecastTable from "components/Location/ForecastTable";
 import GlobalLocation from "components/Location/GlobalLocation";
 import LocationCard from "components/Location/LocationCard";
 import WebCam from "components/Location/WebCam";
@@ -6,9 +7,10 @@ import { media } from "lib/styleUtils";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
+import { setWaves, setWeathers } from "redux/modules/forecast";
 import { loadLocations, setWebcam } from "redux/modules/location";
 import { initialize, setMenu } from "redux/modules/menu";
-import { getWebCam } from "services/ForecastService";
+import { getWaves, getWeathers, getWebCam } from "services/ForecastService";
 import { getLocations } from "services/LocationService";
 import styled from "styled-components";
 
@@ -73,8 +75,33 @@ const LocationListContainer = () => {
   const { state } = useLocation();
   const locations = useSelector((state) => state.location.locations);
 
+  const {
+    timestamps,
+    temperatures,
+    weatherIcons,
+    sunrise,
+    sunset,
+    windSpeeds,
+    windDirections,
+    waveHeights,
+    wavePeriods,
+    waveDirections,
+  } = useSelector(({ forecast }) => ({
+    timestamps: forecast.timestamps,
+    temperatures: forecast.temperatures,
+    weatherIcons: forecast.weatherIcons,
+    sunrise: forecast.sunrise,
+    sunset: forecast.sunset,
+    windSpeeds: forecast.windSpeeds,
+    windDirections: forecast.windDirections,
+    waveHeights: forecast.waveHeights,
+    wavePeriods: forecast.wavePeriods,
+    waveDirections: forecast.waveDirections,
+  }));
+
   const dispatch = useDispatch();
   const [selectedGlobalLocation, setSelectedGlobalLocation] = useState({});
+  const [selectedLocalIndex, setSelectedLocalIndex] = useState(0);
 
   useEffect(() => {
     dispatch(setMenu(menuData));
@@ -136,20 +163,115 @@ const LocationListContainer = () => {
     fetchWebcamData();
   }, [fetchWebcamData]);
 
+  const fetchForecastData = useCallback(async () => {
+    if (locations.length > 0) {
+      try {
+        const { latitude, longitude } = locations[selectedLocalIndex];
+        await getWeathers(latitude, longitude)
+          .then((response) => {
+            const data = response.data;
+            const {
+              list,
+              city: { sunrise, sunset },
+            } = data;
+
+            const currentTime = Date.now();
+
+            const timestamps = [],
+              temperatures = [],
+              weatherIcons = [],
+              windSpeeds = [],
+              windDirections = [];
+
+            // forEach는 async/await 동작 X
+            list.forEach((item) => {
+              const {
+                dt,
+                main: { temp },
+                weather: [{ icon }],
+                wind: { speed, deg },
+              } = item;
+              // 지나간 시간대는 데이터를 다루지 않음: 반복 시 검사할 조건문 추가
+              const timestamp = dt * 1000; // s -> ms
+              const timestampDifference = timestamp - currentTime; // 현재와의 시간차를 구함
+
+              let nearestTimestampDifference = Infinity;
+              if (
+                // 현재와 가장 가까우면서(시간차가 가장 작음), 지나간 시간이 아니어야 함(시간차가 0보다 큼)
+                timestampDifference > 0 &&
+                timestampDifference < nearestTimestampDifference
+              ) {
+                nearestTimestampDifference = timestampDifference;
+                timestamps.push(timestamp);
+                temperatures.push(temp);
+                weatherIcons.push(icon);
+                windSpeeds.push(speed);
+                windDirections.push(deg);
+              }
+            });
+
+            dispatch(
+              setWeathers({
+                timestamps: timestamps,
+                temperatures: temperatures,
+                weatherIcons: weatherIcons,
+                sunrise: sunrise * 1000,
+                sunset: sunset * 1000,
+                windSpeeds: windSpeeds,
+                windDirections: windDirections,
+              })
+            );
+          })
+          .catch((error) => console.log(error));
+
+        await getWaves(latitude, longitude)
+          .then((response) => {
+            dispatch(setWaves(response.data));
+          })
+          .catch((error) => console.log(error));
+      } catch (error) {
+        console.error("error fetching forecast:", error);
+      }
+    }
+  }, [dispatch, locations, selectedLocalIndex]);
+
+  useEffect(() => {
+    fetchForecastData();
+
+    return () => {
+      setSelectedLocalIndex(0); // 다른 카테고리로 이동해도(global이 변경되어도) index 값이 유지되므로 초기화 필요
+    };
+  }, [fetchForecastData]);
+
   if (!locations) return;
   return (
     <>
       <GlobalLocation selectedGlobalLocation={selectedGlobalLocation} />
-      <Box paddingY="1rem">
+      <Box marginY="1rem" paddingY="1rem">
         <CardGrid>
-          {locations.map((location) => (
-            <CardWrapper key={location.id}>
+          {locations.map((location, index) => (
+            <CardWrapper
+              key={location.id}
+              onClick={() => setSelectedLocalIndex(index)}
+            >
               <WebCam webcam={location.webcam} />
               <LocationCard local={location.local} />
             </CardWrapper>
           ))}
         </CardGrid>
       </Box>
+      <ForecastTable
+        timestamps={timestamps}
+        waveHeights={waveHeights}
+        wavePeriods={wavePeriods}
+        waveDirections={waveDirections}
+        temperatures={temperatures}
+        weatherIcons={weatherIcons}
+        sunrise={new Date(sunrise)}
+        sunset={new Date(sunset)}
+        windSpeeds={windSpeeds}
+        windDirections={windDirections}
+      />
     </>
   );
 };

@@ -86,7 +86,7 @@ function App() {
       <Grid container>
         <LeftSidebarContainer />
         <Grid item xs={10}>
-          <Grid xs={12} lg={isHomePage ? 12 : 10}>
+          <Grid item xs={12} lg={isHomePage ? 12 : 10}>
             <Routes>
               <Route path="/auth/*" element={<Auth />} />
               <Route index element={<Home />} />

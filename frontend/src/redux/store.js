@@ -2,6 +2,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import auth from "redux/modules/auth";
 import categories from "redux/modules/categories";
 import comment from "redux/modules/comment";
+import forecast from "redux/modules/forecast";
 import header from "redux/modules/header";
 import loading from "redux/modules/loading";
 import location from "redux/modules/location";
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
   location,
   loading,
   menu,
+  forecast,
 });
 
 export const store = configureStore(
