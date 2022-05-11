@@ -25,7 +25,7 @@ const GlobalLocation = ({ selectedGlobalLocation }) => {
             {title}
           </Box>
         </Typography>
-        <Typography variant="body2" display="inline">
+        <Typography component="div" variant="body2" display="inline">
           <Box
             fontFamily="MinSans-Regular"
             color={oc.gray[8]}
@@ -36,7 +36,7 @@ const GlobalLocation = ({ selectedGlobalLocation }) => {
           </Box>
         </Typography>
         <Box marginY={1}>
-          <Typography variant="body2">
+          <Typography component="div" variant="body2">
             <Box
               fontFamily="MinSans-Regular"
               color={oc.gray[8]}
