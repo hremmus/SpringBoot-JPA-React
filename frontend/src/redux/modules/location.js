@@ -16,7 +16,6 @@ const initialState = {
 const location = handleActions(
   {
     [LOAD_LOCATIONS]: (state, action) => ({
-      ...state,
       locations: action.payload,
     }),
     [SET_WEBCAM]: (state, action) => {
