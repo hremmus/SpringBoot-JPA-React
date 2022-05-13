@@ -2,6 +2,7 @@ import { Box } from "@material-ui/core";
 import ForecastTable from "components/Location/ForecastTable";
 import GlobalLocation from "components/Location/GlobalLocation";
 import LocationCard from "components/Location/LocationCard";
+import NaverMap from "components/Location/NaverMap";
 import WebCam from "components/Location/WebCam";
 import { media } from "lib/styleUtils";
 import { useCallback, useEffect, useState } from "react";
@@ -29,36 +30,48 @@ const globalLocationData = [
     description1: "강원도 양양군",
     description2:
       "국내 최고의 서핑 명소로 불리우며 북동, 남동, 정동의 너울을 받아 발생하는 다양한 서핑 포인트와 넓은 해변의 질 좋은 파도를 사계절 즐길 수 있다. 수심이 얕고 해변 바닥이 모래로 되어 있어 서핑 입문에 좋은 스폿으로 알려져 있다.",
+    center: { latitude: 38.048, longitude: 128.72 },
+    zoom: 11,
   },
   {
     title: "제주",
     description1: "제주특별자치도",
     description2:
       "제주도는 바다마다 파도의 성향이 뚜렷하기 때문에, 이를 알아야 제주바당에서 서핑을 할 수 있다. 중문의 경우 바깥으로 밀어내는 조류가 강한 해변이기 때문에 파도가 큰 날은 주의하여 입수해야 한다.",
+    center: { latitude: 33.38, longitude: 126.555 },
+    zoom: 10,
   },
   {
     title: "고성",
     description1: "강원도 고성군",
     description2:
       "한적하고 깨끗한 해변들이 자리한 고성은 여유로운 서핑을 즐기고 싶은 서퍼들의 성지로 등극했다.",
+    center: { latitude: 38.305, longitude: 128.54 },
+    zoom: 12,
   },
   {
     title: "강릉",
     description1: "강원도 강릉시",
     description2:
       "강릉의 해변은 서핑을 하기에 적당한 형태의 파도가 지속적으로 형성되는 서핑포인트를 다수 보유하고 있다.",
+    center: { latitude: 37.84, longitude: 128.88 },
+    zoom: 11,
   },
   {
     title: "포항",
     description1: "경상북도 포항시",
     description2:
       "호주와 비슷하다고 평가받는 적절한 파도가 비교적 평온한 수온, 알맞게 불어오는 바람과 함께 서퍼들을 유혹한다. 가장 추운 날에도 영상 5도 이상의 수온을 유지하기에 겨울철이면 더욱 서퍼들이 모여들고는 한다.",
+    center: { latitude: 36.114, longitude: 129.427 },
+    zoom: 11,
   },
   {
     title: "남해",
     description1: "전라남도 고흥군",
     description2:
       "아름다운 해돋이 풍경과 넓고 깨끗한 모래사장, 울창한 솔숲 등으로 입소문을 타다가 몇 해 전부터 ‘남도를 대표하는 서핑 포인트’로 이름을 알렸다. 앞바다를 막는 섬이 없으니 먼 바다에서 밀려온 파도가 크고 깨끗해 서핑에 안성맞춤이다. 이런 파도가 4월부터 10월까지 꾸준히 밀려와 서핑 시즌도 길다.",
+    center: { latitude: 34.58, longitude: 127.487 },
+    zoom: 13,
   },
 ];
 
@@ -247,6 +260,13 @@ const LocationListContainer = () => {
   return (
     <>
       <GlobalLocation selectedGlobalLocation={selectedGlobalLocation} />
+      <Box marginY={2} border={1} borderColor="lightgray">
+        <NaverMap
+          center={selectedGlobalLocation.center}
+          zoom={selectedGlobalLocation.zoom}
+          locations={locations}
+        />
+      </Box>
       <Box marginY="1rem" paddingY="1rem">
         <CardGrid>
           {locations.map((location, index) => (

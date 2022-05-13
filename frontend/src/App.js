@@ -1,4 +1,5 @@
 import { Grid } from "@material-ui/core";
+import NaverMap from "components/Location/NaverMap";
 import HeaderContainer from "containers/HeaderContainer";
 import LeftSidebarContainer from "containers/LeftSidebarContainer";
 import storage from "lib/storage";
@@ -94,6 +95,7 @@ function App() {
               <Route path="/posts/write" element={<WritePost />} />
               <Route path="/posts/:postId" element={<Post />} />
               <Route path="/location/:global" element={<Locations />} />
+              <Route path="/map" element={<NaverMap />} />
             </Routes>
           </Grid>
         </Grid>
