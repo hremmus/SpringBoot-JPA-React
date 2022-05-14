@@ -272,7 +272,9 @@ const LocationListContainer = () => {
           {locations.map((location, index) => (
             <CardWrapper
               key={location.id}
+              id={location.latitude + `,` + location.longitude}
               onClick={() => setSelectedLocalIndex(index)}
+              className="location-card"
             >
               <WebCam webcam={location.webcam} />
               <LocationCard local={location.local} />
@@ -319,4 +321,8 @@ const CardWrapper = styled.div`
   overflow: hidden;
   background-color: #ffffff;
   border-radius: 25% 10%;
+
+  &.active {
+    border: 2px solid #025262;
+  }
 `;

@@ -37,10 +37,26 @@ const NaverMap = ({ center, zoom, locations }) => {
           location.latitude,
           location.longitude
         );
-        new naver.maps.Marker({
+        const marker = new naver.maps.Marker({
           position: point,
           map: map,
           zIndex: 100,
+          clickable: true,
+        });
+
+        const card = document.getElementById(
+          location.latitude + `,` + location.longitude
+        );
+
+        marker.addListener("click", () => {
+          // getElementsByClassName: DOM의 변경 사항을 실시간 반영하는 HTMLCollection을 반환
+          // querySelectorAll: 정적 NodeList를 반환, Array.from()이나 스프레드 연산자를 사용하여 배열로 변환하지 않고 forEach() 실행이 가능
+          const allCards = document.querySelectorAll(".location-card");
+          allCards.forEach((card) => {
+            card.classList.remove("active");
+          });
+
+          card.classList.add("active");
         });
       });
     };
@@ -48,7 +64,14 @@ const NaverMap = ({ center, zoom, locations }) => {
     if (map) {
       createMarkers(locations);
     }
-  }, [map, center, locations, naver.maps.LatLng, naver.maps.Marker]);
+  }, [
+    map,
+    center,
+    locations,
+    naver.maps.LatLng,
+    naver.maps.Marker,
+    naver.maps.event,
+  ]);
 
   return <div id="map" style={{ width: "100%", height: "400px" }}></div>;
 };
