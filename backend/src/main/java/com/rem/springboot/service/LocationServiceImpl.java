@@ -1,8 +1,9 @@
 package com.rem.springboot.service;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,8 +29,11 @@ public class LocationServiceImpl {
   public void initLocationData() throws IOException {
     if (locationRepository.count() == 0) {
       Resource resource = new ClassPathResource("locations_kr.csv");
+      InputStreamReader inputStreamReader =
+          new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8);
+
       List<String> allLines =
-          Files.readAllLines(resource.getFile().toPath(), StandardCharsets.UTF_8);
+          new BufferedReader(inputStreamReader).lines().collect(Collectors.toList());
       List<Location> locationList =
           allLines.stream().map(Location::map).collect(Collectors.toList());
 
