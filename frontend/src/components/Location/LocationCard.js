@@ -2,11 +2,11 @@ import oc from "open-color";
 import styled from "styled-components";
 import GradeChip from "./GradeChip";
 
-const LocationCard = ({ local }) => {
+const LocationCard = ({ local, grade }) => {
   return (
     <CardContent>
       <div className="align">
-        <GradeChip grade="초급" />
+        <GradeChip grade={grade} />
         <div className="text">{local}</div>
       </div>
     </CardContent>
