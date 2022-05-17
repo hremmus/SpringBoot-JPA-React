@@ -9,7 +9,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import { setWaves, setWeathers } from "redux/modules/forecast";
-import { loadLocations, setWebcam } from "redux/modules/location";
+import { loadLocations, setGrade, setWebcam } from "redux/modules/location";
 import { initialize, setMenu } from "redux/modules/menu";
 import { getWaves, getWeathers, getWebCam } from "services/ForecastService";
 import { getLocations } from "services/LocationService";
@@ -99,7 +99,8 @@ const LocationListContainer = () => {
     waveHeights,
     wavePeriods,
     waveDirections,
-  } = useSelector(({ forecast }) => ({
+    grades,
+  } = useSelector(({ forecast, location }) => ({
     timestamps: forecast.timestamps,
     temperatures: forecast.temperatures,
     weatherIcons: forecast.weatherIcons,
@@ -110,6 +111,7 @@ const LocationListContainer = () => {
     waveHeights: forecast.waveHeights,
     wavePeriods: forecast.wavePeriods,
     waveDirections: forecast.waveDirections,
+    grades: location.grades,
   }));
 
   const dispatch = useDispatch();
@@ -144,6 +146,38 @@ const LocationListContainer = () => {
 
     fetchLocationsData(state);
   }, [state, fetchLocationsData]);
+
+  const fetchForSetGrade = useCallback(async () => {
+    if (locations.length > 0) {
+      try {
+        const promises = locations.map(async (location) => {
+          const { id, latitude, longitude } = location;
+
+          const response = await getWaves(latitude, longitude);
+          const height = response.data["waves_height-surface"][0];
+          const period = response.data["waves_period-surface"][0];
+
+          let grade;
+          if (height <= 1 && period < 7) {
+            grade = "초급";
+          } else if (height <= 1.5 || period < 9) {
+            grade = "중급";
+          } else {
+            grade = "상급";
+          }
+          dispatch(setGrade(id, grade));
+        });
+
+        await Promise.all(promises);
+      } catch (error) {
+        console.error("error fetching waves:", error);
+      }
+    }
+  }, [dispatch, locations]);
+
+  useEffect(() => {
+    fetchForSetGrade();
+  }, [fetchForSetGrade]);
 
   const fetchWebcamData = useCallback(async () => {
     if (locations.length > 0) {
@@ -241,7 +275,7 @@ const LocationListContainer = () => {
           .then((response) => {
             dispatch(setWaves(response.data));
           })
-          .catch((error) => console.log(error));
+          .catch((error) => console.log(error.response.data));
       } catch (error) {
         console.error("error fetching forecast:", error);
       }
@@ -277,7 +311,10 @@ const LocationListContainer = () => {
               className="location-card"
             >
               <WebCam webcam={location.webcam} />
-              <LocationCard local={location.local} />
+              <LocationCard
+                local={location.local}
+                grade={grades?.[location.id] || "─"}
+              />
             </CardWrapper>
           ))}
         </CardGrid>
