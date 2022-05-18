@@ -13,6 +13,7 @@ export const setGrade = createAction(SET_GRADE, (id, grade) => ({ id, grade }));
 
 const initialState = {
   locations: [],
+  webcams: {},
   grades: {}, // 변수 값 Location ID를 기반으로(개체의 고유 식별자=key가 됨) 서로 다른 지역에 대한 등급을 나타내는 'dynamic key'를 갖는 개체
 };
 
@@ -23,17 +24,13 @@ const location = handleActions(
     }),
     [SET_WEBCAM]: (state, action) => {
       const { id, webcam } = action.payload;
-      const updatedLocations = state.locations.map((location) => {
-        // id 일치 여부로 해당하는 location을 찾음
-        if (location.id === id) {
-          // location 객체에 webcam 속성을 추가
-          return { ...location, webcam };
-        }
-        return location;
-      });
 
       return {
-        locations: updatedLocations,
+        ...state,
+        webcams: {
+          ...state.webcams,
+          [id]: webcam,
+        },
       };
     },
     [SET_GRADE]: (state, action) => {

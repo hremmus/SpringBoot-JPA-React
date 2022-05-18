@@ -86,9 +86,8 @@ const convert = ({ title, urls, images }) => {
 
 const LocationListContainer = () => {
   const { state } = useLocation();
-  const locations = useSelector((state) => state.location.locations);
-
   const {
+    locations,
     timestamps,
     temperatures,
     weatherIcons,
@@ -100,7 +99,9 @@ const LocationListContainer = () => {
     wavePeriods,
     waveDirections,
     grades,
+    webcams,
   } = useSelector(({ forecast, location }) => ({
+    locations: location.locations,
     timestamps: forecast.timestamps,
     temperatures: forecast.temperatures,
     weatherIcons: forecast.weatherIcons,
@@ -112,6 +113,7 @@ const LocationListContainer = () => {
     wavePeriods: forecast.wavePeriods,
     waveDirections: forecast.waveDirections,
     grades: location.grades,
+    webcams: location.webcams,
   }));
 
   const dispatch = useDispatch();
@@ -186,16 +188,14 @@ const LocationListContainer = () => {
         // 일련의 비동기 작업 여러 개가 모두 이행 or 하나라도 거부되는 경우를 다룸
         // 장점: 비동기 작업의 동시 실행 = 병렬 처리가 가능 => 시간 단축, 오류 처리 간소화
         const promises = locations.map(async (location) => {
-          if (!location.webcam) {
-            const { id, latitude, longitude } = location;
-            const response = await getWebCam(latitude, longitude);
+          const { id, latitude, longitude } = location;
+          const response = await getWebCam(latitude, longitude);
 
-            if (response.data.webcams.length > 0) {
-              dispatch(setWebcam(id, convert(response.data.webcams[0])));
-            }
-
-            return response.data; // 응답 데이터, 데이터 속성을 포함
+          if (response.data.webcams.length > 0) {
+            dispatch(setWebcam(id, convert(response.data.webcams[0])));
           }
+
+          return response.data; // 응답 데이터, 데이터 속성을 포함
         });
 
         // await가 앞에 있으면 배열의 모든 promise가 처리될 때까지 기다림 (다음 코드의 실행을 차단)
@@ -310,7 +310,7 @@ const LocationListContainer = () => {
               onClick={() => setSelectedLocalIndex(index)}
               className="location-card"
             >
-              <WebCam webcam={location.webcam} />
+              <WebCam webcam={webcams?.[location.id]} />
               <LocationCard
                 local={location.local}
                 grade={grades?.[location.id] || "─"}
