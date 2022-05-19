@@ -1,4 +1,5 @@
 import { Box } from "@material-ui/core";
+import ForecastChart from "components/Location/ForecastChart";
 import ForecastTable from "components/Location/ForecastTable";
 import GlobalLocation from "components/Location/GlobalLocation";
 import LocationCard from "components/Location/LocationCard";
@@ -320,6 +321,18 @@ const LocationListContainer = () => {
         </CardGrid>
       </Box>
       <ForecastTable
+        timestamps={timestamps}
+        waveHeights={waveHeights}
+        wavePeriods={wavePeriods}
+        waveDirections={waveDirections}
+        temperatures={temperatures}
+        weatherIcons={weatherIcons}
+        sunrise={new Date(sunrise)}
+        sunset={new Date(sunset)}
+        windSpeeds={windSpeeds}
+        windDirections={windDirections}
+      />
+      <ForecastChart
         timestamps={timestamps}
         waveHeights={waveHeights}
         wavePeriods={wavePeriods}
