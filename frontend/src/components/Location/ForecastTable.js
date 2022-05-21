@@ -66,18 +66,18 @@ const ForecastTable = ({
                   <DirectionIcon
                     src={DirectionPNG}
                     alt="arrow"
-                    className={degreeToDirection(waveDirections[index])}
+                    className={degreeToDirection(waveDirections[index]).name}
                   />
-                  {degreeToDirection(waveDirections[index])}
+                  {degreeToDirection(waveDirections[index]).name}
                 </td>
                 <td>{windSpeeds[index].toFixed(1)}m/s</td>
                 <td>
                   <DirectionIcon
                     src={DirectionPNG}
                     alt="arrow"
-                    className={degreeToDirection(windDirections[index])}
+                    className={degreeToDirection(windDirections[index]).name}
                   />
-                  {degreeToDirection(windDirections[index])}
+                  {degreeToDirection(windDirections[index]).name}
                 </td>
               </tr>
             ))}
