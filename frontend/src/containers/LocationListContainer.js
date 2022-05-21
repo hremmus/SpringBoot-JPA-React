@@ -1,9 +1,9 @@
 import { Box } from "@material-ui/core";
-import ForecastChart from "components/Location/ForecastChart";
 import ForecastTable from "components/Location/ForecastTable";
 import GlobalLocation from "components/Location/GlobalLocation";
 import LocationCard from "components/Location/LocationCard";
 import NaverMap from "components/Location/NaverMap";
+import WaveChart from "components/Location/WaveChart";
 import WebCam from "components/Location/WebCam";
 import { media } from "lib/styleUtils";
 import { useCallback, useEffect, useState } from "react";
@@ -332,17 +332,11 @@ const LocationListContainer = () => {
         windSpeeds={windSpeeds}
         windDirections={windDirections}
       />
-      <ForecastChart
+      <WaveChart
         timestamps={timestamps}
         waveHeights={waveHeights}
         wavePeriods={wavePeriods}
         waveDirections={waveDirections}
-        temperatures={temperatures}
-        weatherIcons={weatherIcons}
-        sunrise={new Date(sunrise)}
-        sunset={new Date(sunset)}
-        windSpeeds={windSpeeds}
-        windDirections={windDirections}
       />
     </>
   );
