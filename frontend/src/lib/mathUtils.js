@@ -24,3 +24,29 @@ export const degreeToDirection = (degree) => {
     transform: directions[index].transform,
   };
 };
+
+const toRadians = (degree) => {
+  return (degree * Math.PI) / 180;
+};
+
+// haversine formula를 이용한 대원 거리 구하기
+export const calculateDistance = (lat1, lon1, lat2, lon2) => {
+  const R = 6371; // 지구의 반지름 (km)
+  const dLat = toRadians(lat2 - lat1);
+  const dLon = toRadians(lon2 - lon1);
+
+  // 두 점 사이의 직선 세그먼트 길이의 절반의 제곱
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRadians(lat1)) *
+      Math.cos(toRadians(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+
+  // 두 점 사이의 중심각
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  // const c = 2 * Math.asin(a);
+
+  const distance = R * c;
+  return distance;
+};
