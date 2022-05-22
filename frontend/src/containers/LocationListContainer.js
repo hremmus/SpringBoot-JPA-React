@@ -3,16 +3,22 @@ import ForecastTable from "components/Location/ForecastTable";
 import GlobalLocation from "components/Location/GlobalLocation";
 import LocationCard from "components/Location/LocationCard";
 import NaverMap from "components/Location/NaverMap";
+import TideChart from "components/Location/TideChart";
 import WaveChart from "components/Location/WaveChart";
 import WebCam from "components/Location/WebCam";
 import { media } from "lib/styleUtils";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { setWaves, setWeathers } from "redux/modules/forecast";
+import { setTides, setWaves, setWeathers } from "redux/modules/forecast";
 import { loadLocations, setGrade, setWebcam } from "redux/modules/location";
 import { initialize, setMenu } from "redux/modules/menu";
-import { getWaves, getWeathers, getWebCam } from "services/ForecastService";
+import {
+  getTides,
+  getWaves,
+  getWeathers,
+  getWebCam,
+} from "services/ForecastService";
 import { getLocations } from "services/LocationService";
 import styled from "styled-components";
 
@@ -85,6 +91,37 @@ const convert = ({ title, urls, images }) => {
   };
 };
 
+const formatDate = (date) => {
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const day = date.getDate().toString().padStart(2, "0");
+  return `${year}${month}${day}`;
+};
+
+// 시(o'clock)로 index를 구함
+const getIndexByHours = (hours) => {
+  switch (hours) {
+    case 0:
+      return 0;
+    case 3:
+      return 180;
+    case 6:
+      return 360;
+    case 9:
+      return 540;
+    case 12:
+      return 720;
+    case 15:
+      return 900;
+    case 18:
+      return 1080;
+    case 21:
+      return 1260;
+    default:
+      return -1; // Return -1 for other hours, indicating an invalid input
+  }
+};
+
 const LocationListContainer = () => {
   const { state } = useLocation();
   const {
@@ -101,6 +138,7 @@ const LocationListContainer = () => {
     waveDirections,
     grades,
     webcams,
+    tides,
   } = useSelector(({ forecast, location }) => ({
     locations: location.locations,
     timestamps: forecast.timestamps,
@@ -115,11 +153,12 @@ const LocationListContainer = () => {
     waveDirections: forecast.waveDirections,
     grades: location.grades,
     webcams: location.webcams,
+    tides: forecast.tides,
   }));
-
   const dispatch = useDispatch();
   const [selectedGlobalLocation, setSelectedGlobalLocation] = useState({});
   const [selectedLocalIndex, setSelectedLocalIndex] = useState(0);
+  const [observatory, setObservatory] = useState("");
 
   useEffect(() => {
     dispatch(setMenu(menuData));
@@ -148,6 +187,11 @@ const LocationListContainer = () => {
     setSelectedGlobalLocation(selectedGlobalData || {});
 
     fetchLocationsData(state);
+
+    return () => {
+      setSelectedLocalIndex(0); // 다른 카테고리로 이동해도(global이 변경되어도) index 값이 유지되므로 초기화 필요
+      setObservatory("");
+    };
   }, [state, fetchLocationsData]);
 
   const fetchForSetGrade = useCallback(async () => {
@@ -285,11 +329,67 @@ const LocationListContainer = () => {
 
   useEffect(() => {
     fetchForecastData();
-
-    return () => {
-      setSelectedLocalIndex(0); // 다른 카테고리로 이동해도(global이 변경되어도) index 값이 유지되므로 초기화 필요
-    };
   }, [fetchForecastData]);
+
+  const fetchTidesData = useCallback(async () => {
+    if (locations.length > 0) {
+      try {
+        const { latitude, longitude } = locations[selectedLocalIndex];
+        const tides = [];
+
+        const startDate = new Date(timestamps[0]);
+        const endDate = new Date(timestamps[timestamps.length - 1]);
+
+        let currentDate = new Date(startDate); // while문에 사용할 변수
+        while (currentDate <= endDate) {
+          const formattedDate = formatDate(currentDate); // 요청 데이터 yyyyMMdd
+          await getTides(latitude, longitude, formattedDate)
+            .then((response) => {
+              const responseData = response.data.result.data;
+
+              // for start date
+              if (currentDate.getTime() === startDate.getTime()) {
+                // 24시간 동안의 데이터를 1분 단위로 제공하기 때문에(고정) index로 데이터에 접근이 가능
+                const startIndex = getIndexByHours(startDate.getHours());
+                for (let i = startIndex; i < responseData.length - 1; i++) {
+                  tides.push(responseData[i]);
+                }
+
+                // end date push하기 전에 currentDate > endDate면 안 됨
+                currentDate.setHours(0);
+                // for end date
+              } else if (currentDate.getDay() === endDate.getDay()) {
+                const endIndex = getIndexByHours(endDate.getHours());
+
+                for (let i = 0; i < endIndex - 1; i++) {
+                  tides.push(responseData[i]);
+                }
+
+                setObservatory(response.data.result.meta.obs_post_name);
+                // for middle date
+              } else {
+                for (let i = 0; i < responseData.length - 1; i++) {
+                  tides.push(responseData[i]);
+                }
+              }
+
+              currentDate.setDate(currentDate.getDate() + 1); // 다음 날로 이동
+            })
+            .catch((error) => console.log(error));
+        }
+
+        // 데이터를 1분마다 -> 30분마다로 축소
+        const halfHourlyTides = tides.filter((tide, index) => index % 30 === 0);
+        dispatch(setTides(halfHourlyTides));
+      } catch (error) {
+        console.error("error fetching tides:", error);
+      }
+    }
+  }, [dispatch, locations, timestamps, selectedLocalIndex]);
+
+  useEffect(() => {
+    fetchTidesData();
+  }, [fetchTidesData]);
 
   if (!locations) return;
   return (
@@ -338,6 +438,7 @@ const LocationListContainer = () => {
         wavePeriods={wavePeriods}
         waveDirections={waveDirections}
       />
+      <TideChart tides={tides} observatory={observatory} />
     </>
   );
 };
