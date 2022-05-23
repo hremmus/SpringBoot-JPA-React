@@ -1,23 +1,30 @@
 import { Box } from "@material-ui/core";
-import ForecastTable from "components/Location/ForecastTable";
 import GlobalLocation from "components/Location/GlobalLocation";
 import LocationCard from "components/Location/LocationCard";
 import NaverMap from "components/Location/NaverMap";
 import TideChart from "components/Location/TideChart";
 import WaveChart from "components/Location/WaveChart";
 import WebCam from "components/Location/WebCam";
+import { calculateDistance } from "lib/mathUtils";
 import { media } from "lib/styleUtils";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
-import { setTides, setWaves, setWeathers } from "redux/modules/forecast";
+import {
+  setHighAndLowWater,
+  setTides,
+  setWaves,
+  setWeathers,
+} from "redux/modules/forecast";
 import { loadLocations, setGrade, setWebcam } from "redux/modules/location";
 import { initialize, setMenu } from "redux/modules/menu";
 import {
+  getHighAndLowWater,
   getTides,
   getWaves,
   getWeathers,
   getWebCam,
+  observatories,
 } from "services/ForecastService";
 import { getLocations } from "services/LocationService";
 import styled from "styled-components";
@@ -118,8 +125,29 @@ const getIndexByHours = (hours) => {
     case 21:
       return 1260;
     default:
-      return -1; // Return -1 for other hours, indicating an invalid input
+      return -1;
   }
+};
+
+const findClosestObservatory = (latitude, longitude) => {
+  let closestObservatory = null;
+  let minDistance = Infinity;
+
+  observatories.forEach((observatory) => {
+    const distance = calculateDistance(
+      latitude,
+      longitude,
+      observatory.latitude,
+      observatory.longitude
+    );
+
+    // 변수 재할당을 반복하며 가장 가까운 관측소를 찾음
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestObservatory = observatory;
+    }
+  });
+  return closestObservatory;
 };
 
 const LocationListContainer = () => {
@@ -139,6 +167,7 @@ const LocationListContainer = () => {
     grades,
     webcams,
     tides,
+    highAndLowWater,
   } = useSelector(({ forecast, location }) => ({
     locations: location.locations,
     timestamps: forecast.timestamps,
@@ -154,6 +183,7 @@ const LocationListContainer = () => {
     grades: location.grades,
     webcams: location.webcams,
     tides: forecast.tides,
+    highAndLowWater: forecast.highAndLowWater,
   }));
   const dispatch = useDispatch();
   const [selectedGlobalLocation, setSelectedGlobalLocation] = useState({});
@@ -331,10 +361,9 @@ const LocationListContainer = () => {
     fetchForecastData();
   }, [fetchForecastData]);
 
-  const fetchTidesData = useCallback(async () => {
-    if (locations.length > 0) {
+  const fetchTidesData = useCallback(
+    async (observatory) => {
       try {
-        const { latitude, longitude } = locations[selectedLocalIndex];
         const tides = [];
 
         const startDate = new Date(timestamps[0]);
@@ -343,53 +372,141 @@ const LocationListContainer = () => {
         let currentDate = new Date(startDate); // while문에 사용할 변수
         while (currentDate <= endDate) {
           const formattedDate = formatDate(currentDate); // 요청 데이터 yyyyMMdd
-          await getTides(latitude, longitude, formattedDate)
+          await getTides(observatory.id, formattedDate)
             .then((response) => {
               const responseData = response.data.result.data;
+              if (responseData.length > 0) {
+                // for start date
+                if (currentDate.getTime() === startDate.getTime()) {
+                  // 24시간 동안의 데이터를 1분 단위로 제공하기 때문에(고정) index로 데이터에 접근이 가능
+                  const startIndex = getIndexByHours(startDate.getHours());
+                  for (let i = startIndex; i < responseData.length - 1; i++) {
+                    tides.push(responseData[i]);
+                  }
 
-              // for start date
-              if (currentDate.getTime() === startDate.getTime()) {
-                // 24시간 동안의 데이터를 1분 단위로 제공하기 때문에(고정) index로 데이터에 접근이 가능
-                const startIndex = getIndexByHours(startDate.getHours());
-                for (let i = startIndex; i < responseData.length - 1; i++) {
-                  tides.push(responseData[i]);
+                  // end date push하기 전에 currentDate > endDate면 안 됨
+                  currentDate.setHours(0);
+                  // for end date
+                } else if (currentDate.getDay() === endDate.getDay()) {
+                  const endIndex = getIndexByHours(endDate.getHours());
+
+                  for (let i = 0; i < endIndex - 1; i++) {
+                    tides.push(responseData[i]);
+                  }
+                  // for middle date
+                } else {
+                  for (let i = 0; i < responseData.length - 1; i++) {
+                    tides.push(responseData[i]);
+                  }
                 }
 
-                // end date push하기 전에 currentDate > endDate면 안 됨
-                currentDate.setHours(0);
-                // for end date
-              } else if (currentDate.getDay() === endDate.getDay()) {
-                const endIndex = getIndexByHours(endDate.getHours());
-
-                for (let i = 0; i < endIndex - 1; i++) {
-                  tides.push(responseData[i]);
-                }
-
-                setObservatory(response.data.result.meta.obs_post_name);
-                // for middle date
-              } else {
-                for (let i = 0; i < responseData.length - 1; i++) {
-                  tides.push(responseData[i]);
-                }
+                currentDate.setDate(currentDate.getDate() + 1); // 다음 날로 이동
               }
-
-              currentDate.setDate(currentDate.getDate() + 1); // 다음 날로 이동
             })
             .catch((error) => console.log(error));
         }
 
         // 데이터를 1분마다 -> 30분마다로 축소
-        const halfHourlyTides = tides.filter((tide, index) => index % 30 === 0);
+        const halfHourlyTides = tides
+          .filter((tide, index) => index % 30 === 0)
+          .map((tide) => ({
+            ...tide,
+            record_time: new Date(tide.record_time).getTime(),
+          }));
         dispatch(setTides(halfHourlyTides));
       } catch (error) {
         console.error("error fetching tides:", error);
       }
-    }
-  }, [dispatch, locations, timestamps, selectedLocalIndex]);
+    },
+    [dispatch, timestamps]
+  );
+
+  const fetchHighAndLowWaterData = useCallback(
+    async (observatory) => {
+      try {
+        const highAndLowWater = [];
+
+        const startDate = new Date(timestamps[0]);
+        const endDate = new Date(timestamps[timestamps.length - 1]);
+
+        let currentDate = new Date(startDate); // while문에 사용할 변수
+        while (currentDate <= endDate) {
+          const formattedDate = formatDate(currentDate); // 요청 데이터 yyyyMMdd
+          await getHighAndLowWater(observatory.id, formattedDate)
+            .then((response) => {
+              const responseData = response.data.result.data;
+              if (responseData.length > 0) {
+                // for start date
+                if (currentDate.getTime() === startDate.getTime()) {
+                  for (let i = 0; i < responseData.length; i++) {
+                    highAndLowWater.push(responseData[i]);
+                  }
+
+                  currentDate.setHours(0);
+                  // for end date
+                } else if (currentDate.getDay() === endDate.getDay()) {
+                  for (let i = 0; i < responseData.length; i++) {
+                    highAndLowWater.push(responseData[i]);
+                  }
+                } else {
+                  for (let i = 0; i < responseData.length; i++) {
+                    highAndLowWater.push(responseData[i]);
+                  }
+                }
+
+                currentDate.setDate(currentDate.getDate() + 1); // 다음 날로 이동
+              }
+            })
+            .catch((error) => console.log(error));
+        }
+
+        // 만조/간조 시간이 endDate.getTime()보다 크면 배열에 포함하지 않음(차트에 그리지 않음)
+        for (let i = highAndLowWater.length - 1; i > 0; i--) {
+          if (
+            new Date(highAndLowWater[i].tph_time).getTime() > endDate.getTime()
+          ) {
+            highAndLowWater.pop();
+          }
+        }
+
+        // 만조/간조 시간이 startDate.getTime()보다 작으면 배열에 포함하지 않음(차트에 그리지 않음)
+        for (let i = 0; i < highAndLowWater.length; i++) {
+          const firstHighAndLowWaterTime = new Date(
+            highAndLowWater[0].tph_time
+          ).getTime();
+          if (firstHighAndLowWaterTime < startDate.getTime()) {
+            highAndLowWater.shift();
+          }
+        }
+
+        const formattedHighAndLowWater = highAndLowWater.map((hl) => ({
+          ...hl,
+          tph_time: new Date(hl.tph_time).getTime(),
+        }));
+        dispatch(setHighAndLowWater(formattedHighAndLowWater));
+      } catch (error) {
+        console.error("error fetching highAndLowWater:", error);
+      }
+    },
+    [dispatch, timestamps]
+  );
 
   useEffect(() => {
-    fetchTidesData();
-  }, [fetchTidesData]);
+    if (locations.length > 0) {
+      const { latitude, longitude } = locations[selectedLocalIndex];
+      setObservatory(findClosestObservatory(latitude, longitude));
+      if (observatory) {
+        fetchTidesData(observatory);
+        fetchHighAndLowWaterData(observatory);
+      }
+    }
+  }, [
+    locations,
+    selectedLocalIndex,
+    observatory,
+    fetchTidesData,
+    fetchHighAndLowWaterData,
+  ]);
 
   if (!locations) return;
   return (
@@ -420,25 +537,17 @@ const LocationListContainer = () => {
           ))}
         </CardGrid>
       </Box>
-      <ForecastTable
-        timestamps={timestamps}
-        waveHeights={waveHeights}
-        wavePeriods={wavePeriods}
-        waveDirections={waveDirections}
-        temperatures={temperatures}
-        weatherIcons={weatherIcons}
-        sunrise={new Date(sunrise)}
-        sunset={new Date(sunset)}
-        windSpeeds={windSpeeds}
-        windDirections={windDirections}
-      />
       <WaveChart
         timestamps={timestamps}
         waveHeights={waveHeights}
         wavePeriods={wavePeriods}
         waveDirections={waveDirections}
       />
-      <TideChart tides={tides} observatory={observatory} />
+      <TideChart
+        tides={tides}
+        highAndLowWater={highAndLowWater}
+        observatory={observatory.name}
+      />
     </>
   );
 };

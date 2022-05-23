@@ -3,15 +3,18 @@ import { createAction, handleActions } from "redux-actions";
 const SET_WEATHERS = "forecast/SET_WEATHERS";
 const SET_WAVES = "forecast/SET_WAVES";
 const SET_TIDES = "forecast/SET_TIDES";
+const SET_HIGH_AND_LOW_WATER = "forecast/SET_HIGH_AND_LOW_WATER";
 
 export const setWeathers = createAction(SET_WEATHERS);
 export const setWaves = createAction(SET_WAVES);
 export const setTides = createAction(SET_TIDES);
+export const setHighAndLowWater = createAction(SET_HIGH_AND_LOW_WATER);
 
 const initialState = {
   timestamps: [],
   temperatures: [],
   tides: [],
+  highAndLowWater: [],
   weatherIcons: [],
   windSpeeds: [],
   windDirections: [],
@@ -43,6 +46,10 @@ const forecast = handleActions(
     [SET_TIDES]: (state, { payload }) => ({
       ...state,
       tides: payload,
+    }),
+    [SET_HIGH_AND_LOW_WATER]: (state, { payload }) => ({
+      ...state,
+      highAndLowWater: payload,
     }),
   },
   initialState

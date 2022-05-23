@@ -1,5 +1,4 @@
 import axios from "axios";
-import { calculateDistance } from "lib/mathUtils";
 
 export const getWebCam = (lat, lon) => {
   const url = new URL("https://api.windy.com/webcams/api/v3/webcams");
@@ -38,7 +37,33 @@ export const getWaves = (lat, lon) => {
   });
 };
 
-const observatories = [
+export const getTides = (obsCode, date) => {
+  const url = new URL(
+    "http://www.khoa.go.kr/api/oceangrid/tideObsPre/search.do"
+  );
+  const { searchParams: sp } = url;
+  sp.set("ServiceKey", process.env.REACT_APP_KHOA_API_KEY);
+  sp.set("ObsCode", obsCode);
+  sp.set("Date", date);
+  sp.set("ResultType", "json");
+
+  return axios.get(url);
+};
+
+export const getHighAndLowWater = (obsCode, date) => {
+  const url = new URL(
+    "http://www.khoa.go.kr/api/oceangrid/tideObsPreTab/search.do"
+  );
+  const { searchParams: sp } = url;
+  sp.set("ServiceKey", process.env.REACT_APP_KHOA_API_KEY);
+  sp.set("ObsCode", obsCode);
+  sp.set("Date", date);
+  sp.set("ResultType", "json");
+
+  return axios.get(url);
+};
+
+export const observatories = [
   // { id: "DT_0063", name: "가덕도", latitude: 35.024, longitude: 128.81 },
   // { id: "DT_0032", name: "강화대교", latitude: 37.731, longitude: 126.522 },
   // { id: "DT_0031", name: "거문도", latitude: 34.028, longitude: 127.308 },
@@ -95,39 +120,3 @@ const observatories = [
   // { id: "DT_0011", name: "후포", latitude: 36.677, longitude: 129.453 },
   // { id: "DT_0035", name: "흑산도", latitude: 34.684, longitude: 125.435 },
 ];
-
-const findClosestObservatory = (latitude, longitude) => {
-  let closestObservatory = null;
-  let minDistance = Infinity;
-
-  observatories.forEach((observatory) => {
-    const distance = calculateDistance(
-      latitude,
-      longitude,
-      observatory.latitude,
-      observatory.longitude
-    );
-
-    // 변수 재할당을 반복하며 가장 가까운 관측소를 찾음
-    if (distance < minDistance) {
-      minDistance = distance;
-      closestObservatory = observatory;
-    }
-  });
-  return closestObservatory;
-};
-
-export const getTides = (lat, lon, date) => {
-  const observatory = findClosestObservatory(lat, lon);
-
-  const url = new URL(
-    "http://www.khoa.go.kr/api/oceangrid/tideObsPre/search.do"
-  );
-  const { searchParams: sp } = url;
-  sp.set("ServiceKey", process.env.REACT_APP_KHOA_API_KEY);
-  sp.set("ObsCode", observatory.id);
-  sp.set("Date", date);
-  sp.set("ResultType", "json");
-
-  return axios.get(url);
-};
