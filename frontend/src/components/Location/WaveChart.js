@@ -226,6 +226,7 @@ const WaveChart = ({
         },
         ticks: {
           // 눈금
+          maxRotation: 0,
           callback: (value, index, ticks) => {
             return new Date(timestamps[index]).getHours();
           },
