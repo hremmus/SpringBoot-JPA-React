@@ -4,13 +4,24 @@ import PostReader from "components/Post/PostReader";
 import UploadedImageList from "components/Post/UploadedImageList";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { loadComments, unloadComment } from "redux/modules/comment";
+import { initialize, setMenu } from "redux/modules/menu";
 import { readPost, setOriginalPost, unloadPost } from "redux/modules/post";
+import { getCategories } from "services/CategoryService";
 import { getComments } from "services/CommentService";
 import { deletePost, getPost } from "services/PostService";
 
+const addLinkToCategories = (categories) => {
+  return categories.map((category) => ({
+    ...category,
+    link: `/posts?categoryId=${category.id}&page=0&size=20`,
+    children: addLinkToCategories(category.children), // children category를 파라미터로 한 재귀 호출
+  }));
+};
+
 const PostReadContainer = () => {
+  const { pathname } = useLocation();
   const { postId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -22,6 +33,27 @@ const PostReadContainer = () => {
       shownReplyInput: state.comment.shownReplyInput,
       shownUpdateInput: state.comment.shownUpdateInput,
     }));
+
+  useEffect(() => {
+    getCategories()
+      .then((response) => {
+        const categories = addLinkToCategories(response.data.result.data);
+        categories.unshift({
+          id: 0,
+          name: "전체",
+          children: [],
+          link: "/posts?page=0&size=20",
+        });
+        dispatch(setMenu(categories));
+      })
+      .catch((error) => console.log(error));
+
+    return () => {
+      if (pathname !== "/posts") {
+        dispatch(initialize());
+      }
+    };
+  }, [dispatch, pathname]);
 
   useEffect(() => {
     getPost(postId)
