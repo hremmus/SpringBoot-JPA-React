@@ -5,6 +5,35 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
+const Category = ({ index, name, link, state, children }) => {
+  return (
+    <>
+      <CategoryListItem key={index}>
+        <StyledLink to={link} state={state}>
+          {name}
+        </StyledLink>
+      </CategoryListItem>
+      {children && children.length > 0 && (
+        <>
+          {children.map((child, index) => (
+            <CategoryListItem key={index} className="nested">
+              <StyledLink to={child.link} state={child.state}>
+                {child.name}
+              </StyledLink>
+            </CategoryListItem>
+          ))}
+        </>
+      )}
+    </>
+  );
+};
+
+const renderCategories = (categories) => {
+  return categories.map((category, index) => (
+    <Category key={index} {...category} />
+  ));
+};
+
 const LeftSidebarContainer = () => {
   const visible = useSelector((state) => state.header.visible);
   const { menu } = useSelector(({ menu }) => ({
@@ -16,15 +45,7 @@ const LeftSidebarContainer = () => {
   return (
     <LeftSidebar item xs={2}>
       <SurfBoardIcon />
-      <CategoryList>
-        {menu.map((item, index) => (
-          <CategoryListItem key={index}>
-            <StyledLink to={item.link} state={item.state}>
-              {item.name}
-            </StyledLink>
-          </CategoryListItem>
-        ))}
-      </CategoryList>
+      <CategoryList>{renderCategories(menu)}</CategoryList>
     </LeftSidebar>
   );
 };
@@ -82,6 +103,10 @@ const CategoryListItem = styled.li`
   font-family: "Goldplay", "Kopub Dotum Light";
   letter-spacing: 0.165rem;
   text-transform: uppercase;
+
+  &.nested {
+    padding-left: 20px;
+  }
 `;
 
 const StyledLink = styled(Link)`
