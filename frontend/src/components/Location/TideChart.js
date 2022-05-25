@@ -310,7 +310,7 @@ export default TideChart;
 
 const ChartWrapper = styled.div`
   position: relative;
-  margin: auto;
-  height: 25vh;
-  width: 60vw;
+  margin: 12px;
+  height: 27vh;
+  width: 68vw;
 `;

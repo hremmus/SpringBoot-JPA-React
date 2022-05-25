@@ -4,6 +4,7 @@ import LocationCard from "components/Location/LocationCard";
 import NaverMap from "components/Location/NaverMap";
 import TideChart from "components/Location/TideChart";
 import WaveChart from "components/Location/WaveChart";
+import WeatherTable from "components/Location/WeatherTable";
 import WebCam from "components/Location/WebCam";
 import { calculateDistance } from "lib/mathUtils";
 import { media } from "lib/styleUtils";
@@ -537,6 +538,15 @@ const LocationListContainer = () => {
           ))}
         </CardGrid>
       </Box>
+      <WeatherTable
+        timestamps={timestamps}
+        temperatures={temperatures}
+        weatherIcons={weatherIcons}
+        sunrise={sunrise}
+        sunset={sunset}
+        windSpeeds={windSpeeds}
+        windDirections={windDirections}
+      />
       <WaveChart
         timestamps={timestamps}
         waveHeights={waveHeights}
