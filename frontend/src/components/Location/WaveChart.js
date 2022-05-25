@@ -10,6 +10,7 @@ import {
 } from "chart.js";
 import annotationPlugin from "chartjs-plugin-annotation";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import { useEffect, useRef } from "react";
 import { Chart } from "react-chartjs-2";
 import styled from "styled-components";
 import { degreeToDirection } from "../../lib/mathUtils";
@@ -80,6 +81,16 @@ const WaveChart = ({
   wavePeriods,
   waveDirections,
 }) => {
+  const chartRef = useRef(null);
+
+  useEffect(() => {
+    const chart = chartRef.current;
+
+    if (chart) {
+      console.log("ChartJS", chart);
+    }
+  }, []);
+
   const labels = convertTimestampsToHours(timestamps);
   const chartData = {
     // labels: labels, // 배열을 넣으면, x축의 label을 지정하는 데 사용됨
@@ -267,7 +278,7 @@ const WaveChart = ({
 
   return (
     <ChartWrapper>
-      <Chart data={chartData} options={options} />
+      <Chart ref={chartRef} data={chartData} options={options} />
     </ChartWrapper>
   );
 };
@@ -276,7 +287,7 @@ export default WaveChart;
 
 const ChartWrapper = styled.div`
   position: relative;
-  margin: auto;
-  height: 25vh;
-  width: 60vw;
+  margin: 12px;
+  height: 27vh;
+  width: 68vw;
 `;
