@@ -21,6 +21,8 @@ public class PostDto {
   private String content;
   private UserDto user;
   private Long categoryId;
+  private Long parentCategoryId;
+  private String categoryName;
   private List<ImageDto> images;
 
   @JsonFormat(shape = Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss", timezone = "Asia/Seoul")
@@ -29,8 +31,18 @@ public class PostDto {
   private LocalDateTime modifiedDate;
 
   public static PostDto toDto(Post post) {
-    return new PostDto(post.getId(), post.getTitle(), post.getContent(), UserDto.toDto(post.getUser()),
-        post.getCategory().getId(), post.getImages().stream().map(i -> ImageDto.toDto(i)).collect(toList()),
-        post.getCreatedDate(), post.getModifiedDate());
+    if (post.getCategory().getParent() == null) {
+      return new PostDto(post.getId(), post.getTitle(), post.getContent(),
+          UserDto.toDto(post.getUser()), post.getCategory().getId(), -1L,
+          post.getCategory().getName(),
+          post.getImages().stream().map(i -> ImageDto.toDto(i)).collect(toList()),
+          post.getCreatedDate(), post.getModifiedDate());
+    } else {
+      return new PostDto(post.getId(), post.getTitle(), post.getContent(),
+          UserDto.toDto(post.getUser()), post.getCategory().getId(),
+          post.getCategory().getParent().getId(), post.getCategory().getName(),
+          post.getImages().stream().map(i -> ImageDto.toDto(i)).collect(toList()),
+          post.getCreatedDate(), post.getModifiedDate());
+    }
   }
 }

@@ -2,26 +2,16 @@ import CommentList from "components/Post/CommentList";
 import PostActionButtons from "components/Post/PostActionButtons";
 import PostReader from "components/Post/PostReader";
 import UploadedImageList from "components/Post/UploadedImageList";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { loadComments, unloadComment } from "redux/modules/comment";
-import { initialize, setMenu } from "redux/modules/menu";
 import { readPost, setOriginalPost, unloadPost } from "redux/modules/post";
-import { getCategories } from "services/CategoryService";
+import { size } from "redux/modules/posts";
 import { getComments } from "services/CommentService";
 import { deletePost, getPost } from "services/PostService";
 
-const addLinkToCategories = (categories) => {
-  return categories.map((category) => ({
-    ...category,
-    link: `/posts?categoryId=${category.id}&page=0&size=20`,
-    children: addLinkToCategories(category.children), // children category를 파라미터로 한 재귀 호출
-  }));
-};
-
 const PostReadContainer = () => {
-  const { pathname } = useLocation();
   const { postId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -34,58 +24,54 @@ const PostReadContainer = () => {
       shownUpdateInput: state.comment.shownUpdateInput,
     }));
 
-  useEffect(() => {
-    getCategories()
-      .then((response) => {
-        const categories = addLinkToCategories(response.data.result.data);
-        categories.unshift({
-          id: 0,
-          name: "전체",
-          children: [],
-          link: "/posts?page=0&size=20",
-        });
-        dispatch(setMenu(categories));
-      })
-      .catch((error) => console.log(error));
-
-    return () => {
-      if (pathname !== "/posts") {
-        dispatch(initialize());
-      }
-    };
-  }, [dispatch, pathname]);
-
-  useEffect(() => {
+  const fetchPost = useCallback(() => {
     getPost(postId)
       .then((response) => {
         dispatch(readPost(response.data.result.data));
       })
       .catch((error) => console.log(error));
+  }, [dispatch, postId]);
 
+  useEffect(() => {
+    fetchPost();
+
+    return () => {
+      dispatch(unloadPost());
+    };
+  }, [dispatch, fetchPost]);
+
+  const fetchComments = useCallback(() => {
     getComments({ postId: postId })
       .then((response) => {
         dispatch(loadComments(response.data.result.data));
       })
       .catch((error) => console.log(error));
-
-    return () => {
-      dispatch(unloadPost());
-      dispatch(unloadComment());
-    };
   }, [dispatch, postId]);
 
-  const onEdit = () => {
+  useEffect(() => {
+    fetchComments();
+
+    return () => {
+      dispatch(unloadComment());
+    };
+  }, [dispatch, fetchComments]);
+
+  const onEdit = useCallback(() => {
     dispatch(setOriginalPost(post));
     navigate("/posts/write");
-  };
+  }, [dispatch, post, navigate]);
 
-  const onRemove = () => {
+  const onRemove = useCallback(() => {
     deletePost(postId)
       .then((response) => {
         if (response.data.success) navigate("/posts");
       })
       .catch((error) => console.log(error));
-  };
+  }, [postId, navigate]);
+
+  const handleClick = useCallback(() => {
+    navigate(`/posts?userId=${post.user?.id}&page=0&size=${size}`);
+  }, [post, navigate]);
 
   if (!post || !comments) {
     return null;
@@ -100,6 +86,7 @@ const PostReadContainer = () => {
             <PostActionButtons onEdit={onEdit} onRemove={onRemove} />
           )
         }
+        handleClick={handleClick}
       />
       {post.images && <UploadedImageList images={post.images} />}
       <CommentList

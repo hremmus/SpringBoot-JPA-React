@@ -1,42 +1,39 @@
-import oc from "open-color";
-import styled from "styled-components";
+import { Box, Typography } from "@material-ui/core";
+import { grey } from "@material-ui/core/colors";
 import { SubInfo } from "./SubInfo";
 
-const PostHead = styled.div`
-  border-bottom: 1px solid ${oc.gray[2]};
-  padding-bottom: 1rem;
-  margin-bottom: 1rem;
-  h1 {
-    font-size: 2rem;
-    line-height: 1.5;
-    margin: 0;
-  }
-`;
+const PostReader = ({ post, actionButtons, handleClick }) => {
+  const { title, content, user, categoryName, createdDate, modifiedDate } =
+    post;
 
-const PostContent = styled.div`
-  min-height: 25vh;
-  white-space: pre-wrap; // 줄바꿈 반영
-  font-size: 1.3125rem;
-  color: ${oc.gray[8]};
-`;
-
-const PostReader = ({ post, actionButtons }) => {
-  const { title, content, user, categoryId, createdDate, modifiedDate } = post;
   return (
     <>
-      <PostHead>
-        <h1>
-          [{categoryId}] {title}
-        </h1>
+      <Box
+        margin="1.2rem 0 1rem 0"
+        paddingBottom="0.5rem"
+        borderBottom={`1px solid ${grey[200]}`}
+      >
+        <Typography variant="h5">
+          [{categoryName}] {title}
+        </Typography>
         <SubInfo
           nickname={user.nickname}
           createdDate={createdDate}
           modifiedDate={modifiedDate}
+          post={post.id}
+          handleClick={handleClick}
           hasMarginTop
         />
-      </PostHead>
+      </Box>
       {actionButtons}
-      <PostContent>{content}</PostContent>
+      <Box
+        minHeight="25vh"
+        whiteSpace="pre-wrap"
+        fontFamily="Kopub Dotum Light"
+        color={grey[800]}
+      >
+        {content}
+      </Box>
     </>
   );
 };
