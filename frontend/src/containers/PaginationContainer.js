@@ -1,15 +1,9 @@
 import Pagination from "components/Post/Pagination";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import { useSearchParams } from "react-router-dom";
+import { limit, size } from "redux/modules/posts";
 
-const PaginationContainer = () => {
-  const [searchParams] = useSearchParams();
-  const categoryId = searchParams.get("categoryId");
-  const page = parseInt(searchParams.get("page"), 10) + 1 || 1;
-  const limit = 5;
-  const size = 20;
-
+const PaginationContainer = ({ categoryId, userId, page }) => {
   const { posts, totalPages, hasNext } = useSelector(({ posts }) => ({
     posts: posts.posts,
     totalPages: posts.totalPages,
@@ -18,12 +12,6 @@ const PaginationContainer = () => {
 
   const [currentPageArray, setCurrentPageArray] = useState([]);
   const [totalPageArray, setTotalPageArray] = useState([]);
-
-  useEffect(() => {
-    const slicedPageArray = sliceArrayByLimit(totalPages, limit);
-    setTotalPageArray(slicedPageArray);
-    setCurrentPageArray(slicedPageArray[0]);
-  }, [totalPages, limit]);
 
   const sliceArrayByLimit = (totalPages, limit) => {
     const totalPageArray = Array(totalPages)
@@ -35,6 +23,12 @@ const PaginationContainer = () => {
   };
 
   useEffect(() => {
+    const slicedPageArray = sliceArrayByLimit(totalPages, limit);
+    setTotalPageArray(slicedPageArray);
+    setCurrentPageArray(slicedPageArray[0]);
+  }, [totalPages, page]);
+
+  useEffect(() => {
     // 현재 페이지가 단위를 넘어갈 때 (이전/다음) 해당 페이지 배열로 전환
     if (page % limit === 1) {
       // 1, 6, 11, 16, ...
@@ -43,18 +37,19 @@ const PaginationContainer = () => {
       // 5, 10, 15, 20, ...
       setCurrentPageArray(totalPageArray[Math.floor(page / limit) - 1]);
     }
-  }, [page, limit, totalPageArray, setCurrentPageArray]);
+  }, [page, totalPageArray, setCurrentPageArray]);
 
   return (
     posts.length !== 0 && (
       <Pagination
         categoryId={categoryId}
+        userId={userId}
         page={page}
+        size={size}
         totalPages={totalPages}
         limit={limit}
         hasNext={hasNext}
         currentPageArray={currentPageArray}
-        size={size}
       />
     )
   );

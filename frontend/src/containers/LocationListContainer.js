@@ -18,7 +18,6 @@ import {
   setWeathers,
 } from "redux/modules/forecast";
 import { loadLocations, setGrade, setWebcam } from "redux/modules/location";
-import { initialize, setMenu } from "redux/modules/menu";
 import {
   getHighAndLowWater,
   getTides,
@@ -29,15 +28,6 @@ import {
 } from "services/ForecastService";
 import { getLocations } from "services/LocationService";
 import styled from "styled-components";
-
-const menuData = [
-  { name: "양양 yangyang", link: "/location/yangyang", state: "양양" },
-  { name: "제주 jeju", link: "/location/jeju", state: "제주" },
-  { name: "고성 goseong", link: "/location/goseong", state: "고성" },
-  { name: "강릉 gangneung", link: "/location/gangeung", state: "강릉" },
-  { name: "포항 pohang", link: "/location/pohang", state: "포항" },
-  { name: "남해 namhae", link: "/location/namhae", state: "남해" },
-];
 
 const globalLocationData = [
   {
@@ -190,14 +180,6 @@ const LocationListContainer = () => {
   const [selectedGlobalLocation, setSelectedGlobalLocation] = useState({});
   const [selectedLocalIndex, setSelectedLocalIndex] = useState(0);
   const [observatory, setObservatory] = useState("");
-
-  useEffect(() => {
-    dispatch(setMenu(menuData));
-
-    return () => {
-      dispatch(initialize());
-    };
-  }, [dispatch]);
 
   const fetchLocationsData = useCallback(
     async (global) => {

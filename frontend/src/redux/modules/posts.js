@@ -2,6 +2,8 @@ import { createAction, handleActions } from "redux-actions";
 
 const LOAD_POSTS = "post/LOAD_POSTS";
 
+export const size = 20;
+export const limit = 5;
 export const loadPosts = createAction(LOAD_POSTS);
 
 const initialState = {

@@ -1,75 +1,62 @@
 import {
-  Container,
+  Box,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
-  makeStyles,
 } from "@material-ui/core";
 import oc from "open-color";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
-const tdStyle = {
-  padding: "6px 16px 6px 16px",
+const findParentCategory = (categories, parentCategoryId) => {
+  for (const category of categories) {
+    // 최상위 카테고리 중에서 부모 카테고리를 찾음
+    if (category.id === parentCategoryId) {
+      return category;
+    }
+
+    // 재귀 호출하여 하위 카테고리(들)로 내려가 부모 카테고리를 찾음
+    if (category.children.length > 0) {
+      const parentCategory = findParentCategory(
+        category.children,
+        parentCategoryId
+      );
+      if (parentCategory) {
+        return parentCategory;
+      }
+    }
+  }
+
+  return categories.find((category) => category.id === parentCategoryId);
 };
 
-const PostLink = styled(Link)`
-  color: black;
-  text-decoration: none;
-`;
-
-const CategoryBlock = styled.div`
-  .category {
-    display: inline-block;
-    color: ${oc.cyan[7]};
-    &:hover {
-      color: ${oc.cyan[6]};
-    }
-    text-decoration: none;
-  }
-`;
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    maxWidth: "100%",
-    backgroundColor: theme.palette.action.hover,
-  },
-}));
-
-const Category = ({ categoryId }) => {
+const Category = ({ category, size }) => {
   return (
     <CategoryBlock>
       <Link
         className="category"
-        to={`/posts?categoryId=${categoryId}&page=0&size=20`}
+        to={`/posts?categoryId=${category.id}&page=0&size=${size}`}
       >
-        {
-          {
-            1: `카테1`,
-            2: `카테2`,
-            3: `카테3`,
-          }[categoryId]
-        }
+        {category.name}
       </Link>
     </CategoryBlock>
   );
 };
 
-const PostItem = ({ post }) => {
+const PostItem = ({ post, category, size }) => {
   const createdDate = new Date(post.createdDate);
   const today = new Date();
-  const categoryId = post.categoryId;
+
   return (
     <TableRow>
       <TableCell className="postId" style={tdStyle} align="center">
         {post.id}
       </TableCell>
       <TableCell className="category" style={tdStyle} align="center">
-        <Category categoryId={categoryId} />
+        <Category category={category} size={size} />
       </TableCell>
       <TableCell style={tdStyle} align="left">
         <PostLink to={`/posts/${post.id}`}>{post.title}</PostLink>
@@ -88,11 +75,9 @@ const PostItem = ({ post }) => {
   );
 };
 
-const PostList = ({ posts }) => {
-  const classes = useStyles();
-
+const PostList = ({ posts, size, categories }) => {
   return posts.length !== 0 ? (
-    <div className={classes.root}>
+    <>
       <TableContainer>
         <Table>
           <TableHead>
@@ -114,7 +99,12 @@ const PostList = ({ posts }) => {
           </TableHead>
           <TableBody>
             {posts.map((post) => (
-              <PostItem key={post.id} post={post} />
+              <PostItem
+                key={post.id}
+                post={post}
+                category={findParentCategory(categories, post.categoryId) || {}}
+                size={size}
+              />
             ))}
           </TableBody>
         </Table>
@@ -133,18 +123,39 @@ const PostList = ({ posts }) => {
           width: 160px;
         }
       `}</style>
-    </div>
+    </>
   ) : (
-    <Container className={classes.root}>
-      <Typography
-        component="div"
-        align="center"
-        style={{ paddingTop: "15vh", height: "50vh" }}
-      >
-        게시글이 존재하지 않습니다.
-      </Typography>
-    </Container>
+    <Box
+      display="flex"
+      justifyContent="center"
+      maxWidth="100"
+      height="50vh"
+      paddingTop="15vh"
+      fontFamily="Kopub Dotum Light"
+    >
+      게시글이 존재하지 않습니다.
+    </Box>
   );
 };
 
 export default PostList;
+
+const tdStyle = {
+  padding: "6px 16px 6px 16px",
+};
+
+const PostLink = styled(Link)`
+  color: black;
+  text-decoration: none;
+`;
+
+const CategoryBlock = styled.div`
+  .category {
+    display: inline-block;
+    color: ${oc.cyan[7]};
+    &:hover {
+      color: ${oc.cyan[6]};
+    }
+    text-decoration: none;
+  }
+`;
