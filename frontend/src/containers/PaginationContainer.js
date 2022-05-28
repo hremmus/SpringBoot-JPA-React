@@ -25,7 +25,9 @@ const PaginationContainer = ({ categoryId, userId, page }) => {
   useEffect(() => {
     const slicedPageArray = sliceArrayByLimit(totalPages, limit);
     setTotalPageArray(slicedPageArray);
-    setCurrentPageArray(slicedPageArray[0]);
+    setCurrentPageArray(
+      slicedPageArray.find((slicedPage) => slicedPage.includes(page - 1))
+    );
   }, [totalPages, page]);
 
   useEffect(() => {
