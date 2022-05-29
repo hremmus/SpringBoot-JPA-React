@@ -1,5 +1,5 @@
 import { Box, Typography } from "@material-ui/core";
-import oc from "open-color";
+import { grey } from "@material-ui/core/colors";
 
 const GlobalLocation = ({ selectedGlobalLocation }) => {
   const { title, description1, description2 } = selectedGlobalLocation;
@@ -13,8 +13,8 @@ const GlobalLocation = ({ selectedGlobalLocation }) => {
       </Typography>
       <Typography variant="h5" display="inline">
         <Box
-          fontFamily="MinSans-Regular"
-          color={oc.gray[9]}
+          fontFamily="Kopub Dotum Light"
+          color={grey[900]}
           fontWeight="600"
           letterSpacing={7}
           display="inline"
@@ -24,8 +24,8 @@ const GlobalLocation = ({ selectedGlobalLocation }) => {
       </Typography>
       <Typography component="div" variant="body2" display="inline">
         <Box
-          fontFamily="MinSans-Regular"
-          color={oc.gray[8]}
+          fontFamily="Kopub Dotum Light"
+          color={grey[800]}
           display="inline"
           letterSpacing={1}
         >
@@ -35,8 +35,8 @@ const GlobalLocation = ({ selectedGlobalLocation }) => {
       <Box marginY={1}>
         <Typography component="div" variant="body2">
           <Box
-            fontFamily="MinSans-Regular"
-            color={oc.gray[8]}
+            fontFamily="Kopub Dotum Light"
+            color={grey[800]}
             display="inline"
             letterSpacing={1}
           >

@@ -1,31 +1,7 @@
+import { cyan, grey } from "@material-ui/core/colors";
 import { AskModal } from "lib/styleUtils";
-import oc from "open-color";
 import { useState } from "react";
 import styled from "styled-components";
-
-const PostActionButtonsBlock = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  margin: -1.9rem 0.2rem 2rem;
-`;
-
-const ActionButton = styled.button`
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  color: ${oc.gray[6]};
-  font-weight: bold;
-  border: none;
-  outline: none;
-  font-size: 0.875rem;
-  cursor: pointer;
-  &:hover {
-    background: ${oc.gray[1]};
-    color: ${oc.cyan[7]};
-  }
-  & + & {
-    margin-left: 0.5rem;
-  }
-`;
 
 const PostActionButtons = ({ onEdit, onRemove }) => {
   const [modal, setModal] = useState(false);
@@ -64,3 +40,28 @@ const PostActionButtons = ({ onEdit, onRemove }) => {
 };
 
 export default PostActionButtons;
+
+const PostActionButtonsBlock = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  margin: -1.9rem 0.2rem 2rem;
+`;
+
+const ActionButton = styled.button`
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  font-weight: bold;
+  color: ${grey[600]};
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    color: ${cyan[700]};
+    background: ${grey[100]};
+  }
+
+  & + & {
+    margin-left: 0.5rem;
+  }
+`;

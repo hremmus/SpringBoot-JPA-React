@@ -1,7 +1,7 @@
 import AuthButton from "components/Auth/AuthButton";
 import AuthError from "components/Auth/AuthError";
-import InputWithLabel from "components/Auth/InputWithLabel";
 import RightAlignedLink from "components/Auth/RightAlignedLink";
+import InputWithLabel from "lib/styleUtils";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";

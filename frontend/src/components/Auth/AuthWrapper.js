@@ -1,4 +1,4 @@
-import oc from "open-color";
+import { grey } from "@material-ui/core/colors";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
@@ -44,7 +44,7 @@ const Logo = styled(Link)`
   font-family: "Berold Regular";
   font-size: calc(1.8rem + 1vw);
   letter-spacing: 2px;
-  color: ${oc.gray[8]};
+  color: ${grey[800]};
   text-decoration: none;
 `;
 

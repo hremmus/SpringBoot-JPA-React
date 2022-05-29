@@ -1,6 +1,6 @@
 import { Box } from "@material-ui/core";
+import { grey } from "@material-ui/core/colors";
 import { ReactComponent as CamOff } from "assets/svg/camera-off.svg";
-import oc from "open-color";
 import styled from "styled-components";
 
 const WebCam = ({ webcam }) => {
@@ -22,7 +22,7 @@ const WebCam = ({ webcam }) => {
           display="flex"
           position="relative"
           height="170px"
-          bgcolor={oc.gray[2]}
+          bgcolor={grey[200]}
           justifyContent="center"
           alignItems="center"
           fontFamily="Kopub Dotum Light"

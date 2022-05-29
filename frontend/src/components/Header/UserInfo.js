@@ -1,7 +1,7 @@
 import { Box } from "@material-ui/core";
+import { grey } from "@material-ui/core/colors";
 import Settings from "@material-ui/icons/Settings";
 import { ReactComponent as Logout } from "assets/svg/log-out.svg";
-import oc from "open-color";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
@@ -25,7 +25,7 @@ export default UserInfo;
 const SettingsIcon = styled(Settings)`
   margin: 0 8px 0 2px;
   vertical-align: middle;
-  color: ${oc.gray[8]};
+  color: ${grey[800]};
 `;
 
 const LogoutIcon = styled(Logout)`

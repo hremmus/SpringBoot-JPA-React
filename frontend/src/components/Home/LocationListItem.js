@@ -1,5 +1,5 @@
 import { Box, Chip } from "@material-ui/core";
-import oc from "open-color";
+import { grey } from "@material-ui/core/colors";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
@@ -30,7 +30,7 @@ const LocationItem = styled(Box)`
   margin: 8px;
   padding: 8px;
   border-radius: 18px;
-  border: 1px solid ${oc.gray[2]};
+  border: 1px solid ${grey[200]};
   background: hsla(15, 14%, 95%, 0.35);
   position: relative; // 자식 요소 Chip의 위치 지정을 위해 쓰임
   overflow: hidden; // 자식 요소 img 확대(scale) 시 테두리를 벗어나지 않도록 함
