@@ -1,14 +1,12 @@
-import oc from "open-color";
+import { grey } from "@material-ui/core/colors";
 import styled from "styled-components";
 import GradeChip from "./GradeChip";
 
 const LocationCard = ({ local, grade }) => {
   return (
     <CardContent>
-      <div className="align">
-        <GradeChip grade={grade} />
-        <div className="text">{local}</div>
-      </div>
+      <GradeChip grade={grade} />
+      <div className="text">{local}</div>
     </CardContent>
   );
 };
@@ -20,12 +18,7 @@ const CardContent = styled.div`
   align-items: center;
   padding: 0.5rem 1.25rem 0.5rem 1.25rem;
   height: 55px;
-  background-color: ${oc.gray[1]};
-
-  .align {
-    display: flex;
-    align-items: center;
-  }
+  background-color: ${grey[50]};
 
   .text {
     margin-left: 0.75rem;

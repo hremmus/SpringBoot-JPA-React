@@ -1,5 +1,5 @@
+import { grey } from "@material-ui/core/colors";
 import { media } from "lib/styleUtils";
-import oc from "open-color";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
@@ -21,8 +21,6 @@ export default Header;
 
 // 상단 고정
 const Positioner = styled.div`
-  display: flex;
-  flex-direction: column;
   position: static;
   top: 0px;
   left: 0px;
@@ -31,19 +29,14 @@ const Positioner = styled.div`
 `;
 
 const Top = styled.div`
-  display: inline-block;
-  height: auto;
-  width: 100%;
   background: hsla(15, 14%, 95%, 0.35);
 `;
 
 const HeaderContent = styled.div`
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
-  text-align: center;
-  padding-right: 1rem;
-  padding-left: 1rem;
+  padding: 0 1rem 0 1rem;
 
   ${media.wide`
     width: 992px;
@@ -60,7 +53,7 @@ const LogoText = styled(Link)`
   font-family: "Berold Regular";
   font-size: calc(1rem + 1vw);
   letter-spacing: 2px;
-  color: ${oc.gray[8]};
+  color: ${grey[800]};
   text-decoration: none;
 `;
 

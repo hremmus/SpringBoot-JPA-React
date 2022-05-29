@@ -1,4 +1,5 @@
-import oc from "open-color";
+import { TextField } from "@material-ui/core";
+import { cyan, grey, red } from "@material-ui/core/colors";
 import styled, { css, keyframes } from "styled-components";
 
 // 미디어 쿼리 헬퍼: https://www.styled-components.com/docs/advanced#media-templates 참조
@@ -45,72 +46,114 @@ export const VerticalAligner = styled.div`
   align-items: flex-start;
 `;
 
-const Fullscreen = styled.div`
-  position: fixed;
-  z-index: 30;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.25);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
+const splitText = (text) => {
+  return text.split("").map((char, index) => <span key={index}>{char}</span>);
+};
 
-const AskModalBlock = styled.div`
-  width: 320px;
-  background: white;
-  padding: 1.5rem;
-  border-radius: 4px;
-  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.125);
-  h2 {
-    margin-top: 0;
-    margin-bottom: 1rem;
-  }
-  p {
-    margin-bottom: 3rem;
-  }
-  .buttons {
-    display: flex;
-    justify-content: flex-end;
-  }
-`;
+export const ButtonForLettersToGoUp = ({ children, ...props }) => {
+  return (
+    <StyledButton {...props}>
+      <div>{splitText(children)}</div>
+    </StyledButton>
+  );
+};
 
-export const StyledButton = styled.button`
-  height: 2rem;
-  padding: 0.25rem 1rem;
+const StyledButton = styled.button`
+  --background: #fff;
+  --text: ${grey[700]};
+  --font-size: 14px;
+  --duration: 0.44s;
+  --move-hover: -4px;
+  --shadow: 0 2px 8px -1px rgba(18, 22, 33, 0.05);
+  --shadow-hover: 0 4px 20px -2px rgba(18, 22, 33, 0.15);
+  --font-shadow: var(--font-size);
+
+  display: block;
+  padding: 0.5rem 1rem;
+  appearance: none;
+  background: var(--background);
+  font-family: "Kopub Dotum Light";
+  font-size: var(--font-size);
+  color: var(--text);
+  letter-spacing: 2px;
+  line-height: var(--font-size);
   border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  font-weight: bold;
-  outline: none;
-  cursor: pointer;
-  color: white;
-  background: ${oc.gray[7]};
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  transform: translateY(var(--y)) translateZ(0);
+  transition: transform var(--duration) ease, box-shadow var(--duration) ease;
+
+  div {
+    display: flex;
+    overflow: hidden;
+    text-shadow: 0 var(--font-shadow) 0 var(--text);
+
+    span {
+      display: block;
+      transform: translateY(var(--m)) translateZ(0);
+      transition: transform var(--duration) ease;
+      ${Array.from(
+        { length: 11 },
+        (_, i) => `
+          &:nth-child(${i + 1}) {
+            transition-delay: ${i / 10}s;
+          }
+        `
+      ).join("")}
+    }
+  }
+
+  &.cyan {
+    --text: ${cyan[700]};
+  }
+
+  &.red {
+    --text: ${red[700]};
+  }
 
   &:hover {
-    background: ${oc.gray[5]};
+    --y: var(--move-hover);
+    --shadow: var(--shadow-hover);
+    span {
+      --m: calc(var(--font-size) * -1);
+    }
   }
-  &:active {
-    background: ${oc.gray[8]};
+`;
+
+export const InputWithLabel = ({ ...props }) => {
+  return <StyledTextField {...props} />;
+};
+
+export default InputWithLabel;
+
+const StyledTextField = styled(TextField)`
+  width: 100%;
+
+  && {
+    margin: 10px 0;
   }
 
-  & + & {
-    margin-left: 0.5rem;
+  label.Mui-focused {
+    color: ${cyan[700]};
   }
 
-  ${(props) =>
-    props.green &&
-    css`
-      background: ${oc.green[6]};
-      &:hover {
-        background: ${oc.green[4]};
-      }
-      &:active {
-        background: &{oc.green[7]};
-      }
-    `}
+  .Mui-focused.MuiOutlinedInput-root {
+    fieldset {
+      border-color: ${grey[200]};
+    }
+  }
+
+  .MuiInput-underline:before {
+    border-bottom: none;
+  }
+
+  .MuiInput-underline:hover:not(.Mui-disabled):before {
+    border-bottom: 2px solid ${cyan[700]};
+  }
+
+  .MuiInput-underline:after {
+    border-bottom: 2px solid ${grey[200]};
+  }
 `;
 
 export const AskModal = ({
@@ -129,12 +172,59 @@ export const AskModal = ({
         <h2>{title}</h2>
         <p>{description}</p>
         <div className="buttons">
-          <StyledButton onClick={onCancel}>{cancelText}</StyledButton>
-          <StyledButton green="1" onClick={onConfirm}>
+          <ButtonForLettersToGoUp onClick={onCancel}>
+            {cancelText}
+          </ButtonForLettersToGoUp>
+          <ButtonForLettersToGoUp
+            onClick={onConfirm}
+            className={confirmText === "삭제" ? "red" : "cyan"}
+          >
             {confirmText}
-          </StyledButton>
+          </ButtonForLettersToGoUp>
         </div>
       </AskModalBlock>
     </Fullscreen>
   );
 };
+
+const Fullscreen = styled.div`
+  position: fixed;
+  z-index: 30;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.25);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const AskModalBlock = styled.div`
+  padding: 1.5rem;
+  width: 15vw;
+  font-family: "Kopub Dotum Light";
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 4px;
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.125);
+
+  h2 {
+    margin: 0.2rem 0 1.5rem 0;
+    padding: 0.2rem;
+  }
+
+  p {
+    margin: 0.5rem 0 1.5rem 0;
+    padding: 0.2rem;
+  }
+
+  .buttons {
+    display: flex;
+    justify-content: flex-end;
+
+    // 두 번째 button에만 스타일이 적용됨
+    button + button {
+      margin-left: 0.5rem;
+    }
+  }
+`;

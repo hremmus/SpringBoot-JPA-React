@@ -1,5 +1,11 @@
-import oc from "open-color";
+import { cyan } from "@material-ui/core/colors";
 import styled from "styled-components";
+
+const AuthButton = ({ children, onClick }) => (
+  <Wrapper onClick={onClick}>{children}</Wrapper>
+);
+
+export default AuthButton;
 
 const Wrapper = styled.div`
   margin-top: 1rem;
@@ -7,29 +13,23 @@ const Wrapper = styled.div`
   padding-bottom: 0.4rem;
   height: 48px;
 
-  background: ${oc.teal[6]};
-  color: white;
-
   text-align: center;
   vertical-align: middle;
+  color: #343a40;
+  font-family: "Kopub Dotum Light";
   font-size: 1rem;
-  font-weight: 600;
+  letter-spacing: 0.2rem;
+  background: ${cyan[100]};
 
   cursor: pointer;
   user-select: none;
   transition: 0.2s all;
 
   &:hover {
-    background: ${oc.teal[5]};
+    background: ${cyan[200]};
   }
 
   &:active {
-    background: ${oc.teal[7]};
+    background: ${cyan[500]};
   }
 `;
-
-const AuthButton = ({ children, onClick }) => (
-  <Wrapper onClick={onClick}>{children}</Wrapper>
-);
-
-export default AuthButton;

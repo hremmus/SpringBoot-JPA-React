@@ -1,9 +1,12 @@
+import { Box } from "@material-ui/core";
+import ShopBannerJPG from "assets/img/shop-banner.jpg";
 import PostList from "components/Post/PostList";
 import WriteButton from "components/Post/WriteButton";
 import { useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loadPosts, size } from "redux/modules/posts";
 import { getPosts } from "services/PostService";
+import styled from "styled-components";
 
 const PostListContainer = ({ categoryId, userId, page }) => {
   const dispatch = useDispatch();
@@ -33,6 +36,15 @@ const PostListContainer = ({ categoryId, userId, page }) => {
 
   return (
     <>
+      <Box display="flex" justifyContent="center">
+        <a
+          href="https://www.surfcornerstore.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <AdBanner src={ShopBannerJPG} alt="shop" />
+        </a>
+      </Box>
       <WriteButton showWriteButton={isLoggedIn} />
       <PostList posts={posts} size={size} categories={categories} />
     </>
@@ -40,3 +52,8 @@ const PostListContainer = ({ categoryId, userId, page }) => {
 };
 
 export default PostListContainer;
+
+const AdBanner = styled.img`
+  width: 500px;
+  height: 180px;
+`;

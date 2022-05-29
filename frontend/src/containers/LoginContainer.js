@@ -1,9 +1,9 @@
 import axios from "axios";
 import LoginButton from "components/Auth/AuthButton";
 import AuthError from "components/Auth/AuthError";
-import InputWithLabel from "components/Auth/InputWithLabel";
 import RightAlignedLink from "components/Auth/RightAlignedLink";
 import storage from "lib/storage";
+import InputWithLabel from "lib/styleUtils";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
