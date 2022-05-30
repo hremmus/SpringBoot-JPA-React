@@ -12,9 +12,9 @@ export const changeInput = createAction(CHANGE_INPUT, ({ key, value }) => ({
   key,
   value,
 }));
-export const readPost = createAction(READ_POST, (post) => post);
+export const readPost = createAction(READ_POST);
 export const unloadPost = createAction(UNLOAD_POST);
-export const setOriginalPost = createAction(SET_ORIGINAL_POST, (post) => post);
+export const setOriginalPost = createAction(SET_ORIGINAL_POST);
 
 const initialState = {
   post: null,
@@ -42,7 +42,9 @@ const post = handleActions(
       id: post.id,
       title: post.title,
       content: post.content,
+      parentCategoryId: post.parentCategoryId,
       categoryId: post.categoryId,
+      categoryName: post.categoryName,
       images: post.images,
     }),
   },

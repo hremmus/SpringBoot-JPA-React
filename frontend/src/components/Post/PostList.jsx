@@ -7,7 +7,7 @@ import {
   TableHead,
   TableRow,
 } from "@material-ui/core";
-import oc from "open-color";
+import { cyan } from "@material-ui/core/colors";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
@@ -152,9 +152,10 @@ const PostLink = styled(Link)`
 const CategoryBlock = styled.div`
   .category {
     display: inline-block;
-    color: ${oc.cyan[7]};
+    color: ${cyan[700]};
+
     &:hover {
-      color: ${oc.cyan[6]};
+      color: ${cyan[600]};
     }
     text-decoration: none;
   }
