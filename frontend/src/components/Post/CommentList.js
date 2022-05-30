@@ -1,16 +1,17 @@
 import {
   Avatar,
+  Box,
   Divider,
   List,
   ListItem,
   ListItemAvatar,
   ListItemText,
-  ListSubheader,
   Typography,
-  makeStyles,
 } from "@material-ui/core";
+import { grey } from "@material-ui/core/colors";
+import { ReactComponent as MessageCircle } from "assets/svg/message-circle.svg";
 import CommentReplyContainer from "containers/CommentReplyContainer";
-import React from "react";
+import { useCallback } from "react";
 import { useDispatch } from "react-redux";
 import {
   loadComments,
@@ -18,27 +19,8 @@ import {
   toggleSwitch,
 } from "redux/modules/comment";
 import { deleteComment, getComments } from "services/CommentService";
+import styled from "styled-components";
 import CommentActionButtons from "./CommentActionButtons";
-
-const useStyles = makeStyles((theme) => ({
-  root: {
-    maxWidth: "100%",
-    backgroundColor: theme.palette.action.hover,
-    overflow: "clip", // scroll 시 subheader도 같이 넘어가도록
-    display: "flow-root",
-    marginTop: "16px",
-  },
-  inline: {
-    display: "inline",
-  },
-  vertical: {
-    paddingTop: "8px",
-  },
-  nested: {
-    paddingLeft: (props) =>
-      props === 0 ? theme.spacing(2) : theme.spacing(props * 4 + 2),
-  },
-}));
 
 const convertDate = (date) => {
   return date.toLocaleDateString() + " " + date.toLocaleTimeString();
@@ -50,16 +32,13 @@ const CommentItem = ({
   shownReplyInput,
   shownUpdateInput,
   loggedInfo,
-  classes,
 }) => {
-  classes = useStyles(comment.depth);
   const dispatch = useDispatch();
-
-  const onEdit = () => {
+  const onEdit = useCallback(() => {
     dispatch(setOriginalComment(comment));
-  };
+  }, [dispatch, comment]);
 
-  const onRemove = () => {
+  const onRemove = useCallback(() => {
     const id = comment.id;
     deleteComment({ id })
       .then((response) => {
@@ -72,13 +51,13 @@ const CommentItem = ({
         }
       })
       .catch((error) => console.log(error));
-  };
+  }, [dispatch, comment.id, postId]);
 
   return (
     <>
       {comment.content !== null && comment.user !== null ? (
         <>
-          <ListItem alignItems="flex-start" className={classes.nested}>
+          <NestedListItem depth={comment.depth}>
             <ListItemAvatar>
               <Avatar />
             </ListItemAvatar>
@@ -88,11 +67,10 @@ const CommentItem = ({
                 dispatch(toggleSwitch(comment.id));
               }}
               secondary={
-                <React.Fragment>
+                <>
                   <Typography
                     component="span"
                     variant="body2"
-                    className={classes.inline}
                     color="textPrimary"
                   >
                     {comment.user.nickname}
@@ -101,13 +79,13 @@ const CommentItem = ({
                   {comment.createdDate === comment.modifiedDate
                     ? convertDate(new Date(comment.createdDate))
                     : convertDate(new Date(comment.modifiedDate))}
-                </React.Fragment>
+                </>
               }
             />
             {(loggedInfo && loggedInfo.id) === comment.user.id && (
               <CommentActionButtons onEdit={onEdit} onRemove={onRemove} />
             )}
-          </ListItem>
+          </NestedListItem>
           <Divider variant="middle" component="div" />
           {shownReplyInput[comment.id] && (
             <CommentReplyContainer
@@ -119,12 +97,11 @@ const CommentItem = ({
         </>
       ) : (
         <>
-          <ListItem alignItems="flex-start" className={classes.nested}>
+          <NestedListItem depth={0}>
             <ListItemAvatar>
               <Avatar />
             </ListItemAvatar>
             <ListItemText
-              className={classes.vertical}
               primary={
                 <Typography
                   component="span"
@@ -136,7 +113,7 @@ const CommentItem = ({
                 </Typography>
               }
             />
-          </ListItem>
+          </NestedListItem>
           <Divider variant="middle" component="div" />
         </>
       )}
@@ -151,13 +128,27 @@ const CommentList = ({
   shownUpdateInput,
   loggedInfo,
 }) => {
-  const classes = useStyles();
-
   return (
-    <List className={classes.root}>
-      <ListSubheader style={{ backgroundColor: "transparent" }}>
-        댓글 {comments.length}개
-      </ListSubheader>
+    <ListStyled
+      aria-labelledby="nested-list-subheader"
+      subheader={
+        <Box
+          m={1}
+          p={2}
+          paddingY={2.5}
+          display="flex"
+          alignItems="center"
+          fontSize="14px"
+          fontFamily="Kopub Dotum Light"
+          color={`${grey[900]}`}
+          letterSpacing="1px"
+          id="nested-list-subheader"
+        >
+          <MessageCircleStyled />
+          댓글&nbsp; <b>{comments.length}</b>개
+        </Box>
+      }
+    >
       {comments.map((comment) => {
         return (
           <CommentItem
@@ -167,12 +158,28 @@ const CommentList = ({
             shownReplyInput={shownReplyInput}
             shownUpdateInput={shownUpdateInput}
             loggedInfo={loggedInfo}
-            classes={classes}
           />
         );
       })}
-    </List>
+    </ListStyled>
   );
 };
 
 export default CommentList;
+
+const ListStyled = styled(List)`
+  background-color: hsla(185, 63%, 75%, 0.05);
+`;
+
+const NestedListItem = styled(ListItem)`
+  && {
+    padding-left: ${(props) =>
+      props.depth === 0 ? "30px" : `${props.depth * 5 * 6 + 30}px`};
+  }
+`;
+
+const MessageCircleStyled = styled(MessageCircle)`
+  margin-right: 0.5rem;
+  stroke: rgba(1, 160, 176, 0.25);
+  fill: #fff;
+`;

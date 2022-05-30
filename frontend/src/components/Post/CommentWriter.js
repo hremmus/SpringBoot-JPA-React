@@ -1,73 +1,48 @@
-import { IconButton, TextField, makeStyles } from "@material-ui/core";
-import CreateRoundedIcon from "@material-ui/icons/CreateRounded";
-import { useDispatch } from "react-redux";
-import { changeInput, setComment } from "redux/modules/comment";
-import { createComment } from "services/CommentService";
+import { IconButton } from "@material-ui/core";
+import { cyan } from "@material-ui/core/colors";
+import { ReactComponent as WriteIcon } from "assets/svg/edit.svg";
+import InputWithLabel from "lib/styleUtils";
+import styled from "styled-components";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    "& .MuiTextField-root": {
-      width: "100%",
-      maxWidth: "115ch",
-    },
-  },
-  button: {
-    paddingRight: "10px",
-    marginLeft: "10px",
-    marginTop: "11px",
-  },
-}));
-
-const CommentWriter = ({ content, postId }) => {
-  const classes = useStyles();
-  const dispatch = useDispatch();
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-
-    dispatch(
-      changeInput({
-        input: "common",
-        key: name,
-        value,
-      })
-    );
-  };
-
-  const handleSubmit = (e) => {
-    createComment({ content, postId, parentId: null })
-      .then((response) => {
-        if (response.data.success) {
-          // 답댓글이 아니면 기존 리스트에 추가
-          dispatch(setComment(response.data.result.data));
-        }
-      })
-      .catch((error) => console.log(error));
-  };
-
+const CommentWriter = ({ content, handleChange, handleSubmit }) => {
   return (
-    <form className={classes.root} autoComplete="off">
-      <TextField
+    <CommentWriteForm autoComplete="off">
+      <InputWithLabel
         name="content"
         value={content}
         onChange={handleChange}
-        id="outlined-helperText"
         label="댓글 작성하기"
         helperText="댓글은 자신을 나타내는 얼굴입니다."
         variant="outlined"
+        color="primary"
         margin="normal"
         size="small"
       />
-      <IconButton
-        onClick={handleSubmit}
-        className={classes.button}
-        size="medium"
-        color="primary"
-      >
-        <CreateRoundedIcon />
+      <IconButton onClick={handleSubmit} size="medium">
+        <WriteStyled />
       </IconButton>
-    </form>
+    </CommentWriteForm>
   );
 };
 
 export default CommentWriter;
+
+const CommentWriteForm = styled.form`
+  display: flex;
+  justify-content: space-around;
+  margin-top: 0.5rem;
+  padding-left: 0.5rem;
+
+  .MuiTextField-root {
+    width: 95%;
+  }
+
+  button {
+    top: 9px;
+    height: 45px;
+  }
+`;
+
+const WriteStyled = styled(WriteIcon)`
+  stroke: ${cyan[700]};
+`;

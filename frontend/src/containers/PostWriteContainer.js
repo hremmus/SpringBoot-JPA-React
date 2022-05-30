@@ -5,15 +5,25 @@ import { initialize } from "redux/modules/post";
 
 const PostWriteContainer = () => {
   const dispatch = useDispatch();
-  const { id, title, content, categoryId, images } = useSelector(
-    ({ post }) => ({
-      id: post.id,
-      title: post.title,
-      content: post.content,
-      categoryId: post.categoryId,
-      images: post.images,
-    })
-  );
+  const {
+    categories,
+    parentCategoryId,
+    subCategoryId,
+    id,
+    title,
+    content,
+    categoryId,
+    images,
+  } = useSelector(({ categories, post }) => ({
+    categories: categories.categories || [],
+    parentCategoryId: post.parentCategoryId,
+    subCategoryId: post.subCategoryId,
+    id: post.id,
+    title: post.title,
+    content: post.content,
+    categoryId: post.categoryId,
+    images: post.images || [],
+  }));
 
   useEffect(() => {
     return () => {
@@ -23,6 +33,9 @@ const PostWriteContainer = () => {
 
   return (
     <PostWriter
+      categories={categories}
+      parentCategoryId={parentCategoryId}
+      subCategoryId={subCategoryId}
       id={id}
       title={title}
       content={content}
