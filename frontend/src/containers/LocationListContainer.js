@@ -9,7 +9,7 @@ import WebCam from "components/Location/WebCam";
 import { calculateDistance } from "lib/mathUtils";
 import { media } from "lib/styleUtils";
 import { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import {
   setHighAndLowWater,
@@ -143,6 +143,8 @@ const findClosestObservatory = (latitude, longitude) => {
 
 const LocationListContainer = () => {
   const { state } = useLocation();
+  const dispatch = useDispatch();
+
   const {
     locations,
     timestamps,
@@ -159,24 +161,27 @@ const LocationListContainer = () => {
     webcams,
     tides,
     highAndLowWater,
-  } = useSelector(({ forecast, location }) => ({
-    locations: location.locations,
-    timestamps: forecast.timestamps,
-    temperatures: forecast.temperatures,
-    weatherIcons: forecast.weatherIcons,
-    sunrise: forecast.sunrise,
-    sunset: forecast.sunset,
-    windSpeeds: forecast.windSpeeds,
-    windDirections: forecast.windDirections,
-    waveHeights: forecast.waveHeights,
-    wavePeriods: forecast.wavePeriods,
-    waveDirections: forecast.waveDirections,
-    grades: location.grades,
-    webcams: location.webcams,
-    tides: forecast.tides,
-    highAndLowWater: forecast.highAndLowWater,
-  }));
-  const dispatch = useDispatch();
+  } = useSelector(
+    ({ forecast, location }) => ({
+      locations: location.locations,
+      timestamps: forecast.timestamps,
+      temperatures: forecast.temperatures,
+      weatherIcons: forecast.weatherIcons,
+      sunrise: forecast.sunrise,
+      sunset: forecast.sunset,
+      windSpeeds: forecast.windSpeeds,
+      windDirections: forecast.windDirections,
+      waveHeights: forecast.waveHeights,
+      wavePeriods: forecast.wavePeriods,
+      waveDirections: forecast.waveDirections,
+      grades: location.grades,
+      webcams: location.webcams,
+      tides: forecast.tides,
+      highAndLowWater: forecast.highAndLowWater,
+    }),
+    shallowEqual
+  );
+
   const [selectedGlobalLocation, setSelectedGlobalLocation] = useState({});
   const [selectedLocalIndex, setSelectedLocalIndex] = useState(0);
   const [observatory, setObservatory] = useState("");
@@ -194,17 +199,19 @@ const LocationListContainer = () => {
   );
 
   useEffect(() => {
-    const selectedGlobalData = globalLocationData.find(
-      (element) => element.title === state
-    );
-    setSelectedGlobalLocation(selectedGlobalData || {});
+    if (state) {
+      const selectedGlobalData = globalLocationData.find(
+        (element) => element.title === state
+      );
+      setSelectedGlobalLocation(selectedGlobalData || {});
 
-    fetchLocationsData(state);
+      fetchLocationsData(state);
 
-    return () => {
-      setSelectedLocalIndex(0); // 다른 카테고리로 이동해도(global이 변경되어도) index 값이 유지되므로 초기화 필요
-      setObservatory("");
-    };
+      return () => {
+        setSelectedLocalIndex(0); // 다른 카테고리로 이동해도(global이 변경되어도) index 값이 유지되므로 초기화 필요
+        setObservatory("");
+      };
+    }
   }, [state, fetchLocationsData]);
 
   const fetchForSetGrade = useCallback(async () => {

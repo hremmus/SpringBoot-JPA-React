@@ -17,10 +17,8 @@ const LoginContainer = (props) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { form, authError } = useSelector(({ auth }) => ({
-    form: auth.login,
-    authError: auth.authError,
-  }));
+  const form = useSelector((state) => state.auth.login);
+  const authError = useSelector((state) => state.auth.authError);
 
   useEffect(() => {
     dispatch(initializeForm("login"));

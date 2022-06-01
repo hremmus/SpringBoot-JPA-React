@@ -14,12 +14,13 @@ import {
 } from "services/CommentService";
 
 const CommentReplyContainer = ({ parentId, parentNickname }) => {
-  const dispatch = useDispatch();
   const { postId } = useParams();
-  const { id, content } = useSelector(({ comment }) => ({
-    id: comment.id,
-    content: comment.reply.content || comment.content,
-  }));
+  const dispatch = useDispatch();
+
+  const id = useSelector((state) => state.comment.id);
+  const content = useSelector(
+    (state) => state.comment.reply.content || state.comment.content
+  );
 
   const handleChange = useCallback(
     (e) => {

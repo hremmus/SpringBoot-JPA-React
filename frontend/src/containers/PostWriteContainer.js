@@ -1,10 +1,11 @@
 import PostWriter from "components/Post/PostWriter";
 import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { initialize } from "redux/modules/post";
 
 const PostWriteContainer = () => {
   const dispatch = useDispatch();
+
   const {
     categories,
     parentCategoryId,
@@ -14,16 +15,19 @@ const PostWriteContainer = () => {
     content,
     categoryId,
     images,
-  } = useSelector(({ categories, post }) => ({
-    categories: categories.categories || [],
-    parentCategoryId: post.parentCategoryId,
-    subCategoryId: post.subCategoryId,
-    id: post.id,
-    title: post.title,
-    content: post.content,
-    categoryId: post.categoryId,
-    images: post.images || [],
-  }));
+  } = useSelector(
+    ({ categories, post }) => ({
+      categories: categories.categories || [],
+      parentCategoryId: post.parentCategoryId,
+      subCategoryId: post.subCategoryId,
+      id: post.id,
+      title: post.title,
+      content: post.content,
+      categoryId: post.categoryId,
+      images: post.images || [],
+    }),
+    shallowEqual
+  );
 
   useEffect(() => {
     return () => {

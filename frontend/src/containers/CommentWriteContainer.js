@@ -6,11 +6,10 @@ import { changeInput, setComment } from "redux/modules/comment";
 import { createComment } from "services/CommentService";
 
 const CommentWriteContainer = () => {
-  const dispatch = useDispatch();
   const { postId } = useParams();
-  const { content } = useSelector(({ comment }) => ({
-    content: comment.common.content,
-  }));
+  const dispatch = useDispatch();
+
+  const content = useSelector((state) => state.comment.common.content);
 
   const handleChange = useCallback(
     (e) => {

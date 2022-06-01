@@ -3,7 +3,7 @@ import PostActionButtons from "components/Post/PostActionButtons";
 import PostReader from "components/Post/PostReader";
 import UploadedImageList from "components/Post/UploadedImageList";
 import { useCallback, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { loadComments, unloadComment } from "redux/modules/comment";
 import { readPost, setOriginalPost, unloadPost } from "redux/modules/post";
@@ -15,14 +15,18 @@ const PostReadContainer = () => {
   const { postId } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const { post, loggedInfo, comments, shownReplyInput, shownUpdateInput } =
-    useSelector((state) => ({
-      post: state.post.post,
-      loggedInfo: state.user.loggedInfo,
-      comments: state.comment.comments,
-      shownReplyInput: state.comment.shownReplyInput,
-      shownUpdateInput: state.comment.shownUpdateInput,
-    }));
+    useSelector(
+      (state) => ({
+        post: state.post.post,
+        loggedInfo: state.user.loggedInfo,
+        comments: state.comment.comments,
+        shownReplyInput: state.comment.shownReplyInput,
+        shownUpdateInput: state.comment.shownUpdateInput,
+      }),
+      shallowEqual
+    );
 
   const fetchPost = useCallback(() => {
     getPost(postId)
