@@ -11,11 +11,9 @@ import styled from "styled-components";
 const PostListContainer = ({ categoryId, userId, page }) => {
   const dispatch = useDispatch();
 
-  const { isLoggedIn, posts, categories } = useSelector((state) => ({
-    isLoggedIn: state.user.isLoggedIn,
-    posts: state.posts.posts,
-    categories: state.categories.categories || [],
-  }));
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const posts = useSelector((state) => state.posts.posts);
+  const categories = useSelector((state) => state.categories.categories || []);
 
   const fetchPosts = useCallback(() => {
     getPosts({

@@ -4,11 +4,9 @@ import { useSelector } from "react-redux";
 import { limit, size } from "redux/modules/posts";
 
 const PaginationContainer = ({ categoryId, userId, page }) => {
-  const { posts, totalPages, hasNext } = useSelector(({ posts }) => ({
-    posts: posts.posts,
-    totalPages: posts.totalPages,
-    hasNext: posts.hasNext,
-  }));
+  const posts = useSelector((state) => state.posts.posts);
+  const totalPages = useSelector((state) => state.posts.totalPages);
+  const hasNext = useSelector((state) => state.posts.hasNext);
 
   const [currentPageArray, setCurrentPageArray] = useState([]);
   const [totalPageArray, setTotalPageArray] = useState([]);

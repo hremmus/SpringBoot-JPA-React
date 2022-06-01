@@ -11,10 +11,9 @@ import { joinUser } from "services/AuthService";
 const JoinContainer = (props) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { form, authError } = useSelector(({ auth }) => ({
-    form: auth.join,
-    authError: auth.authError,
-  }));
+
+  const form = useSelector((state) => state.auth.join);
+  const authError = useSelector((state) => state.auth.authError);
 
   useEffect(() => {
     dispatch(initializeForm("join"));
@@ -41,7 +40,8 @@ const JoinContainer = (props) => {
     joinUser(form)
       .then((response) => {
         if (response.data.success) {
-          navigate("/");
+          alert(`회원 가입에 성공했습니다! 로그인 페이지로 이동합니다.`);
+          navigate(`/auth/login`);
         }
       })
       .catch((error) => {

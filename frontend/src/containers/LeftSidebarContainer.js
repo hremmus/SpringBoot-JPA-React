@@ -48,12 +48,11 @@ const renderCategories = (categories) => {
 };
 
 const LeftSidebarContainer = () => {
-  const dispatch = useDispatch();
   const { pathname } = useLocation();
-  const { visible, menu } = useSelector(({ header, menu }) => ({
-    visible: header.visible,
-    menu: menu.menu,
-  }));
+  const dispatch = useDispatch();
+
+  const visible = useSelector((state) => state.header.visible);
+  const menu = useSelector((state) => state.menu.menu);
 
   const fetchPostCategories = useCallback(() => {
     getCategories()

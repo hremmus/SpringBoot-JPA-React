@@ -11,13 +11,10 @@ import Header from "../components/Header/Header";
 
 const HeaderContainer = () => {
   const dispatch = useDispatch();
-  const { visible, isLoggedIn, loggedInfo } = useSelector(
-    ({ header, user }) => ({
-      visible: header.visible,
-      isLoggedIn: user.isLoggedIn,
-      loggedInfo: user.loggedInfo,
-    })
-  );
+
+  const visible = useSelector((state) => state.header.visible);
+  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const loggedInfo = useSelector((state) => state.user.loggedInfo);
 
   const handleLogout = useCallback(async () => {
     await logoutUser()

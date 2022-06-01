@@ -3,9 +3,7 @@ import { useSelector } from "react-redux";
 import styled from "styled-components";
 
 const Spinner = () => {
-  const { loading } = useSelector(({ loading }) => ({
-    loading: loading.loading,
-  }));
+  const loading = useSelector((state) => state.loading.loading);
 
   return (
     <>
