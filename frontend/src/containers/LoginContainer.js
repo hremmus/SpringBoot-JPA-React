@@ -1,4 +1,3 @@
-import axios from "axios";
 import LoginButton from "components/Auth/AuthButton";
 import AuthError from "components/Auth/AuthError";
 import RightAlignedLink from "components/Auth/RightAlignedLink";
@@ -8,7 +7,6 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { setError } from "redux/modules/auth";
-import { setAccessToken } from "redux/modules/user";
 import { loginUser } from "services/AuthService";
 import { changeInput, initializeForm } from "./../redux/modules/auth";
 
@@ -51,10 +49,7 @@ const LoginContainer = (props) => {
     loginUser(form)
       .then((response) => {
         if (response.data.success) {
-          axios.defaults.headers.common[
-            "Authorization"
-          ] = `${response.data.result.data.accessToken}`;
-          dispatch(setAccessToken(response.data.result.data.accessToken));
+          storage.set("accessToken", response.data.result.data.accessToken);
           storage.set("loggedInfo", response.data.result.data.user);
         }
 

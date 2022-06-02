@@ -22,6 +22,7 @@ const HeaderContainer = () => {
       .catch((error) => console.log(error));
 
     storage.remove("loggedInfo");
+    storage.remove("accessToken");
     dispatch(logout());
   }, [dispatch]);
 

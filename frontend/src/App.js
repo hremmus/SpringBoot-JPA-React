@@ -1,5 +1,4 @@
 import { Grid } from "@material-ui/core";
-import NaverMap from "components/Location/NaverMap";
 import HeaderContainer from "containers/HeaderContainer";
 import LeftSidebarContainer from "containers/LeftSidebarContainer";
 import storage from "lib/storage";
@@ -17,23 +16,16 @@ import { logout, setAccessToken, setLoggedInfo } from "redux/modules/user";
 import api from "services";
 import { refreshToken } from "services/AuthService";
 
-function App() {
+const App = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { accessToken } = useSelector(({ user }) => ({
-    accessToken: user.accessToken,
-  }));
 
+  // 로딩 상태 관리와 관련된 인터셉터 설정을 컴포넌트 마운트 시 한 번만 실행
   useEffect(() => {
-    const loggedInfo = storage.get("loggedInfo");
-    if (loggedInfo) dispatch(setLoggedInfo(loggedInfo));
-
-    api.interceptors.request.use(
+    const requestInterceptor = api.interceptors.request.use(
       (config) => {
         // 로딩 호출
         dispatch(isLoading());
-        if (config.headers["Authorization"] === undefined)
-          config.headers["Authorization"] = accessToken;
         return config;
       },
       (error) => {
@@ -43,7 +35,7 @@ function App() {
       }
     );
 
-    api.interceptors.response.use(
+    const responseInterceptor = api.interceptors.response.use(
       (response) => {
         // 완료 시 로딩 종료
         dispatch(isLoaded());
@@ -52,6 +44,56 @@ function App() {
       async (error) => {
         // 실패 시 로딩 종료
         dispatch(isLoaded());
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      api.interceptors.request.eject(requestInterceptor);
+      api.interceptors.response.eject(responseInterceptor);
+    };
+  }, []);
+
+  const loggedInfo = useSelector((state) => state.user.loggedInfo);
+  const storedLoggedInfo = storage.get("loggedInfo");
+  const accessToken = useSelector((state) => state.user.accessToken);
+  const storedAccessToken = storage.get("accessToken");
+
+  useEffect(() => {
+    if (
+      (!loggedInfo?.id && storedLoggedInfo) ||
+      (storedLoggedInfo && loggedInfo?.id !== storedLoggedInfo?.id)
+    ) {
+      dispatch(setLoggedInfo(storedLoggedInfo));
+    }
+  }, [dispatch, loggedInfo, storedLoggedInfo]);
+
+  useEffect(() => {
+    if (
+      (!accessToken && storedAccessToken) ||
+      (storedAccessToken && accessToken !== storedAccessToken)
+    ) {
+      dispatch(setAccessToken(storedAccessToken));
+    }
+  }, [dispatch, accessToken, storedAccessToken]);
+
+  useEffect(() => {
+    const requestInterceptors = api.interceptors.request.use(
+      (config) => {
+        if (!config.headers["Authorization"] && accessToken)
+          config.headers["Authorization"] = accessToken;
+        return config;
+      },
+      (error) => {
+        return Promise.reject(error);
+      }
+    );
+
+    const responseInterceptors = api.interceptors.response.use(
+      (response) => {
+        return response;
+      },
+      async (error) => {
         const {
           config,
           response: { status },
@@ -61,15 +103,15 @@ function App() {
           prevRequest.sent = true;
           await refreshToken()
             .then((response) => {
-              config.headers[
-                "Authorization"
-              ] = `${response.data.result.data.accessToken}`;
-              dispatch(setAccessToken(response.data.result.data.accessToken));
+              const refreshToken = response.data.result.data.accessToken;
+              config.headers["Authorization"] = refreshToken;
+              storage.set("accessToken", refreshToken);
             })
             .catch((error) => {
               console.log(error);
-              storage.remove("loggedInfo");
               dispatch(logout());
+              storage.remove("loggedInfo");
+              storage.remove("accessToken");
               navigate("/auth/login?expired");
             });
           return api(prevRequest);
@@ -77,6 +119,11 @@ function App() {
         return Promise.reject(error);
       }
     );
+
+    return () => {
+      api.interceptors.request.eject(requestInterceptors);
+      api.interceptors.response.eject(responseInterceptors);
+    };
   }, [dispatch, navigate, accessToken]);
 
   const isHomePage = window.location.pathname === "/";
@@ -95,13 +142,12 @@ function App() {
               <Route path="/posts/write" element={<WritePost />} />
               <Route path="/posts/:postId" element={<Post />} />
               <Route path="/location/:global" element={<Locations />} />
-              <Route path="/map" element={<NaverMap />} />
             </Routes>
           </Grid>
         </Grid>
       </Grid>
     </>
   );
-}
+};
 
 export default App;
