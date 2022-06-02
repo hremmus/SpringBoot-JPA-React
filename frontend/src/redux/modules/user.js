@@ -30,10 +30,9 @@ export default handleActions(
       ...state,
       accessToken,
     }),
-    [LOGOUT]: (state) => ({
-      ...state,
-      accessToken: null,
-      loggedInfo: null,
+    [LOGOUT]: () => ({
+      loggedInfo: {},
+      accessToken: "",
       isLoggedIn: false,
     }),
   },
