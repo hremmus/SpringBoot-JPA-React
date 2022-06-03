@@ -16,17 +16,24 @@ const PostReadContainer = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { post, loggedInfo, comments, shownReplyInput, shownUpdateInput } =
-    useSelector(
-      (state) => ({
-        post: state.post.post,
-        loggedInfo: state.user.loggedInfo,
-        comments: state.comment.comments,
-        shownReplyInput: state.comment.shownReplyInput,
-        shownUpdateInput: state.comment.shownUpdateInput,
-      }),
-      shallowEqual
-    );
+  const {
+    post,
+    loggedInfo,
+    isAdmin,
+    comments,
+    shownReplyInput,
+    shownUpdateInput,
+  } = useSelector(
+    (state) => ({
+      post: state.post.post,
+      loggedInfo: state.user.loggedInfo,
+      isAdmin: state.user.isAdmin,
+      comments: state.comment.comments,
+      shownReplyInput: state.comment.shownReplyInput,
+      shownUpdateInput: state.comment.shownUpdateInput,
+    }),
+    shallowEqual
+  );
 
   const fetchPost = useCallback(() => {
     getPost(postId)
@@ -86,7 +93,7 @@ const PostReadContainer = () => {
       <PostReader
         post={post}
         actionButtons={
-          (loggedInfo && loggedInfo.id) === (post && post.user.id) && (
+          (loggedInfo?.id === post?.user.id || isAdmin) && (
             <PostActionButtons onEdit={onEdit} onRemove={onRemove} />
           )
         }
