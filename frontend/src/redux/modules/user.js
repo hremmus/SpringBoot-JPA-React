@@ -16,6 +16,7 @@ const initialState = {
     nickname: null,
   },
   accessToken: null,
+  isAdmin: false,
   isLoggedIn: false, // 현재 로그인 중인지 알려 준다
 };
 
@@ -23,7 +24,12 @@ export default handleActions(
   {
     [SET_LOGGED_INFO]: (state, { payload: loggedInfo }) => ({
       ...state,
-      loggedInfo,
+      loggedInfo: {
+        id: loggedInfo.id,
+        email: loggedInfo.email,
+        nickname: loggedInfo.nickname,
+      },
+      isAdmin: loggedInfo.roles.includes("ROLE_ADMIN"),
       isLoggedIn: true,
     }),
     [SET_ACCESS_TOKEN]: (state, { payload: accessToken }) => ({
