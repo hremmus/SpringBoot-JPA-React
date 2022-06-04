@@ -1,11 +1,11 @@
 import { Grid } from "@material-ui/core";
 import { grey } from "@material-ui/core/colors";
 import SurfBoardPNG from "assets/img/surf-board.png";
-import { useCallback, useEffect } from "react";
+import { Fragment, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import { loadCategories } from "redux/modules/categories";
-import { initialize, locationMenuData, setMenu } from "redux/modules/menu";
+import { initialize, menuData, setMenu } from "redux/modules/menu";
 import { size } from "redux/modules/posts";
 import { getCategories } from "services/CategoryService";
 import styled from "styled-components";
@@ -18,32 +18,25 @@ const addLinkToCategories = (categories, size) => {
   }));
 };
 
-const Category = ({ index, name, link, state, children }) => {
+const Category = ({ name, link, state, depth }) => {
   return (
     <>
-      <CategoryListItem key={index}>
+      <CategoryListItem depth={depth}>
         <StyledLink to={link} state={state}>
           {name}
         </StyledLink>
       </CategoryListItem>
-      {children && children.length > 0 && (
-        <>
-          {children.map((child, index) => (
-            <CategoryListItem key={index} className="nested">
-              <StyledLink to={child.link} state={child.state}>
-                {child.name}
-              </StyledLink>
-            </CategoryListItem>
-          ))}
-        </>
-      )}
     </>
   );
 };
 
-const renderCategories = (categories) => {
+const renderCategories = (categories, depth = 0) => {
   return categories.map((category, index) => (
-    <Category key={index} {...category} />
+    <Fragment key={`${category.id}-${index}`}>
+      <Category {...category} depth={depth} />
+      {category.children?.length > 0 &&
+        renderCategories(category.children, depth + 1)}
+    </Fragment>
   ));
 };
 
@@ -78,7 +71,9 @@ const LeftSidebarContainer = () => {
     } else if (pathname.includes("/posts")) {
       fetchPostCategories();
     } else if (pathname.includes("/location")) {
-      dispatch(setMenu(locationMenuData));
+      dispatch(setMenu(menuData.location));
+    } else if (pathname.includes("/admin")) {
+      dispatch(setMenu(menuData.admin));
     }
   }, [dispatch, pathname, fetchPostCategories]);
 
@@ -145,9 +140,7 @@ const CategoryListItem = styled.li`
   letter-spacing: 0.165rem;
   text-transform: uppercase;
 
-  &.nested {
-    padding-left: 20px;
-  }
+  padding-left: ${(props) => `${props.depth * 10}px`};
 `;
 
 const StyledLink = styled(Link)`

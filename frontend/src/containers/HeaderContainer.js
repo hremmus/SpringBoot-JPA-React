@@ -15,6 +15,7 @@ const HeaderContainer = () => {
   const visible = useSelector((state) => state.header.visible);
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
   const loggedInfo = useSelector((state) => state.user.loggedInfo);
+  const isAdmin = useSelector((state) => state.user.isAdmin);
 
   const handleLogout = useCallback(async () => {
     await logoutUser()
@@ -30,9 +31,13 @@ const HeaderContainer = () => {
 
   return (
     <Header>
-      <NavBar menu={menuData} />
+      <NavBar menu={menuData.initial} />
       {isLoggedIn ? (
-        <UserInfo loggedInfo={loggedInfo} handleLogout={handleLogout} />
+        <UserInfo
+          loggedInfo={loggedInfo}
+          isAdmin={isAdmin}
+          handleLogout={handleLogout}
+        />
       ) : (
         <LoginButton />
       )}
