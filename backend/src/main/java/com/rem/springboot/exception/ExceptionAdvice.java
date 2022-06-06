@@ -1,6 +1,7 @@
 package com.rem.springboot.exception;
 
 import javax.management.relation.RoleNotFoundException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
@@ -72,6 +73,12 @@ public class ExceptionAdvice {
   @ResponseStatus(HttpStatus.NOT_FOUND)
   public Response categoryNotFoundException() {
     return Response.failure(-1010, "존재하지 않는 카테고리입니다.");
+  }
+
+  @ExceptionHandler({DataIntegrityViolationException.class})
+  @ResponseStatus(HttpStatus.CONFLICT)
+  public Response categoryConstraintViolationException() {
+    return Response.failure(-1017, "카테고리를 참조하는 게시글이 있습니다.");
   }
 
   @ExceptionHandler(CannotConvertHierarchicalStructureException.class)

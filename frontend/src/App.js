@@ -15,6 +15,7 @@ import { isLoaded, isLoading } from "redux/modules/loading";
 import { logout, setAccessToken, setLoggedInfo } from "redux/modules/user";
 import api from "services";
 import { refreshToken } from "services/AuthService";
+import ManageCategories from "./pages/ManageCategories";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -142,6 +143,7 @@ const App = () => {
               <Route path="/posts/write" element={<WritePost />} />
               <Route path="/posts/:postId" element={<Post />} />
               <Route path="/location/:global" element={<Locations />} />
+              <Route path="/admin/categories" element={<ManageCategories />} />
             </Routes>
           </Grid>
         </Grid>

@@ -1,4 +1,5 @@
 import { produce } from "immer";
+import { calcDepth, convertOneArray } from "lib/mathUtils";
 import { createAction, handleActions } from "redux-actions";
 
 const LOAD_COMMENTS = "comment/LOAD_COMMENTS";
@@ -86,47 +87,5 @@ const comment = handleActions(
   },
   initialState
 );
-
-// 계층형 구조의 배열을 전부 꺼내어 한 배열에 담음
-const convertOneArray = (array) => {
-  const newArray = [];
-  const recursion = (array) => {
-    for (let i = 0; i < array.length; i++) {
-      array[i].childrenIds = [];
-    }
-
-    for (let i = 0; i < array.length; i++) {
-      newArray.push(array[i]);
-
-      if (array[i].children.length !== 0) {
-        array[i].childrenIds = array[i].children.map((child) => child.id); // id만 꺼냄
-        recursion(array[i].children);
-      }
-    }
-  };
-
-  recursion(array);
-  return newArray;
-};
-
-// 부모 객체의 개수만큼 자식 객체의 depth에 담음
-const calcDepth = (array) => {
-  const newArray = [...array]; // readonly로 depth 프로퍼티를 추가할 수 없음 => 얕은 복사
-  for (let i = 0; i < newArray.length; i++) {
-    newArray[i].depth = 0;
-  }
-
-  for (let i = 0; i < newArray.length; i++) {
-    for (let j = i + 1; j < newArray.length; j++) {
-      if (
-        newArray[i].childrenIds.length !== 0 && // 최상위 댓글 제외
-        newArray[i].childrenIds.includes(newArray[j].id) // JAVA의 contains
-      ) {
-        newArray[j].depth = newArray[i].depth + 1; // 부모 depth에 +1
-      }
-    }
-  }
-  return newArray;
-};
 
 export default comment;

@@ -5,13 +5,13 @@ import { ReactComponent as Logout } from "assets/svg/log-out.svg";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 
-const UserInfo = ({ loggedInfo, handleLogout }) => {
+const UserInfo = ({ loggedInfo, isAdmin, handleLogout }) => {
   return (
     <>
       <Box display="flex" alignItems="center" fontFamily="Kopub Dotum Light">
         {loggedInfo.nickname}님 환영합니다!
         <Bar />
-        <Link to="#">
+        <Link to={isAdmin && `/admin/categories`}>
           <SettingsIcon />
         </Link>
         <LogoutIcon onClick={handleLogout} />

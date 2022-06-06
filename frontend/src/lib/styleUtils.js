@@ -1,5 +1,6 @@
 import { TextField } from "@material-ui/core";
 import { cyan, grey, red } from "@material-ui/core/colors";
+import AlertIcon from "assets/img/alert.png";
 import styled, { css, keyframes } from "styled-components";
 
 // 미디어 쿼리 헬퍼: https://www.styled-components.com/docs/advanced#media-templates 참조
@@ -21,21 +22,48 @@ export const media = Object.keys(sizes).reduce((acc, label) => {
 
 export const transitions = {
   shake: keyframes`
-      0% {
-          transform: translate(-30px);
-      }
-      25% {
-          transform: translate(15px);
-      }
-      50% {
-          transform: translate(-10px);
-      }
-      75% {
-          transform: translate(5px);
-      }
-      100% {
-          transform: translate(0px);
-      }
+    0% {
+      transform: translate(-30px);
+    }
+    25% {
+      transform: translate(15px);
+    }
+    50% {
+      transform: translate(-10px);
+    }
+    75% {
+      transform: translate(5px);
+    }
+    100% {
+      transform: translate(0px);
+    }
+  `,
+
+  showModal: keyframes`
+    0% {
+      transform: scale(0);
+    }
+    60% {
+      transform: scale(1.1);
+    }
+    80% {
+      transform: scale(.95);
+    }
+    100% {
+      transform: scale(1);
+    }
+  `,
+
+  hideModal: keyframes`
+    0% {
+      transform: scale(1);
+    }
+    20% {
+      transform: scale(1.1);
+    }
+    100% {
+      transform: scale(0);
+    }
   `,
 };
 
@@ -225,6 +253,83 @@ const AskModalBlock = styled.div`
     // 두 번째 button에만 스타일이 적용됨
     button + button {
       margin-left: 0.5rem;
+    }
+  }
+`;
+
+export const ErrorModal = ({
+  visible,
+  title,
+  description,
+  confirmText = "확인",
+  onConfirm,
+}) => {
+  if (!visible) return null;
+  return (
+    <Fullscreen>
+      <ErrorModalBlock id="error-modal">
+        <img src={AlertIcon} width="44" height="38" alt="alert" />
+        <span className="title">{title}</span>
+        <p>{description}</p>
+        <div onClick={onConfirm} className="button">
+          {confirmText}
+        </div>
+      </ErrorModalBlock>
+    </Fullscreen>
+  );
+};
+
+const ErrorModalBlock = styled.div`
+  position: absolute;
+  width: 13vw;
+  height: 17vh;
+  text-align: center;
+  font-family: "Kopub Dotum Light";
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 4px 8px 12px 0 rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+
+  animation: ${transitions.showModal} 0.7s ease-in-out;
+
+  &.hide {
+    animation: ${transitions.hideModal} 0.6s ease-in-out both;
+  }
+
+  img {
+    margin-top: 24px;
+  }
+
+  .title {
+    display: block;
+    margin: 10px 0 5px 0;
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 24px;
+  }
+
+  p {
+    padding: 0 30px;
+    font-size: 14px;
+    font-weight: 300;
+    line-height: 19px;
+  }
+
+  .button {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3vh;
+    font-size: 14px;
+    line-height: 40px;
+    color: #fff;
+    background: ${red[400]};
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+
+    &:hover {
+      background: ${red[600]};
     }
   }
 `;
