@@ -1,5 +1,6 @@
 import { Box } from "@material-ui/core";
 import ShopBannerJPG from "assets/img/shop-banner.jpg";
+import TitleAndDescription from "components/Common/TitleAndDescription";
 import PostList from "components/Post/PostList";
 import WriteButton from "components/Post/WriteButton";
 import { useCallback, useEffect } from "react";
@@ -34,6 +35,10 @@ const PostListContainer = ({ categoryId, userId, page }) => {
 
   return (
     <>
+      <TitleAndDescription
+        titleText="TALK"
+        descriptionText="자유롭게 이야기를 나누어 보세요"
+      />
       <Box display="flex" justifyContent="center">
         <a
           href="https://www.surfcornerstore.com/"

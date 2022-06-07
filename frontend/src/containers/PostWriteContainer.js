@@ -1,3 +1,4 @@
+import TitleAndDescription from "components/Common/TitleAndDescription";
 import PostWriter from "components/Post/PostWriter";
 import { useEffect } from "react";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
@@ -8,23 +9,21 @@ const PostWriteContainer = () => {
 
   const {
     categories,
-    parentCategoryId,
-    subCategoryId,
+    selectedCategoryDepth,
     id,
     title,
     content,
-    categoryId,
     images,
+    postError,
   } = useSelector(
     ({ categories, post }) => ({
       categories: categories.categories || [],
-      parentCategoryId: post.parentCategoryId,
-      subCategoryId: post.subCategoryId,
+      selectedCategoryDepth: post.categoryDepth,
       id: post.id,
       title: post.title,
       content: post.content,
-      categoryId: post.categoryId,
       images: post.images || [],
+      postError: post.postError,
     }),
     shallowEqual
   );
@@ -36,17 +35,22 @@ const PostWriteContainer = () => {
   }, [dispatch]);
 
   return (
-    <PostWriter
-      categories={categories}
-      parentCategoryId={parentCategoryId}
-      subCategoryId={subCategoryId}
-      id={id}
-      title={title}
-      content={content}
-      categoryId={categoryId}
-      images={images}
-      dispatch={dispatch}
-    />
+    <>
+      <TitleAndDescription
+        titleText="TALK"
+        descriptionText="자유롭게 이야기를 나누어 보세요"
+      />
+      <PostWriter
+        categories={categories}
+        selectedCategoryDepth={selectedCategoryDepth}
+        id={id}
+        title={title}
+        content={content}
+        images={images}
+        postError={postError}
+        dispatch={dispatch}
+      />
+    </>
   );
 };
 

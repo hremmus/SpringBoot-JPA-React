@@ -10,26 +10,28 @@ import {
 import { cyan, grey } from "@material-ui/core/colors";
 import { Clear } from "@material-ui/icons";
 import { ReactComponent as ImageIcon } from "assets/svg/image.svg";
-import InputWithLabel, { VerticalAligner } from "lib/styleUtils";
-import { useEffect, useState } from "react";
+import InputWithLabel, { ErrorModal, VerticalAligner } from "lib/styleUtils";
+import { useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { changeInput } from "redux/modules/post";
+import { changeInput, setError } from "redux/modules/post";
 import { createPost, updatePost } from "services/PostService";
 import styled from "styled-components";
 import WriteActionButtons from "./WriteActionButtons";
 
 const PostWriter = ({
   categories,
-  parentCategoryId,
-  subCategoryId,
+  selectedCategoryDepth,
   id,
   title,
   content,
-  categoryId,
   images,
+  postError,
   dispatch,
 }) => {
   const navigate = useNavigate();
+  const postState = useSelector((state) => state.post);
+  const [depth, setDepth] = useState(0);
 
   const formData = new FormData();
   const [selectedImages, setSelectedImages] = useState([]);
@@ -38,112 +40,53 @@ const PostWriter = ({
   const [loadedImages, setDeleteImage] = useState([...images]);
   const [deletedImageIds, setDeletedImageIds] = useState([]);
 
-  useEffect(() => {
-    if (categories.length > 0) {
-      const findParentCategory = (categories, parentCategoryId) => {
-        if (parentCategoryId === -1) {
-          return null;
-        }
+  const [modal, setModal] = useState(false);
+  const onConfirm = () => {
+    document.getElementById("error-modal").classList.add("hide");
 
-        for (const category of categories) {
-          // 최상위 카테고리 중에서 부모 카테고리를 찾음
-          if (category.id === parentCategoryId) {
-            return category;
-          }
-
-          // 재귀 호출하여 하위 카테고리(들)로 내려가 부모 카테고리를 찾음
-          if (category.children.length > 0) {
-            const parentCategory = findParentCategory(
-              category.children,
-              parentCategoryId
-            );
-            if (parentCategory) {
-              return parentCategory;
-            }
-          }
-        }
-
-        return null;
-      };
-
-      const parentCategory = findParentCategory(categories, parentCategoryId);
-      if (parentCategory) {
-        dispatch(
-          changeInput({
-            key: "parentCategoryId",
-            value: parentCategory.id,
-          })
-        );
-        dispatch(
-          changeInput({
-            key: "subCategoryId",
-            value: parentCategory.children.find(
-              (child) => child.id === categoryId
-            )?.id,
-          })
-        );
-      } else {
-        dispatch(changeInput({ key: "parentCategoryId", value: categoryId }));
-      }
-    }
-  }, [dispatch, categories, categoryId, parentCategoryId]);
-
-  const renderOptions = (categories) => {
-    return categories.map((category) => (
-      // material-ui warning 발생 => unique key 지정
-      <MenuItem key={category.id} value={category.id}>
-        {category.name}
-      </MenuItem>
-    ));
+    setTimeout(() => {
+      setModal(false);
+    }, 600);
   };
 
-  const CategorySelect = ({ categories, handleChange }) => {
-    return (
-      <Box margin="10px 15px 10px 0">
-        <FormControl style={{ width: "100px" }}>
-          <InputLabelStyled id="first-select-label">카테고리</InputLabelStyled>
-          <SelectStyled
-            name="parentCategoryId"
-            value={parentCategoryId || ""}
-            onChange={handleChange}
-            label="카테고리"
-            labelId="first-select-label"
-          >
-            {renderOptions(categories)}
-          </SelectStyled>
-        </FormControl>
-      </Box>
-    );
-  };
+  const RecursiveCategorySelect = ({ categories, depth, handleChange }) => {
+    setDepth(depth);
 
-  const renderChildrenOptions = (categories) => {
-    const parentCategory = categories.find(
-      (category) => category.id === parseInt(parentCategoryId)
+    const selectedCategory = postState[`categoryId${depth}`];
+    const selectedParentCategory = categories.find(
+      (category) => category.id === selectedCategory
     );
 
-    if (
-      !parentCategory ||
-      !parentCategory.children ||
-      parentCategory.children.length === 0
-    ) {
-      return null;
-    }
-
     return (
-      <Box margin="10px 15px 10px 0">
-        <FormControl style={{ width: "100px" }}>
-          <InputLabelStyled id="next-select-label">카테고리</InputLabelStyled>
-          <SelectStyled
-            name="subCategoryId"
-            value={subCategoryId || ""}
-            onChange={handleChange}
-            label="카테고리"
-            labelId="next-select-label"
-          >
-            {renderOptions(parentCategory.children)}
-          </SelectStyled>
-        </FormControl>
-      </Box>
+      <>
+        <Box margin="10px 15px 10px 0">
+          <FormControl style={{ width: "100px" }}>
+            <InputLabelStyled id={`select-label-${depth}`}>
+              카테고리
+            </InputLabelStyled>
+            <SelectStyled
+              name={`categoryId${depth}`}
+              value={selectedCategory}
+              onChange={handleChange}
+              label="카테고리"
+              labelId={`select-label-${depth}`}
+            >
+              {categories.map((category) => (
+                <MenuItem key={category.id} value={category.id}>
+                  {category.name}
+                </MenuItem>
+              ))}
+            </SelectStyled>
+          </FormControl>
+        </Box>
+        {selectedParentCategory?.children.length > 0 && (
+          <RecursiveCategorySelect
+            categories={selectedParentCategory.children}
+            depth={depth + 1}
+            handleChange={handleChange}
+          />
+        )}
+      </>
     );
   };
 
@@ -156,6 +99,13 @@ const PostWriter = ({
         value,
       })
     );
+
+    if (id) {
+      // 수정 시 기존 카테고리보다 하위 depth의 값들을 모두 초기화해 주어야 수정된 값이 제대로 반영됨
+      for (let i = depth + 1; i < selectedCategoryDepth; i++) {
+        dispatch(changeInput({ key: `categoryId${i}`, value: "" }));
+      }
+    }
   };
 
   const handleSubmit = (e) => {
@@ -163,11 +113,17 @@ const PostWriter = ({
 
     formData.append("title", title);
     formData.append("content", content);
-    if (subCategoryId) {
-      formData.append("categoryId", subCategoryId);
-    } else {
-      formData.append("categoryId", parentCategoryId);
+
+    let selectedCategoryId = "";
+    // 밑에서부터 선택된 값을 찾아 올라감
+    for (let i = depth; i >= 0; i--) {
+      const categoryId = postState[`categoryId${i}`];
+      if (categoryId) {
+        selectedCategoryId = categoryId;
+        break;
+      }
     }
+    formData.append("categoryId", selectedCategoryId);
     // for (const keyValue of formData) console.log(keyValue);
 
     if (!id) {
@@ -183,7 +139,15 @@ const PostWriter = ({
             navigate("/posts");
           }
         })
-        .catch((error) => alert(error.response.data.result.message));
+        .catch((error) => {
+          dispatch(
+            setError({
+              type: "작성",
+              message: error.response.data.result.message,
+            })
+          );
+          setModal(true);
+        });
     }
 
     if (id) {
@@ -200,7 +164,15 @@ const PostWriter = ({
         .then((response) => {
           if (response.data.success) navigate(`/posts/${id}`);
         })
-        .catch((error) => console.log(error));
+        .catch((error) => {
+          dispatch(
+            setError({
+              type: "수정",
+              message: error.response.data.result.message,
+            })
+          );
+          setModal(true);
+        });
       return;
     }
 
@@ -258,8 +230,12 @@ const PostWriter = ({
           <Typography variant="h5">글쓰기</Typography>
         </Box>
         <Box display="flex">
-          <CategorySelect categories={categories} handleChange={handleChange} />
-          {renderChildrenOptions(categories)}
+          <RecursiveCategorySelect
+            categories={categories}
+            depth={0}
+            parentId={null}
+            handleChange={handleChange}
+          />
         </Box>
         <Box marginY="10px">
           <InputWithLabel
@@ -345,6 +321,12 @@ const PostWriter = ({
           isEdit={id}
         />
       </Box>
+      <ErrorModal
+        visible={modal}
+        title={`게시글 ` + postError?.type + ` 오류`}
+        description={postError?.message}
+        onConfirm={onConfirm}
+      />
     </VerticalAligner>
   );
 };

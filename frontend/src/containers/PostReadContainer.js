@@ -1,3 +1,4 @@
+import TitleAndDescription from "components/Common/TitleAndDescription";
 import CommentList from "components/Post/CommentList";
 import PostActionButtons from "components/Post/PostActionButtons";
 import PostReader from "components/Post/PostReader";
@@ -90,6 +91,10 @@ const PostReadContainer = () => {
 
   return (
     <>
+      <TitleAndDescription
+        titleText="TALK"
+        descriptionText="자유롭게 이야기를 나누어 보세요"
+      />
       <PostReader
         post={post}
         actionButtons={
@@ -106,6 +111,7 @@ const PostReadContainer = () => {
         shownReplyInput={shownReplyInput}
         shownUpdateInput={shownUpdateInput}
         loggedInfo={loggedInfo}
+        isAdmin={isAdmin}
       />
     </>
   );
