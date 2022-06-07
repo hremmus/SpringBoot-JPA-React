@@ -32,6 +32,7 @@ const CommentItem = ({
   shownReplyInput,
   shownUpdateInput,
   loggedInfo,
+  isAdmin,
 }) => {
   const dispatch = useDispatch();
   const onEdit = useCallback(() => {
@@ -82,7 +83,7 @@ const CommentItem = ({
                 </>
               }
             />
-            {(loggedInfo && loggedInfo.id) === comment.user.id && (
+            {(loggedInfo?.id === comment.user?.id || isAdmin) && (
               <CommentActionButtons onEdit={onEdit} onRemove={onRemove} />
             )}
           </NestedListItem>
@@ -127,6 +128,7 @@ const CommentList = ({
   shownReplyInput,
   shownUpdateInput,
   loggedInfo,
+  isAdmin,
 }) => {
   return (
     <ListStyled
@@ -158,6 +160,7 @@ const CommentList = ({
             shownReplyInput={shownReplyInput}
             shownUpdateInput={shownUpdateInput}
             loggedInfo={loggedInfo}
+            isAdmin={isAdmin}
           />
         );
       })}

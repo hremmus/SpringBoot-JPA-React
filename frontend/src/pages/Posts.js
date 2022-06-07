@@ -1,4 +1,3 @@
-import PostHeader from "components/Post/PostHeader";
 import PaginationContainer from "containers/PaginationContainer";
 import PostListContainer from "containers/PostListContainer";
 import useQueryParams from "lib/useQueryParams";
@@ -8,7 +7,6 @@ const Posts = () => {
 
   return (
     <>
-      <PostHeader />
       <PostListContainer categoryId={categoryId} userId={userId} page={page} />
       <PaginationContainer
         categoryId={categoryId}

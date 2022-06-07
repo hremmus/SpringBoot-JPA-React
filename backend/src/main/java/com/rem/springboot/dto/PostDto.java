@@ -2,9 +2,12 @@ package com.rem.springboot.dto;
 
 import static java.util.stream.Collectors.toList;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonFormat.Shape;
+import com.rem.springboot.entity.Category;
 import com.rem.springboot.entity.Post;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,8 +23,7 @@ public class PostDto {
   private String title;
   private String content;
   private UserDto user;
-  private Long categoryId;
-  private Long parentCategoryId;
+  private List<Long> categoryIds = new ArrayList<>();
   private String categoryName;
   private List<ImageDto> images;
 
@@ -31,18 +33,17 @@ public class PostDto {
   private LocalDateTime modifiedDate;
 
   public static PostDto toDto(Post post) {
-    if (post.getCategory().getParent() == null) {
-      return new PostDto(post.getId(), post.getTitle(), post.getContent(),
-          UserDto.toDto(post.getUser()), post.getCategory().getId(), -1L,
-          post.getCategory().getName(),
-          post.getImages().stream().map(i -> ImageDto.toDto(i)).collect(toList()),
-          post.getCreatedDate(), post.getModifiedDate());
-    } else {
-      return new PostDto(post.getId(), post.getTitle(), post.getContent(),
-          UserDto.toDto(post.getUser()), post.getCategory().getId(),
-          post.getCategory().getParent().getId(), post.getCategory().getName(),
-          post.getImages().stream().map(i -> ImageDto.toDto(i)).collect(toList()),
-          post.getCreatedDate(), post.getModifiedDate());
+    List<Long> categoryIds = new ArrayList<>();
+    Category category = post.getCategory();
+    while (category != null) {
+      categoryIds.add(category.getId());
+      category = category.getParent();
     }
+    Collections.reverse(categoryIds);
+
+    return new PostDto(post.getId(), post.getTitle(), post.getContent(),
+        UserDto.toDto(post.getUser()), categoryIds, post.getCategory().getName(),
+        post.getImages().stream().map(i -> ImageDto.toDto(i)).collect(toList()),
+        post.getCreatedDate(), post.getModifiedDate());
   }
 }
