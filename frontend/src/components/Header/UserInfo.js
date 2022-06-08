@@ -11,7 +11,7 @@ const UserInfo = ({ loggedInfo, isAdmin, handleLogout }) => {
       <Box display="flex" alignItems="center" fontFamily="Kopub Dotum Light">
         {loggedInfo.nickname}님 환영합니다!
         <Bar />
-        <Link to={isAdmin && `/admin/categories`}>
+        <Link to={!isAdmin ? `/mypage/profile` : `/admin/categories`}>
           <SettingsIcon />
         </Link>
         <LogoutIcon onClick={handleLogout} />

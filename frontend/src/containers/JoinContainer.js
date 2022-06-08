@@ -1,6 +1,6 @@
 import AuthButton from "components/Auth/AuthButton";
-import AuthError from "components/Auth/AuthError";
 import RightAlignedLink from "components/Auth/RightAlignedLink";
+import ShakeText from "components/Common/ShakeText";
 import InputWithLabel from "lib/styleUtils";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 import { changeInput, initializeForm, setError } from "redux/modules/auth";
 import { joinUser } from "services/AuthService";
 
-const JoinContainer = (props) => {
+const JoinContainer = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -50,7 +50,7 @@ const JoinContainer = (props) => {
   };
 
   return (
-    <div>
+    <>
       <InputWithLabel
         required
         name="email"
@@ -91,10 +91,10 @@ const JoinContainer = (props) => {
         value={form.nickname}
         onChange={handleChange}
       />
-      {authError && <AuthError>{authError}</AuthError>}
+      {authError && <ShakeText>{authError}</ShakeText>}
       <AuthButton onClick={handleSubmit}>회원가입</AuthButton>
       <RightAlignedLink href="/auth/login">돌아가기</RightAlignedLink>
-    </div>
+    </>
   );
 };
 

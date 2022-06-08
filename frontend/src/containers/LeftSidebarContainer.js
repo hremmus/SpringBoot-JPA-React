@@ -74,6 +74,8 @@ const LeftSidebarContainer = () => {
       dispatch(setMenu(menuData.location));
     } else if (pathname.includes("/admin")) {
       dispatch(setMenu(menuData.admin));
+    } else if (pathname.includes("/mypage")) {
+      dispatch(setMenu(menuData.mypage));
     }
   }, [dispatch, pathname, fetchPostCategories]);
 

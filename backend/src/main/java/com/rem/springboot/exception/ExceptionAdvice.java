@@ -119,4 +119,10 @@ public class ExceptionAdvice {
   public Response locationNotFoundException() {
     return Response.failure(-1016, "존재하지 않는 지역입니다.");
   }
+
+  @ExceptionHandler(InvalidPasswordException.class)
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  public Response invalidPasswordException() {
+    return Response.failure(-1018, "비밀번호가 일치하지 않습니다.");
+  }
 }

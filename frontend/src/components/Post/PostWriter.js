@@ -10,7 +10,7 @@ import {
 import { cyan, grey } from "@material-ui/core/colors";
 import { Clear } from "@material-ui/icons";
 import { ReactComponent as ImageIcon } from "assets/svg/image.svg";
-import InputWithLabel, { ErrorModal, VerticalAligner } from "lib/styleUtils";
+import InputWithLabel, { AlertModal, VerticalAligner } from "lib/styleUtils";
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -42,7 +42,7 @@ const PostWriter = ({
 
   const [modal, setModal] = useState(false);
   const onConfirm = () => {
-    document.getElementById("error-modal").classList.add("hide");
+    document.getElementById("alert-modal").classList.add("hide");
 
     setTimeout(() => {
       setModal(false);
@@ -321,11 +321,12 @@ const PostWriter = ({
           isEdit={id}
         />
       </Box>
-      <ErrorModal
+      <AlertModal
         visible={modal}
         title={`게시글 ` + postError?.type + ` 오류`}
         description={postError?.message}
         onConfirm={onConfirm}
+        isError
       />
     </VerticalAligner>
   );

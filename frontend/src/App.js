@@ -3,6 +3,7 @@ import HeaderContainer from "containers/HeaderContainer";
 import LeftSidebarContainer from "containers/LeftSidebarContainer";
 import storage from "lib/storage";
 import Auth from "pages/Auth";
+import EditProfile from "pages/EditProfile";
 import Home from "pages/Home";
 import Locations from "pages/Locations";
 import Post from "pages/Post";
@@ -144,6 +145,7 @@ const App = () => {
               <Route path="/posts/:postId" element={<Post />} />
               <Route path="/location/:global" element={<Locations />} />
               <Route path="/admin/categories" element={<ManageCategories />} />
+              <Route path="/mypage/profile" element={<EditProfile />} />
             </Routes>
           </Grid>
         </Grid>
