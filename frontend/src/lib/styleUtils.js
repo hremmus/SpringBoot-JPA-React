@@ -1,6 +1,7 @@
 import { TextField } from "@material-ui/core";
-import { cyan, grey, red } from "@material-ui/core/colors";
+import { cyan, green, grey, red } from "@material-ui/core/colors";
 import AlertIcon from "assets/img/alert.png";
+import CheckIcon from "assets/img/check.png";
 import styled, { css, keyframes } from "styled-components";
 
 // 미디어 쿼리 헬퍼: https://www.styled-components.com/docs/advanced#media-templates 참조
@@ -187,6 +188,7 @@ const StyledTextField = styled(TextField)`
 export const AskModal = ({
   visible,
   title,
+  children,
   description,
   confirmText = "확인",
   cancelText = "취소",
@@ -198,6 +200,7 @@ export const AskModal = ({
     <Fullscreen>
       <AskModalBlock>
         <h2>{title}</h2>
+        {children}
         <p>{description}</p>
         <div className="buttons">
           <ButtonForLettersToGoUp onClick={onCancel}>
@@ -257,29 +260,36 @@ const AskModalBlock = styled.div`
   }
 `;
 
-export const ErrorModal = ({
+export const AlertModal = ({
   visible,
   title,
   description,
   confirmText = "확인",
   onConfirm,
+  isSuccess = false,
+  isError = false,
 }) => {
   if (!visible) return null;
   return (
     <Fullscreen>
-      <ErrorModalBlock id="error-modal">
-        <img src={AlertIcon} width="44" height="38" alt="alert" />
+      <AlertModalBlock id="alert-modal" isSuccess={isSuccess} isError={isError}>
+        <img
+          src={isSuccess ? CheckIcon : AlertIcon}
+          width="44"
+          height="38"
+          alt="alert"
+        />
         <span className="title">{title}</span>
         <p>{description}</p>
         <div onClick={onConfirm} className="button">
           {confirmText}
         </div>
-      </ErrorModalBlock>
+      </AlertModalBlock>
     </Fullscreen>
   );
 };
 
-const ErrorModalBlock = styled.div`
+const AlertModalBlock = styled.div`
   position: absolute;
   width: 13vw;
   height: 17vh;
@@ -324,12 +334,14 @@ const ErrorModalBlock = styled.div`
     font-size: 14px;
     line-height: 40px;
     color: #fff;
-    background: ${red[400]};
+    background: ${({ isSuccess, isError }) =>
+      isSuccess ? green[400] : isError ? red[400] : grey[400]};
     cursor: pointer;
     transition: background 0.3s ease-in-out;
 
     &:hover {
-      background: ${red[600]};
+      background: ${({ isSuccess, isError }) =>
+        isSuccess ? green[600] : isError ? red[600] : grey[600]};
     }
   }
 `;

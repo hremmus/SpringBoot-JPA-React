@@ -18,6 +18,7 @@ export const menuData = {
     { name: "회원 관리", link: "/admin/users" },
     { name: "카테고리 관리", link: "/admin/categories" },
   ],
+  mypage: [{ name: "회원 정보 변경", link: "/mypage/profile" }],
 };
 
 const SET_MENU = "menu/SET_MENU";

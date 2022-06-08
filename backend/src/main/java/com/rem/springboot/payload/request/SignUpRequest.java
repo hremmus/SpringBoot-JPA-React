@@ -39,7 +39,7 @@ public class SignUpRequest {
   private String password;
 
   @ApiModelProperty(value = "닉네임", notes = "닉네임은 한글 또는 알파벳으로 입력해주세요.", required = true, example = "말랑")
-  @NotBlank(message = "{signUpRequest.password.notBlank}")
+  @NotBlank(message = "{signUpRequest.nickname.notBlank}")
   @Size(min = 2, max = 10, message = "{signUpRequest.nickname.size}")
   @Pattern(regexp = "^[A-Za-z가-힣]+$", message = "{signUpRequest.nickname.pattern}")
   private String nickname;

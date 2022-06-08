@@ -1,6 +1,6 @@
 import LoginButton from "components/Auth/AuthButton";
-import AuthError from "components/Auth/AuthError";
 import RightAlignedLink from "components/Auth/RightAlignedLink";
+import ShakeText from "components/Common/ShakeText";
 import storage from "lib/storage";
 import InputWithLabel from "lib/styleUtils";
 import { useEffect } from "react";
@@ -10,7 +10,7 @@ import { setError } from "redux/modules/auth";
 import { loginUser } from "services/AuthService";
 import { changeInput, initializeForm } from "./../redux/modules/auth";
 
-const LoginContainer = (props) => {
+const LoginContainer = () => {
   const [searchParams] = useSearchParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -61,7 +61,7 @@ const LoginContainer = (props) => {
   };
 
   return (
-    <div>
+    <>
       <InputWithLabel
         name="email"
         label="이메일"
@@ -78,10 +78,10 @@ const LoginContainer = (props) => {
         value={form.password}
         onChange={handleChange}
       />
-      {authError && <AuthError>{authError}</AuthError>}
+      {authError && <ShakeText>{authError}</ShakeText>}
       <LoginButton onClick={handleSubmit}>로그인</LoginButton>
       <RightAlignedLink href="/auth/join">회원가입</RightAlignedLink>
-    </div>
+    </>
   );
 };
 

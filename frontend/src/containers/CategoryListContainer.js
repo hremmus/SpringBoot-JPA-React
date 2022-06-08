@@ -1,7 +1,7 @@
 import { Box, Button } from "@material-ui/core";
 import CategoryList from "components/Admin/CategoryList";
 import { calcDepth, convertOneArray } from "lib/mathUtils";
-import InputWithLabel, { ErrorModal } from "lib/styleUtils";
+import InputWithLabel, { AlertModal } from "lib/styleUtils";
 import { useCallback, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setError } from "redux/modules/categories";
@@ -21,7 +21,7 @@ const CategoryListContainer = () => {
 
   const [modal, setModal] = useState(false);
   const onConfirm = () => {
-    document.getElementById("error-modal").classList.add("hide");
+    document.getElementById("alert-modal").classList.add("hide");
 
     setTimeout(() => {
       setModal(false);
@@ -108,11 +108,12 @@ const CategoryListContainer = () => {
           placeholder="카테고리 이름을 입력하세요."
         />
         <Button onClick={() => handleAdd(null, newCategoryName)}>생성</Button>
-        <ErrorModal
+        <AlertModal
           visible={modal}
           title={`카테고리 ` + categoryError?.type + ` 오류`}
           description={categoryError?.message}
           onConfirm={onConfirm}
+          isError
         />
       </Box>
     </>
