@@ -17,9 +17,9 @@ const initialState = {
     id: null,
     email: null,
     nickname: null,
+    isAdmin: false,
   },
   accessToken: null,
-  isAdmin: false,
   isLoggedIn: false, // 현재 로그인 중인지 알려 준다
   userError: null,
 };
@@ -30,11 +30,13 @@ export default handleActions(
       const updatedState = {
         ...state,
         loggedInfo: {
-          id: action.payload.id ?? state.loggedInfo.id,
-          email: action.payload.email ?? state.loggedInfo.email,
-          nickname: action.payload.nickname ?? state.loggedInfo.nickname,
+          id: action.payload.id,
+          email: action.payload.email,
+          nickname: action.payload.nickname,
+          isAdmin:
+            action.payload.roles?.includes("ROLE_ADMIN") ||
+            action.payload.isAdmin,
         },
-        isAdmin: action.payload.roles?.includes("ROLE_ADMIN"),
         isLoggedIn: true,
       };
 
