@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { setError } from "redux/modules/auth";
+import { setAccessToken, setLoggedInfo } from "redux/modules/user";
 import { loginUser } from "services/AuthService";
 import { changeInput, initializeForm } from "./../redux/modules/auth";
 
@@ -49,8 +50,13 @@ const LoginContainer = () => {
     loginUser(form)
       .then((response) => {
         if (response.data.success) {
-          storage.set("accessToken", response.data.result.data.accessToken);
-          storage.set("loggedInfo", response.data.result.data.user);
+          const accessToken = response.data.result.data.accessToken;
+          storage.set("accessToken", accessToken);
+          dispatch(setAccessToken(accessToken));
+
+          const loggedInfo = response.data.result.data.user;
+          storage.set("loggedInfo", loggedInfo);
+          dispatch(setLoggedInfo(loggedInfo));
         }
 
         navigate("/");

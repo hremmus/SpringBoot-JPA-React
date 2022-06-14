@@ -10,11 +10,13 @@ import menu from "redux/modules/menu";
 import post from "redux/modules/post";
 import posts from "redux/modules/posts";
 import user from "redux/modules/user";
+import users from "redux/modules/users";
 
 const rootReducer = combineReducers({
   header,
   auth,
   user,
+  users,
   post,
   posts,
   categories,

@@ -1,5 +1,5 @@
-import { TextField } from "@material-ui/core";
-import { cyan, green, grey, red } from "@material-ui/core/colors";
+import { Checkbox, TextField } from "@material-ui/core";
+import { cyan, grey, red } from "@material-ui/core/colors";
 import AlertIcon from "assets/img/alert.png";
 import CheckIcon from "assets/img/check.png";
 import styled, { css, keyframes } from "styled-components";
@@ -220,15 +220,15 @@ export const AskModal = ({
 
 const Fullscreen = styled.div`
   position: fixed;
-  z-index: 30;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.25);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  z-index: 30;
 `;
 
 const AskModalBlock = styled.div`
@@ -335,13 +335,32 @@ const AlertModalBlock = styled.div`
     line-height: 40px;
     color: #fff;
     background: ${({ isSuccess, isError }) =>
-      isSuccess ? green[400] : isError ? red[400] : grey[400]};
+      isSuccess ? cyan[100] : isError ? red[400] : grey[400]};
     cursor: pointer;
     transition: background 0.3s ease-in-out;
 
     &:hover {
       background: ${({ isSuccess, isError }) =>
-        isSuccess ? green[600] : isError ? red[600] : grey[600]};
+        isSuccess ? cyan[200] : isError ? red[600] : grey[600]};
     }
+  }
+`;
+
+export const CheckBoxStyled = styled(Checkbox)`
+  &.MuiCheckbox-root {
+    color: ${grey[200]};
+  }
+
+  &.MuiIconButton-colorSecondary:hover {
+    color: ${cyan[50]};
+    background-color: white;
+  }
+
+  &.MuiCheckbox-colorSecondary.Mui-checked:hover {
+    background-color: white;
+  }
+
+  &.MuiCheckbox-colorSecondary.Mui-checked {
+    color: ${cyan[200]};
   }
 `;

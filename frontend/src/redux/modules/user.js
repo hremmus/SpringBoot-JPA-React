@@ -35,7 +35,8 @@ export default handleActions(
           nickname: action.payload.nickname,
           isAdmin:
             action.payload.roles?.includes("ROLE_ADMIN") ||
-            action.payload.isAdmin,
+            action.payload.isAdmin ||
+            false,
         },
         isLoggedIn: true,
       };
@@ -49,7 +50,7 @@ export default handleActions(
     }),
     [LOGOUT]: () => ({
       loggedInfo: {},
-      accessToken: "",
+      accessToken: null,
       isLoggedIn: false,
     }),
     [SET_ERROR]: (state, action) => ({

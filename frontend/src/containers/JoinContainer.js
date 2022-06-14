@@ -1,8 +1,8 @@
 import AuthButton from "components/Auth/AuthButton";
 import RightAlignedLink from "components/Auth/RightAlignedLink";
 import ShakeText from "components/Common/ShakeText";
-import InputWithLabel from "lib/styleUtils";
-import { useEffect } from "react";
+import InputWithLabel, { AlertModal } from "lib/styleUtils";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { changeInput, initializeForm, setError } from "redux/modules/auth";
@@ -40,13 +40,18 @@ const JoinContainer = () => {
     joinUser(form)
       .then((response) => {
         if (response.data.success) {
-          alert(`회원 가입에 성공했습니다! 로그인 페이지로 이동합니다.`);
-          navigate(`/auth/login`);
+          setModal(true);
         }
       })
       .catch((error) => {
         dispatch(setError(error.response.data.result.message));
       });
+  };
+
+  const [modal, setModal] = useState(false);
+  const onConfirm = () => {
+    setModal(false);
+    navigate(`/auth/login`);
   };
 
   return (
@@ -94,6 +99,13 @@ const JoinContainer = () => {
       {authError && <ShakeText>{authError}</ShakeText>}
       <AuthButton onClick={handleSubmit}>회원가입</AuthButton>
       <RightAlignedLink href="/auth/login">돌아가기</RightAlignedLink>
+      <AlertModal
+        visible={modal}
+        title="회원가입에 성공했습니다!"
+        description="로그인 페이지로 이동합니다"
+        onConfirm={onConfirm}
+        isSuccess
+      />
     </>
   );
 };
