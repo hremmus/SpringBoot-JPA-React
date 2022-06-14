@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,7 +72,7 @@ class AuthControllerTest {
     LoginRequest request = new LoginRequest("user@email.com", "password");
     Set<String> userRoles = new HashSet<>(); 
     userRoles.add("ROLE_USER");
-    given(authService.login(request)).willReturn(new LoginResponse(new UserDto(1L, "user@email.com", "nickname", userRoles), "access", "refresh"));
+    given(authService.login(request)).willReturn(new LoginResponse(new UserDto(1L, "user@email.com", "nickname", userRoles, LocalDateTime.now()), "access", "refresh"));
     ResponseCookie mockJwtCookie = ResponseCookie.from("refreshToken", "refresh")
         .path("/")
         .httpOnly(true)

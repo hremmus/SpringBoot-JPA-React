@@ -6,21 +6,20 @@ import Auth from "pages/Auth";
 import EditProfile from "pages/EditProfile";
 import Home from "pages/Home";
 import Locations from "pages/Locations";
+import ManageUsers from "pages/ManageUsers";
 import Post from "pages/Post";
 import Posts from "pages/Posts";
 import WritePost from "pages/WritePost";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes } from "react-router-dom";
 import { isLoaded, isLoading } from "redux/modules/loading";
-import { logout, setAccessToken, setLoggedInfo } from "redux/modules/user";
+import { setAccessToken, setLoggedInfo } from "redux/modules/user";
 import api from "services";
-import { refreshToken } from "services/AuthService";
 import ManageCategories from "./pages/ManageCategories";
 
 const App = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   // 로딩 상태 관리와 관련된 인터셉터 설정을 컴포넌트 마운트 시 한 번만 실행
   useEffect(() => {
@@ -57,76 +56,27 @@ const App = () => {
   }, []);
 
   const loggedInfo = useSelector((state) => state.user.loggedInfo);
-  const storedLoggedInfo = storage.get("loggedInfo");
   const accessToken = useSelector((state) => state.user.accessToken);
-  const storedAccessToken = storage.get("accessToken");
 
   useEffect(() => {
+    const storedLoggedInfo = storage.get("loggedInfo");
     if (
       (!loggedInfo?.id && storedLoggedInfo) ||
       (storedLoggedInfo && loggedInfo?.id !== storedLoggedInfo?.id)
     ) {
       dispatch(setLoggedInfo(storedLoggedInfo));
     }
-  }, [dispatch, loggedInfo, storedLoggedInfo]);
+  }, [dispatch, loggedInfo]);
 
   useEffect(() => {
+    const storedAccessToken = storage.get("accessToken");
     if (
       (!accessToken && storedAccessToken) ||
       (storedAccessToken && accessToken !== storedAccessToken)
     ) {
       dispatch(setAccessToken(storedAccessToken));
     }
-  }, [dispatch, accessToken, storedAccessToken]);
-
-  useEffect(() => {
-    const requestInterceptors = api.interceptors.request.use(
-      (config) => {
-        if (!config.headers["Authorization"] && accessToken)
-          config.headers["Authorization"] = accessToken;
-        return config;
-      },
-      (error) => {
-        return Promise.reject(error);
-      }
-    );
-
-    const responseInterceptors = api.interceptors.response.use(
-      (response) => {
-        return response;
-      },
-      async (error) => {
-        const {
-          config,
-          response: { status },
-        } = error;
-        const prevRequest = config;
-        if (status === 401 && !prevRequest.sent) {
-          prevRequest.sent = true;
-          await refreshToken()
-            .then((response) => {
-              const refreshToken = response.data.result.data.accessToken;
-              config.headers["Authorization"] = refreshToken;
-              storage.set("accessToken", refreshToken);
-            })
-            .catch((error) => {
-              console.log(error);
-              dispatch(logout());
-              storage.remove("loggedInfo");
-              storage.remove("accessToken");
-              navigate("/auth/login?expired");
-            });
-          return api(prevRequest);
-        }
-        return Promise.reject(error);
-      }
-    );
-
-    return () => {
-      api.interceptors.request.eject(requestInterceptors);
-      api.interceptors.response.eject(responseInterceptors);
-    };
-  }, [dispatch, navigate, accessToken]);
+  }, [dispatch, accessToken]);
 
   const isHomePage = window.location.pathname === "/";
 
@@ -145,6 +95,7 @@ const App = () => {
               <Route path="/posts/:postId" element={<Post />} />
               <Route path="/location/:global" element={<Locations />} />
               <Route path="/admin/categories" element={<ManageCategories />} />
+              <Route path="/admin/users" element={<ManageUsers />} />
               <Route path="/mypage/profile" element={<EditProfile />} />
             </Routes>
           </Grid>

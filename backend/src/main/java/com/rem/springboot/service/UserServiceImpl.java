@@ -1,5 +1,7 @@
 package com.rem.springboot.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,7 @@ import com.rem.springboot.exception.InvalidPasswordException;
 import com.rem.springboot.exception.UserNicknameAlreadyExistsException;
 import com.rem.springboot.exception.UserNotFoundException;
 import com.rem.springboot.payload.request.PasswordCheckRequest;
+import com.rem.springboot.payload.request.UserSearchRequest;
 import com.rem.springboot.payload.request.UserUpdateRequest;
 import com.rem.springboot.payload.response.UserUpdateResponse;
 import com.rem.springboot.repository.UserRepository;
@@ -24,6 +27,11 @@ public class UserServiceImpl {
 
   public UserDto read(Long id) {
     return UserDto.toDto(userRepository.findById(id).orElseThrow(UserNotFoundException::new));
+  }
+  
+  public List<UserDto> readAll(UserSearchRequest request) {
+    return userRepository.findAllByCondition(request.getEmail(), request.getNickname())
+        .stream().map(u -> UserDto.toDto(u)).collect(Collectors.toList());
   }
 
   @Transactional

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import com.rem.springboot.dto.Response;
 import com.rem.springboot.payload.request.PasswordCheckRequest;
+import com.rem.springboot.payload.request.UserSearchRequest;
 import com.rem.springboot.payload.request.UserUpdateRequest;
 import com.rem.springboot.security.UserDetailsImpl;
 import com.rem.springboot.service.UserServiceImpl;
@@ -37,6 +38,13 @@ public class UserController {
   @ResponseStatus(HttpStatus.OK)
   public Response read(@ApiParam(value = "회원 ID", required = true) @PathVariable Long id) {
     return Response.success(userService.read(id));
+  }
+  
+  @ApiOperation(value = "회원 목록 검색")
+  @GetMapping("/users")
+  @ResponseStatus(HttpStatus.OK)
+  public Response read(@ApiParam(value = "이메일 또는 닉네임", required = true) UserSearchRequest request) {
+    return Response.success(userService.readAll(request));
   }
 
   @ApiOperation(value = "회원 정보 삭제")
