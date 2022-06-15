@@ -14,6 +14,7 @@ import javax.persistence.OneToMany;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
+import org.hibernate.annotations.SQLDelete;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,7 @@ import lombok.ToString;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
+@SQLDelete(sql = "UPDATE user SET deleted = 1 WHERE user_id = ?")
 public class User extends EntityDate {
   public User(String email, String password, String nickname, List<Role> roles) {
     this.email = email;
@@ -57,6 +59,8 @@ public class User extends EntityDate {
   private Set<UserRole> roles = new HashSet<>();
 
   private String refreshToken;
+
+  private boolean deleted = false;
 
   public void setRefreshToken(String refreshToken) {
     this.refreshToken = refreshToken;
