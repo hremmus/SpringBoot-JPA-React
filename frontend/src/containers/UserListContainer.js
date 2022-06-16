@@ -1,3 +1,4 @@
+import SearchInput from "components/Admin/SearchInput";
 import UserList from "components/Admin/UserList";
 import TitleAndDescription from "components/Common/TitleAndDescription";
 import { AlertModal, AskModal } from "lib/styleUtils";
@@ -13,27 +14,41 @@ const UserListContainer = () => {
 
   const users = useSelector((state) => state.users.users);
   const [checked, setChecked] = useState([]);
+  const [keyword, setKeyword] = useState("");
+
   const usersError = useSelector((state) => state.users.usersError);
 
-  const fetchUsers = useCallback(() => {
-    getUsers(
-      {
-        email: null,
-        nickname: null,
-      },
-      accessToken
-    )
-      .then((response) => {
-        dispatch(loadUsers(response.data.result.data));
-      })
-      .catch((error) => console.log(error));
-  }, [dispatch, accessToken]);
+  const fetchUsers = useCallback(
+    (keyword) => {
+      getUsers(
+        {
+          email: keyword,
+          nickname: keyword,
+        },
+        accessToken
+      )
+        .then((response) => {
+          dispatch(loadUsers(response.data.result.data));
+        })
+        .catch((error) => console.log(error));
+    },
+    [dispatch, accessToken]
+  );
 
   useEffect(() => {
     // useEffect 훅으로 사용자 인증이 요구되는 api를 호출하자, token이 제대로 전달되지 않는 현상이 나타남
     // => token을 의존성 배열에 포함, 조건부 실행
     if (accessToken) fetchUsers();
   }, [accessToken, fetchUsers]);
+
+  const handleChange = (e) => setKeyword(e.target.value);
+
+  const handleSubmit = () => fetchUsers(keyword);
+
+  const handleClear = () => {
+    setKeyword("");
+    fetchUsers();
+  };
 
   const handleToggle = (id) => {
     setChecked(
@@ -93,6 +108,12 @@ const UserListContainer = () => {
       <TitleAndDescription
         titleText="USER"
         descriptionText="회원 관리 페이지입니다"
+      />
+      <SearchInput
+        keyword={keyword}
+        handleChange={handleChange}
+        handleSubmit={handleSubmit}
+        handleClear={handleClear}
       />
       <UserList
         users={users}
