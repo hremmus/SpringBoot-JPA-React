@@ -14,8 +14,9 @@ const convertTimestampToDate = (timestamp) => {
 const convertTimestampToTime = (timestamp) => {
   const date = new Date(timestamp);
 
-  return `${date.getHours()}:
-  ${date.getMinutes() > 10 ? date.getMinutes() : "0" + date.getMinutes()}`;
+  return `${date.getHours()}:${
+    date.getMinutes() >= 10 ? date.getMinutes() : "0" + date.getMinutes()
+  }`;
 };
 
 const WeatherTable = ({
@@ -34,33 +35,48 @@ const WeatherTable = ({
     return accumulator;
   }, []); // reduce의 두 번째 파라미터인 initialValue로 빈 배열을 주면, 차례로 push된 리턴 값 accumulator를 담는 map의 역할을 수행
 
+  const now = new Date();
+  const dates = [];
+  for (let i = 0; i <= 5; i++) {
+    const currentDate = new Date(timestamps[0]);
+    currentDate.setDate(currentDate.getDate() + i);
+    dates.push(currentDate.getTime());
+  }
+
   const thElements = [];
   let colspanValue;
-  for (let i = 0; i <= 5; i++) {
+  for (let i = 1; i <= 6; i++) {
     // 현 시간에 따라 i는 5 or 6 (일)
-    if (i === 0) {
-      colspanValue = hour21IndexArray[i] + 1;
-    } else if (i === 5) {
-      colspanValue = 8 - hour21IndexArray[0];
+    if (i === 1) {
+      colspanValue = hour21IndexArray[i - 1] + 1;
+    } else if (i === 6) {
+      colspanValue = 8 - parseInt(hour21IndexArray[0] + 1);
     } else {
       colspanValue = 8;
     }
 
+    const currentSunrise = sunrise + (i - 1) * 86400000 - i * 60000; // + 24h - 1m
+    const currentSunset = sunset + (i - 1) * 86460000; // + 24h + 1m
+
     thElements.push(
       <>
-        {!(i === 5 && colspanValue === 0) && (
-          <th colspan={colspanValue} align="center">
-            {(i < 5 || colspanValue >= 6) && (
+        {!(i === 6 && colspanValue === 0) && (
+          <th className="date" colspan={colspanValue} align="center">
+            {colspanValue >= 4 && <>{convertTimestampToDate(dates[i - 1])}</>}
+            {colspanValue >= 4 && now.getTime() < currentSunrise && (
               <>
-                {convertTimestampToDate(timestamps[i * colspanValue])}
                 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
                 <SunriseIcon src={SunrisePNG} alt="sunrise" />
                 &nbsp;
-                {convertTimestampToTime(sunrise - i * 60000)}
-                &nbsp; &nbsp; &nbsp;
+                {convertTimestampToTime(currentSunrise)}
+              </>
+            )}
+            {((colspanValue >= 4 && i < 6) || colspanValue >= 7) && (
+              <>
+                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
                 <SunsetIcon src={SunsetPNG} alt="sunset" />
                 &nbsp;
-                {convertTimestampToTime(sunset + i * 60000)}
+                {convertTimestampToTime(currentSunset)}
               </>
             )}
           </th>
@@ -68,6 +84,7 @@ const WeatherTable = ({
       </>
     );
   }
+
   return (
     <WeatherTableWrapper>
       <table>
@@ -142,6 +159,10 @@ const WeatherTableWrapper = styled.div`
     width: auto;
     padding: 6px 3px 6px 3px;
     border: 1px solid #dae2ed;
+  }
+
+  & .date {
+    background-color: rgba(152, 225, 232, 0.2);
   }
 `;
 
