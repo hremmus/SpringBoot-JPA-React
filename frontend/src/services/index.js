@@ -1,7 +1,6 @@
 import axios from "axios";
 import storage from "lib/storage";
-import { Navigate } from "react-router-dom";
-import { logout } from "redux/modules/user";
+import { logout, setAccessToken } from "redux/modules/user";
 import { store } from "redux/store";
 import { refreshToken } from "./AuthService";
 
@@ -27,28 +26,37 @@ api.interceptors.response.use(
   (response) => {
     return response;
   },
-  async (error) => {
+  (error) => {
     const {
       config,
-      response: { status },
+      response: {
+        status,
+        data: { statusCode },
+      },
     } = error;
     const prevRequest = config;
-    if (status === 401 && !prevRequest.sent) {
+    if (status === 401 && statusCode === -1019 && !prevRequest.sent) {
       prevRequest.sent = true;
-      await refreshToken()
+      return refreshToken() // axios 호출의 결과(비동기 작업 then 또는 catch)를 체인의 다음 단계로 전달하기 위해서는 return하여 Promise를 반환해야 함
         .then((response) => {
           const newAccessToken = response.data.result.data.accessToken;
-          config.headers["Authorization"] = newAccessToken;
+          prevRequest.headers["Authorization"] = newAccessToken;
           storage.set("accessToken", newAccessToken);
+          store.dispatch(setAccessToken(newAccessToken));
+
+          return api(prevRequest);
         })
-        .catch(() => {
+        .catch((error) => {
           store.dispatch(logout());
           storage.remove("loggedInfo");
           storage.remove("accessToken");
-          Navigate("/auth/login?expired");
+
+          // 반환된 Promise가 다음 단계로 연결될 때 에러를 던짐 => 체인의 다음, 즉 호출한 쪽의 catch 문에서 처리하게 함
+          return Promise.reject(error);
         });
-      return api(prevRequest);
     }
+
+    // JWT 에러를 제외한 나머지 던짐
     return Promise.reject(error);
   }
 );

@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -50,7 +49,7 @@ public class AuthController {
     return success();
   }
 
-  @ApiOperation(value = "로그인", notes="로그인 성공 시 JWT 토큰을 반환한다.")
+  @ApiOperation(value = "로그인", notes = "로그인 성공 시 JWT 토큰을 반환한다.")
   @PostMapping("/signin")
   @ResponseStatus(HttpStatus.OK)
   public ResponseEntity<?> authenticateUser(HttpServletRequest httpServletRequest, @Valid @RequestBody LoginRequest request) {
@@ -62,7 +61,7 @@ public class AuthController {
         .body(success(response));
   }
 
-  @ApiOperation(value = "토큰 재발급", notes="리프레시 토큰을 넘겨 받아 새 액세스 토큰을 발급한다.")
+  @ApiOperation(value = "토큰 재발급", notes = "리프레시 토큰을 넘겨 받아 새 액세스 토큰을 발급한다.")
   @PostMapping("/refreshtoken")
   @ResponseStatus(HttpStatus.OK)
   public Response refreshToken(@ApiIgnore @CookieValue("refreshToken") String refreshToken) {
@@ -71,12 +70,11 @@ public class AuthController {
 
   @ApiOperation("로그아웃")
   @GetMapping("/signout")
-  @ResponseStatus(HttpStatus.OK)
-  @ApiImplicitParams({
-    @ApiImplicitParam(name = "Authorization", value = "accessToken", required = true, dataType = "String", paramType = "header")
-  })
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @ApiImplicitParams({@ApiImplicitParam(name = "Authorization", value = "accessToken", required = true, dataType = "String", paramType = "header")})
   public Response logout(@ApiIgnore HttpServletResponse response, @ApiIgnore @AuthenticationPrincipal UserDetailsImpl userDetails) {
-    authService.logout(Long.valueOf(userDetails.getId()));
+    // 토큰이 만료된 사용자에게 500 내부 서버 오류를 발생시키지 않기 위함
+    if (userDetails != null) authService.logout(Long.valueOf(userDetails.getId()));
     ResponseCookie responseCookie = ResponseCookie.from("refreshToken", "").path("/api").httpOnly(true).maxAge(0).build();
     response.setHeader(HttpHeaders.AUTHORIZATION, null);
     response.setHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());

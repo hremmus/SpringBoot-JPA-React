@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.rem.springboot.dto.Response;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 
 @RestControllerAdvice
@@ -63,10 +64,10 @@ public class ExceptionAdvice {
     return Response.failure(-1008, "요청한 권한 등급을 찾을 수 없습니다.");
   }
 
-  @ExceptionHandler(RefreshTokenFailureException.class)
-  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  @ExceptionHandler({RefreshTokenFailureException.class, ExpiredJwtException.class})
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
   public Response refreshTokenFailureException() {
-    return Response.failure(-1009, "토큰 재발급에 실패하였습니다.");
+    return Response.failure(-1009, "토큰이 만료되었습니다. 다시 로그인해 주세요.");
   }
 
   @ExceptionHandler(CategoryNotFoundException.class)
@@ -75,7 +76,7 @@ public class ExceptionAdvice {
     return Response.failure(-1010, "존재하지 않는 카테고리입니다.");
   }
 
-  @ExceptionHandler({DataIntegrityViolationException.class})
+  @ExceptionHandler(DataIntegrityViolationException.class)
   @ResponseStatus(HttpStatus.CONFLICT)
   public Response categoryConstraintViolationException() {
     return Response.failure(-1017, "카테고리를 참조하는 게시글이 있습니다.");
@@ -124,5 +125,11 @@ public class ExceptionAdvice {
   @ResponseStatus(HttpStatus.UNAUTHORIZED)
   public Response invalidPasswordException() {
     return Response.failure(-1018, "비밀번호가 일치하지 않습니다.");
+  }
+
+  @ExceptionHandler(ExpiredTokenException.class)
+  @ResponseStatus(HttpStatus.UNAUTHORIZED)
+  public Response expiredTokenException() {
+    return Response.failure(-1019, "토큰 재발급이 필요합니다.");
   }
 }

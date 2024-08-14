@@ -25,6 +25,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+  private final AuthenticationEntryPointImpl authEntryPoint;
+  private final AccessDeniedHandlerImpl accessDeniedHandler;
   private final UserDetailsServiceImpl userDetailsService;
 
   @Override
@@ -38,8 +40,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
   @Override
   protected void configure(HttpSecurity http) throws Exception {
     http.cors().configurationSource(corsConfigurationSource()).and().csrf().disable()
-        .exceptionHandling().authenticationEntryPoint(new AuthenticationEntryPointImpl())
-        .accessDeniedHandler(new AccessDeniedHandlerImpl()).and().sessionManagement()
+        .exceptionHandling().authenticationEntryPoint(authEntryPoint)
+        .accessDeniedHandler(accessDeniedHandler).and().sessionManagement()
         .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
         .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
         .antMatchers(HttpMethod.GET, "/image/**").permitAll()
@@ -57,9 +59,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         .antMatchers(HttpMethod.POST, "/api/comments/**").authenticated()
         .antMatchers(HttpMethod.PATCH, "/api/comments/{id}").authenticated()
         .antMatchers(HttpMethod.DELETE, "/api/comments/{id}").authenticated()
-        .antMatchers(HttpMethod.GET, "/api/**").permitAll().anyRequest().hasAnyRole("ADMIN").and()
-        .addFilterBefore(new AuthTokenFilter(userDetailsService),
-            UsernamePasswordAuthenticationFilter.class);
+        .antMatchers(HttpMethod.GET, "/api/**").permitAll()
+        .anyRequest().hasAnyRole("ADMIN").and()
+        .addFilterBefore(new AuthTokenFilter(userDetailsService),UsernamePasswordAuthenticationFilter.class);
   }
 
   @Bean

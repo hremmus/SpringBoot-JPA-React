@@ -6,7 +6,6 @@ import java.util.Optional;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -27,15 +26,9 @@ public class JwtHandler {
   }
 
   public Optional<Claims> parse(String key, String token) {
-    try {
-      String target = token;
-      if (token.contains(type))
-        target = untype(token);
-      return Optional
-          .of(Jwts.parser().setSigningKey(key.getBytes()).parseClaimsJws(target).getBody());
-    } catch (JwtException e) {
-      return Optional.empty();
-    }
+    String target = token;
+    if (token.contains(type)) target = untype(token);
+    return Optional.of(Jwts.parser().setSigningKey(key.getBytes()).parseClaimsJws(target).getBody());
   }
 
   private String untype(String token) {
