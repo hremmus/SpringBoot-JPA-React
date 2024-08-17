@@ -1,11 +1,12 @@
 package com.rem.springboot.security;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import java.util.Base64;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.SignatureException;
 
 class JwtHandlerTest {
   JwtHandler jwtHandler = new JwtHandler();
@@ -37,30 +38,27 @@ class JwtHandlerTest {
   @Test
   void parseByInvalidKeyTest() {
     // given
-    String encodedKey = Base64.getEncoder().encodeToString("myKey".getBytes());
-    String token = createToken(encodedKey, Map.of(), 60L);
+    String token = createToken("myKey", Map.of(), 60L);
 
-    // when
-    Optional<Claims> claims = jwtHandler.parse("invalidKey", token);
-
-    // then
-    assertThat(claims).isEmpty();
+    // when & when
+    assertThrows(SignatureException.class, () -> {
+      jwtHandler.parse("invalidKey", token);
+    });
   }
 
   @Test
   void parseByExpiredTokenTest() {
     // given
-    String encodedKey = Base64.getEncoder().encodeToString("myKey".getBytes());
-    String token = createToken(encodedKey, Map.of(),0L);
+    String key = "myKey";
+    String token = createToken(key, Map.of(), 0L);
 
-    // when
-    Optional<Claims> claims = jwtHandler.parse("invalidKey", token);
-
-    // then
-    assertThat(claims).isEmpty();
+    // when & then
+    assertThrows(ExpiredJwtException.class, () -> {
+      jwtHandler.parse(key, token);
+    });
   }
 
-  private String createToken(String encodedKey, Map<String, Object> claims, long maxAgeSeconds) {
-    return jwtHandler.generateToken(encodedKey, claims, maxAgeSeconds);
+  private String createToken(String key, Map<String, Object> claims, long maxAgeSeconds) {
+    return jwtHandler.generateToken(key, claims, maxAgeSeconds);
   }
 }

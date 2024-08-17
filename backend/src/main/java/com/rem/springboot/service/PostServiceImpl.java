@@ -33,7 +33,7 @@ public class PostServiceImpl {
   private final PostRepository postRepository;
   private final UserRepository userRepository;
   private final CategoryRepository categoryRepository;
-  private final FileService fileService;
+  private final SimpleStorageServiceImpl s3Service;
 
   @Transactional
   public PostCreateResponse create(PostCreateRequest request) {
@@ -77,10 +77,11 @@ public class PostServiceImpl {
   }
 
   private void uploadImages(List<Image> images, List<MultipartFile> fileImages) {
-    IntStream.range(0, images.size()).forEach(i -> fileService.upload(fileImages.get(i), images.get(i).getUniqueName()));
+    IntStream.range(0, images.size()).forEach(i -> s3Service.upload(fileImages.get(i), images.get(i).getUniqueName()));
   }
+ 
 
   private void deleteImages(List<Image> images) {
-    images.stream().forEach(i -> fileService.delete(i.getUniqueName()));
+    images.stream().forEach(i -> s3Service.delete(i.getUniqueName()));
   }
 }

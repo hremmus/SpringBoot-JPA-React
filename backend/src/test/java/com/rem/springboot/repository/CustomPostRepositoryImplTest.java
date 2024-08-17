@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
+import org.springframework.test.context.ActiveProfiles;
 import com.rem.springboot.config.QuerydslConfig;
 import com.rem.springboot.dto.PostReadCondition;
 import com.rem.springboot.dto.PostSimpleDto;
@@ -19,6 +20,7 @@ import com.rem.springboot.entity.Category;
 import com.rem.springboot.entity.Post;
 import com.rem.springboot.entity.User;
 
+@ActiveProfiles("test")
 @Import(QuerydslConfig.class)
 @DataJpaTest
 class CustomPostRepositoryImplTest {

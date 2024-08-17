@@ -6,7 +6,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.rem.springboot.dto.CommentDto;
-import com.rem.springboot.dto.PostDto;
 import com.rem.springboot.entity.Comment;
 import com.rem.springboot.entity.Post;
 import com.rem.springboot.entity.User;
@@ -39,7 +38,7 @@ public class CommentServiceImpl {
         .orElse(null);
     
     Comment comment = commentRepository.save(new Comment(request.getContent(), user, post, parent));
-    return CommentDto.toDto(commentRepository.findById(comment.getId()).orElseThrow(PostNotFoundException::new));
+    return CommentDto.toDto(commentRepository.findById(comment.getId()).orElseThrow(CommentNotFoundException::new));
   }
 
   public List<CommentDto> readAll(CommentReadCondition condition) {

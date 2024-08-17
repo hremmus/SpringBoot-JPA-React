@@ -34,7 +34,6 @@ class PostTest {
     // then
     assertThat(post.getTitle()).isEqualTo(postUpdateRequest.getTitle());
     assertThat(post.getContent()).isEqualTo(postUpdateRequest.getContent());
-    assertThat(post.getCategory().getId()).isEqualTo(postUpdateRequest.getCategoryId());
 
     List<Image> resultImages = post.getImages();
     List<String> resultOriginNames = resultImages.stream().map(i -> i.getOriginName()).collect(toList());

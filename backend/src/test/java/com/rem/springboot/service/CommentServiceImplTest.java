@@ -2,10 +2,13 @@ package com.rem.springboot.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -43,18 +46,28 @@ class CommentServiceImplTest {
   PostRepository postRepository;
 
   @Test
-  void createTest() {
+  void createTest() throws Exception {
     // given
     User user = new User("user@email.com", "123456a!", "nickname", List.of());
+    Post post = new Post("title", "content", user, new Category("category", null), List.of());
+    Comment comment = new Comment("content", user, post, null);
+    // Use java.lang.reflect.Field to set comment's id field
+    Field idField = Comment.class.getDeclaredField("id");
+    idField.setAccessible(true);
+    idField.set(comment, 1L);
+
     given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
-    given(postRepository.findById(anyLong())).willReturn(
-        Optional.of(new Post("title", "content", user, new Category("category", null), List.of())));
+    given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+    given(commentRepository.save(any(Comment.class))).willReturn(comment);
+    given(commentRepository.findById(comment.getId())).willReturn(Optional.of(comment));
 
     // when
-    commentService.create(new CommentCreateRequest("content", 1L, 1L, null));
+    CommentDto commentDto = commentService.create(new CommentCreateRequest("content", 1L, 1L, null));
 
     // then
-    verify(commentRepository).save(any());
+    verify(commentRepository).save(any(Comment.class));
+    assertNotNull(commentDto);
+    assertEquals("content", commentDto.getContent());
   }
 
   @Test

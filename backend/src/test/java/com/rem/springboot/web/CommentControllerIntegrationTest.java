@@ -141,7 +141,8 @@ class CommentControllerIntegrationTest {
     // when, then
     mockMvc.perform(
         patch("/api/comments/{id}", comment.getId())
-        .param("content", request.getContent())
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(new ObjectMapper().writeValueAsString(request.getContent()))
         .header("Authorization", loginResponse.getAccessToken()))
     .andExpect(status().isOk());
 
@@ -172,7 +173,8 @@ class CommentControllerIntegrationTest {
     // when, then
     mockMvc.perform(
         patch("/api/comments/{id}", comment.getId())
-        .param("content", request.getContent())
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(new ObjectMapper().writeValueAsString(request.getContent()))
         .header("Authorization", notOwnerLoginResponse.getAccessToken()))
     .andExpect(status().isForbidden());
   }
@@ -188,7 +190,8 @@ class CommentControllerIntegrationTest {
     // when, then
     mockMvc.perform(
         patch("/api/comments/{id}", comment.getId())
-        .param("content", request.getContent())
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(new ObjectMapper().writeValueAsString(request.getContent()))
         .header("Authorization", adminLoginResponse.getAccessToken()))
     .andExpect(status().isForbidden());
   }

@@ -11,10 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.test.context.ActiveProfiles;
 import com.rem.springboot.config.QuerydslConfig;
 import com.rem.springboot.entity.Category;
 import com.rem.springboot.exception.CategoryNotFoundException;
 
+@ActiveProfiles("test")
 @DataJpaTest
 @Import(QuerydslConfig.class)
 class CategoryRepositoryTest {
@@ -65,8 +67,8 @@ class CategoryRepositoryTest {
     clear();
 
     // then
-    assertThatThrownBy(() -> categoryRepository.findById(category.getId()).orElseThrow(CategoryNotFoundException::new))
-    .isInstanceOf(CategoryNotFoundException.class);
+    assertThatThrownBy(() -> categoryRepository.findById(category.getId())
+        .orElseThrow(CategoryNotFoundException::new)).isInstanceOf(CategoryNotFoundException.class);
   }
 
   @Test
@@ -80,8 +82,8 @@ class CategoryRepositoryTest {
     clear();
 
     // then
-    assertThatThrownBy(() -> categoryRepository.findById(category.getId()).orElseThrow(CategoryNotFoundException::new))
-    .isInstanceOf(CategoryNotFoundException.class);
+    assertThatThrownBy(() -> categoryRepository.findById(category.getId())
+        .orElseThrow(CategoryNotFoundException::new)).isInstanceOf(CategoryNotFoundException.class);
   }
 
   @Test
@@ -110,21 +112,21 @@ class CategoryRepositoryTest {
 
     // when, then
     assertThatThrownBy(() -> categoryRepository.deleteById(noneValueId))
-    .isInstanceOf(EmptyResultDataAccessException.class);
+        .isInstanceOf(EmptyResultDataAccessException.class);
   }
 
   @Test
   void findAllWithParentOrderByParentIdAscNullsFirstCategoryIdAscTest() {
     // given
     // child parent
-    //   1    NULL  - root
-    //   2     1
-    //   3     1
-    //   4     2
-    //   5     2
-    //   6     4
-    //   7     3
-    //   8    NULL  - root
+    // 1 NULL - root
+    // 2 1
+    // 3 1
+    // 4 2
+    // 5 2
+    // 6 4
+    // 7 3
+    // 8 NULL - root
     Category c1 = categoryRepository.save(new Category("category1", null));
     Category c2 = categoryRepository.save(new Category("category2", c1));
     Category c3 = categoryRepository.save(new Category("category3", c1));
@@ -140,14 +142,14 @@ class CategoryRepositoryTest {
 
     // then
     // child parent
-    //   1    NULL  - root
-    //   8    NULL  - root
-    //   2     1
-    //   3     1
-    //   4     2
-    //   5     2
-    //   7     3
-    //   6     4
+    // 1 NULL - root
+    // 8 NULL - root
+    // 2 1
+    // 3 1
+    // 4 2
+    // 5 2
+    // 7 3
+    // 6 4
     assertThat(result.size()).isEqualTo(8);
     assertThat(result.get(0).getId()).isEqualTo(c1.getId());
     assertThat(result.get(1).getId()).isEqualTo(c8.getId());

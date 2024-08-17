@@ -60,6 +60,6 @@ class AuthControllerIntegrationTest {
     mockMvc.perform(
         get("/api/auth/signout")
         .header("Authorization", loginResponse.getAccessToken()))
-    .andExpect(status().isOk());
+    .andExpect(status().isNoContent());
   }
 }

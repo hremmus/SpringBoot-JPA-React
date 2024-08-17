@@ -53,7 +53,7 @@ class PostServiceImplTest {
   CategoryRepository categoryRepository;
 
   @Mock
-  FileService fileService;
+  SimpleStorageServiceImpl s3Service;
 
   @Test
   void createTest() {
@@ -75,7 +75,7 @@ class PostServiceImplTest {
 
     // then
     verify(postRepository).save(any());
-    verify(fileService, times(request.getImages().size())).upload(any(), anyString());
+    verify(s3Service, times(request.getImages().size())).upload(any(), anyString());
   }
 
   @Test
@@ -165,6 +165,7 @@ class PostServiceImplTest {
     Post post = new Post("title", "content", new User("user@email.com", "password", "nickname", List.of()),
         new Category("name", null), List.of(a, b));
     given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+    given(categoryRepository.findById(anyLong())).willReturn(Optional.of(new Category("name", null)));
     MockMultipartFile cFile = new MockMultipartFile("c", "c.png", MediaType.IMAGE_PNG_VALUE, "c".getBytes());
 
     PostUpdateRequest request = new PostUpdateRequest("title", "content", 1L, List.of(cFile), List.of(a.getId()));
@@ -178,8 +179,8 @@ class PostServiceImplTest {
     assertThat(images.size()).isEqualTo(2);
     assertThat(originNames).contains(b.getOriginName(), cFile.getOriginalFilename());
 
-    verify(fileService, times(1)).upload(any(), anyString());
-    verify(fileService, times(1)).delete(anyString());
+    verify(s3Service, times(1)).upload(any(), anyString());
+    verify(s3Service, times(1)).delete(anyString());
   }
 
   @Test
@@ -207,7 +208,7 @@ class PostServiceImplTest {
     postService.delete(1L);
 
     // then
-    verify(fileService, times(post.getImages().size())).delete(anyString());
+    verify(s3Service, times(post.getImages().size())).delete(anyString());
     verify(postRepository).delete(any());
   }
 

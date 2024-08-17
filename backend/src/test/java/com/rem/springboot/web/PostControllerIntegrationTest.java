@@ -163,7 +163,11 @@ class PostControllerIntegrationTest {
         multipart("/api/posts/{id}", post.getId())
         .param("title", updatedTitle)
         .param("content", updatedContent)
-        .with(requestPostProcessor -> { requestPostProcessor.setMethod("PUT"); return requestPostProcessor; })
+        .param("categoryId", String.valueOf(post.getCategory().getId()))
+        .with(requestPostProcessor -> {
+          requestPostProcessor.setMethod("PUT");
+          return requestPostProcessor;
+        })
         .contentType(MediaType.MULTIPART_FORM_DATA)
         .header("Authorization", loginResponse.getAccessToken()))
     .andExpect(status().isOk());
@@ -187,6 +191,7 @@ class PostControllerIntegrationTest {
         multipart("/api/posts/{id}", post.getId())
         .param("title", updatedTitle)
         .param("content", updatedContent)
+        .param("categoryId", String.valueOf(post.getCategory().getId()))
         .with(requestPostProcessor -> { requestPostProcessor.setMethod("PUT"); return requestPostProcessor; })
         .contentType(MediaType.MULTIPART_FORM_DATA)
         .header("Authorization", loginResponse.getAccessToken()))
@@ -209,6 +214,7 @@ class PostControllerIntegrationTest {
         multipart("/api/posts/{id}", post.getId())
         .param("title", updatedTitle)
         .param("content", updatedContent)
+        .param("categoryId", String.valueOf(post.getCategory().getId()))
         .with(requestPostProcessor -> { requestPostProcessor.setMethod("PUT"); return requestPostProcessor; })
         .contentType(MediaType.MULTIPART_FORM_DATA))
     .andExpect(status().isUnauthorized());
@@ -227,6 +233,7 @@ class PostControllerIntegrationTest {
         multipart("/api/posts/{id}", post.getId())
         .param("title", updatedTitle)
         .param("content", updatedContent)
+        .param("categoryId", String.valueOf(post.getCategory().getId()))
         .with(requestPostProcessor -> { requestPostProcessor.setMethod("PUT"); return requestPostProcessor; })
         .contentType(MediaType.MULTIPART_FORM_DATA)
         .header("Authorization", notOwnerLoginResponse.getAccessToken()))

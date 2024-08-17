@@ -3,29 +3,14 @@ server:
     encoding:
       charset: utf-8
       enabled: true
-      
+
 spring:
-  h2:
-    console:
-      enabled: true
-      
-  datasource:
-    url: jdbc:h2:mem:testdb
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: 
-    
-  jpa:
-    hibernate:
-      ddl-auto: update # create, create-drop, validate, update
-    show-sql: true
-    
   profiles:
     active: local
     include: secret
-    
+
   servlet.multipart.max-file-size: 10MB # uploaded files
   servlet.multipart.max-request-size: 10MB # multipart/form-data requests
-  
+
   messages:
     basename: i18n/validation

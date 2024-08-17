@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import com.rem.springboot.config.QuerydslConfig;
 import com.rem.springboot.entity.Category;
 import com.rem.springboot.entity.Comment;
@@ -18,6 +19,7 @@ import com.rem.springboot.entity.User;
 import com.rem.springboot.exception.CommentNotFoundException;
 import com.rem.springboot.payload.request.CommentUpdateRequest;
 
+@ActiveProfiles("test")
 @DataJpaTest
 @Import(QuerydslConfig.class)
 class CommentRepositoryTest {
@@ -55,7 +57,8 @@ class CommentRepositoryTest {
     em.clear();
 
     // when
-    Comment foundComment = commentRepository.findById(comment.getId()).orElseThrow(CommentNotFoundException::new);
+    Comment foundComment =
+        commentRepository.findById(comment.getId()).orElseThrow(CommentNotFoundException::new);
 
     // then
     assertThat(foundComment.getId()).isEqualTo(comment.getId());
@@ -118,7 +121,8 @@ class CommentRepositoryTest {
     em.clear();
 
     // when
-    Comment comment = commentRepository.findById(parent.getId()).orElseThrow(CommentNotFoundException::new);
+    Comment comment =
+        commentRepository.findById(parent.getId()).orElseThrow(CommentNotFoundException::new);
 
     // then
     assertThat(comment.getChildren().size()).isEqualTo(2);
@@ -133,7 +137,8 @@ class CommentRepositoryTest {
     em.clear();
 
     // when
-    Comment comment = commentRepository.findByIdWithParent(child.getId()).orElseThrow(CommentNotFoundException::new);
+    Comment comment = commentRepository.findByIdWithParent(child.getId())
+        .orElseThrow(CommentNotFoundException::new);
 
     // then
     assertThat(comment.getParent().getContent()).isEqualTo("comment1");
@@ -158,8 +163,10 @@ class CommentRepositoryTest {
     em.clear();
 
     // when
-    Comment comment = commentRepository.findByIdWithParent(comment5.getId()).orElseThrow(CommentNotFoundException::new);
-    comment.findDeletableComment().ifPresentOrElse(c -> commentRepository.delete(c), () -> comment5.delete());
+    Comment comment = commentRepository.findByIdWithParent(comment5.getId())
+        .orElseThrow(CommentNotFoundException::new);
+    comment.findDeletableComment().ifPresentOrElse(c -> commentRepository.delete(c),
+        () -> comment5.delete());
     em.flush();
     em.clear();
 
@@ -187,8 +194,10 @@ class CommentRepositoryTest {
     em.clear();
 
     // when
-    Comment comment = commentRepository.findByIdWithParent(comment5.getId()).orElseThrow(CommentNotFoundException::new);
-    comment.findDeletableComment().ifPresentOrElse(c -> commentRepository.delete(c), () -> comment5.delete());
+    Comment comment = commentRepository.findByIdWithParent(comment5.getId())
+        .orElseThrow(CommentNotFoundException::new);
+    comment.findDeletableComment().ifPresentOrElse(c -> commentRepository.delete(c),
+        () -> comment5.delete());
     em.flush();
     em.clear();
 
@@ -202,12 +211,12 @@ class CommentRepositoryTest {
   void findAllWithUserAndParentByPostIdOrderByParentIdAscNullsFirstCommentIdAscTest() {
     // given
     // 1 NULL
-    // 2  1
-    // 3  1
-    // 4  2
-    // 5  3
-    // 6  4
-    // 7  3
+    // 2 1
+    // 3 1
+    // 4 2
+    // 5 3
+    // 6 4
+    // 7 3
     // 8 NULL
     Comment comment1 = commentRepository.save(new Comment("comment1", user, post, null));
     Comment comment2 = commentRepository.save(new Comment("comment2", user, post, comment1));
@@ -221,17 +230,18 @@ class CommentRepositoryTest {
     em.clear();
 
     // when
-    List<Comment> result = commentRepository.findAllWithUserAndParentByPostIdOrderByParentIdAscNullsFirstCommentIdAsc(post.getId());
+    List<Comment> result = commentRepository
+        .findAllWithUserAndParentByPostIdOrderByParentIdAscNullsFirstCommentIdAsc(post.getId());
 
     // then
     // 1 NULL
     // 8 NULL
-    // 2  1
-    // 3  1
-    // 4  2
-    // 5  3
-    // 7  3
-    // 6  4
+    // 2 1
+    // 3 1
+    // 4 2
+    // 5 3
+    // 7 3
+    // 6 4
     assertThat(result.size()).isEqualTo(8);
     assertThat(result.get(0).getId()).isEqualTo(comment1.getId());
     assertThat(result.get(1).getId()).isEqualTo(comment8.getId());
@@ -252,13 +262,15 @@ class CommentRepositoryTest {
 
     // when
     CommentUpdateRequest request = new CommentUpdateRequest("updated content");
-    Comment foundComment = commentRepository.findById(comment.getId()).orElseThrow(CommentNotFoundException::new);
+    Comment foundComment =
+        commentRepository.findById(comment.getId()).orElseThrow(CommentNotFoundException::new);
     foundComment.update(request.getContent());
     em.flush();
     em.clear();
 
     // then
-    Comment result = commentRepository.findById(comment.getId()).orElseThrow(CommentNotFoundException::new);
+    Comment result =
+        commentRepository.findById(comment.getId()).orElseThrow(CommentNotFoundException::new);
     assertThat(result.getContent()).isEqualTo(request.getContent());
   }
 }

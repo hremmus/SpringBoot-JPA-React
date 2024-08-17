@@ -67,6 +67,7 @@ const PostWriter = ({
             <SelectStyled
               name={`categoryId${depth}`}
               value={selectedCategory}
+              defaultValue="" // 하위 카테고리 박스 생성 시 초기 값이 undefined => Material UI Warning 발생. 초기값을 ''로 설정해 주어야 함
               onChange={handleChange}
               label="카테고리"
               labelId={`select-label-${depth}`}

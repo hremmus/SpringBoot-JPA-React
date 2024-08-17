@@ -75,7 +75,8 @@ class CommentControllerTest {
     // when, then
     mockMvc.perform(
         patch("/api/comments/{id}", 1L)
-        .param("content", request.getContent()))
+        .contentType(MediaType.APPLICATION_JSON)
+        .content(new ObjectMapper().writeValueAsString(request.getContent())))
     .andExpect(status().isOk());
   }
 

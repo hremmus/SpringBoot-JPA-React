@@ -14,18 +14,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import com.rem.springboot.config.QuerydslConfig;
 import com.rem.springboot.entity.ERole;
 import com.rem.springboot.entity.Role;
 import com.rem.springboot.entity.User;
 import com.rem.springboot.entity.UserRole;
 import com.rem.springboot.exception.UserNotFoundException;
 
-
+@ActiveProfiles("test")
 @Transactional
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = Replace.ANY)
+@Import(QuerydslConfig.class)
 class UserRepositoryTest {
   @PersistenceContext
   EntityManager em;
