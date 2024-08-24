@@ -39,7 +39,7 @@ export const getWaves = (lat, lon) => {
 
 export const getTides = (obsCode, date) => {
   const url = new URL(
-    "http://www.khoa.go.kr/api/oceangrid/tideObsPre/search.do"
+    "https://www.khoa.go.kr/api/oceangrid/tideObsPre/search.do"
   );
   const { searchParams: sp } = url;
   sp.set("ServiceKey", process.env.REACT_APP_KHOA_API_KEY);
@@ -52,7 +52,7 @@ export const getTides = (obsCode, date) => {
 
 export const getHighAndLowWater = (obsCode, date) => {
   const url = new URL(
-    "http://www.khoa.go.kr/api/oceangrid/tideObsPreTab/search.do"
+    "https://www.khoa.go.kr/api/oceangrid/tideObsPreTab/search.do"
   );
   const { searchParams: sp } = url;
   sp.set("ServiceKey", process.env.REACT_APP_KHOA_API_KEY);
