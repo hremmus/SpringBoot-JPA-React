@@ -1,6 +1,5 @@
 package com.rem.springboot.web;
 
-import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +19,7 @@ import com.rem.springboot.service.PostServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Api(value = "Post Controller", tags = "Post")

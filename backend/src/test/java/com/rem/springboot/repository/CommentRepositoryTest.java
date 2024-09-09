@@ -3,8 +3,6 @@ package com.rem.springboot.repository;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +16,8 @@ import com.rem.springboot.entity.Post;
 import com.rem.springboot.entity.User;
 import com.rem.springboot.exception.CommentNotFoundException;
 import com.rem.springboot.payload.request.CommentUpdateRequest;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @ActiveProfiles("test")
 @DataJpaTest
@@ -211,12 +211,12 @@ class CommentRepositoryTest {
   void findAllWithUserAndParentByPostIdOrderByParentIdAscNullsFirstCommentIdAscTest() {
     // given
     // 1 NULL
-    // 2 1
-    // 3 1
-    // 4 2
-    // 5 3
-    // 6 4
-    // 7 3
+    // 2  1
+    // 3  1
+    // 4  2
+    // 5  3
+    // 6  4
+    // 7  3
     // 8 NULL
     Comment comment1 = commentRepository.save(new Comment("comment1", user, post, null));
     Comment comment2 = commentRepository.save(new Comment("comment2", user, post, comment1));
@@ -236,12 +236,12 @@ class CommentRepositoryTest {
     // then
     // 1 NULL
     // 8 NULL
-    // 2 1
-    // 3 1
-    // 4 2
-    // 5 3
-    // 7 3
-    // 6 4
+    // 2  1
+    // 3  1
+    // 4  2
+    // 5  3
+    // 7  3
+    // 6  4
     assertThat(result.size()).isEqualTo(8);
     assertThat(result.get(0).getId()).isEqualTo(comment1.getId());
     assertThat(result.get(1).getId()).isEqualTo(comment8.getId());

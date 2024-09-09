@@ -30,6 +30,7 @@ import com.rem.springboot.payload.response.LoginResponse;
 import com.rem.springboot.payload.response.RefreshTokenResponse;
 import com.rem.springboot.security.JwtUtils;
 import com.rem.springboot.service.AuthServiceImpl;
+import jakarta.servlet.http.Cookie;
 
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
@@ -114,7 +115,7 @@ class AuthControllerTest {
     // when, then
     mockMvc.perform(
         post("/api/auth/refreshtoken")
-        .cookie(new javax.servlet.http.Cookie("refreshToken", "refreshToken")))
+        .cookie(new Cookie("refreshToken", "refreshToken")))
     .andExpect(status().isOk())
     .andExpect(jsonPath("$.result.data.accessToken").value("accessToken"));
   }

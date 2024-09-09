@@ -5,8 +5,6 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.stream.IntStream;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -19,6 +17,8 @@ import com.rem.springboot.dto.PostSimpleDto;
 import com.rem.springboot.entity.Category;
 import com.rem.springboot.entity.Post;
 import com.rem.springboot.entity.User;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @ActiveProfiles("test")
 @Import(QuerydslConfig.class)

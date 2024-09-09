@@ -1,6 +1,5 @@
 package com.rem.springboot.web;
 
-import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +11,7 @@ import com.rem.springboot.payload.response.LocationResponse;
 import com.rem.springboot.service.LocationServiceImpl;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @Api(value = "Location Controller", tags = "Location")

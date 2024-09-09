@@ -2,9 +2,7 @@ package com.rem.springboot.web;
 
 import static com.rem.springboot.dto.Response.success;
 import javax.management.relation.RoleNotFoundException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -29,6 +27,9 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import springfox.documentation.annotations.ApiIgnore;
 
@@ -39,6 +40,7 @@ import springfox.documentation.annotations.ApiIgnore;
 @RequiredArgsConstructor
 public class AuthController {
   private final AuthServiceImpl authService;
+  @Qualifier("refreshTokenProvider")
   private final JwtUtils refreshTokenProvider;
 
   @ApiOperation("회원 가입")
@@ -64,7 +66,7 @@ public class AuthController {
   @ApiOperation(value = "토큰 재발급", notes = "리프레시 토큰을 넘겨 받아 새 액세스 토큰을 발급한다.")
   @PostMapping("/refreshtoken")
   @ResponseStatus(HttpStatus.OK)
-  public Response refreshToken(@ApiIgnore @CookieValue("refreshToken") String refreshToken) {
+  public Response refreshToken(@ApiIgnore @CookieValue String refreshToken) {
     return success(authService.refreshToken(refreshToken));
   }
 

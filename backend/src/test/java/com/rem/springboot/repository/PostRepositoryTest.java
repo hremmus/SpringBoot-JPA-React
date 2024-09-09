@@ -5,8 +5,6 @@ import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,9 +18,10 @@ import com.rem.springboot.entity.Category;
 import com.rem.springboot.entity.Image;
 import com.rem.springboot.entity.Post;
 import com.rem.springboot.entity.User;
-import com.rem.springboot.exception.CategoryNotFoundException;
 import com.rem.springboot.exception.PostNotFoundException;
 import com.rem.springboot.payload.request.PostUpdateRequest;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @ActiveProfiles("test")
 @DataJpaTest

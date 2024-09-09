@@ -10,7 +10,7 @@ class JwtUtilsTest {
 
   @BeforeEach
   void beforeEach() {
-    jwtUtils = new JwtUtils(new JwtHandler(),"myKey", 1000L);
+    jwtUtils = new JwtUtils(new JwtHandler(),"this-is-a-key-for-json-web-token", 1000L);
   }
 
   @Test

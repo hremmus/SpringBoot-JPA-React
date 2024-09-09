@@ -1,6 +1,7 @@
 package com.rem.springboot.security;
 
 import java.util.stream.Collectors;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class UserDetailsServiceImpl implements UserDetailsService {
+  @Qualifier("accessTokenProvider")
   private final JwtUtils accessTokenProvider;
 
   @Override

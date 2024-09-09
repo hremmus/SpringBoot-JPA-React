@@ -4,11 +4,11 @@ import static java.util.stream.Collectors.toSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import java.util.List;
 import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
 import org.junit.jupiter.api.Test;
 import com.rem.springboot.payload.request.PostCreateRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 
 class PostCreateRequestValidationTest {
   Validator validator = Validation.buildDefaultValidatorFactory().getValidator();

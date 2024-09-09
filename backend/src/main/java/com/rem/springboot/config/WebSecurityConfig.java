@@ -1,15 +1,16 @@
 package com.rem.springboot.config;
 
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -21,47 +22,55 @@ import com.rem.springboot.security.AuthenticationEntryPointImpl;
 import com.rem.springboot.security.UserDetailsServiceImpl;
 import lombok.RequiredArgsConstructor;
 
+@Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableGlobalMethodSecurity(prePostEnabled = true)
-public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+@EnableMethodSecurity(prePostEnabled = true)
+public class WebSecurityConfig {
   private final AuthenticationEntryPointImpl authEntryPoint;
   private final AccessDeniedHandlerImpl accessDeniedHandler;
   private final UserDetailsServiceImpl userDetailsService;
 
-  @Override
-  public void configure(WebSecurity webSecurity) {
-    webSecurity.ignoring().antMatchers("/h2-console/**", "/favicon.ico");
-
-    webSecurity.ignoring().mvcMatchers("/swagger-ui/**", "/swagger-resources/**",
-        "/v3/api-docs/**");
+  @Bean
+  public WebSecurityCustomizer webSecurityCustomizer() {
+    return webSecurity -> webSecurity.ignoring()
+        .requestMatchers("/h2-console/**", "/favicon.ico")
+        .requestMatchers("/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**");
   }
+  
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
+        .csrf(csrf -> csrf.disable())
+        .exceptionHandling(exceptionHandling -> exceptionHandling
+            .authenticationEntryPoint(authEntryPoint)
+            .accessDeniedHandler(accessDeniedHandler))
+        .sessionManagement(sessionManagement -> sessionManagement
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(
+            authorizeRequests -> authorizeRequests
+                .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
+                .requestMatchers(HttpMethod.GET, "/image/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/auth/logout").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/api/user/{id}/**").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/user/checkpassword").authenticated()
+                .requestMatchers(HttpMethod.PUT, "/api/user").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.POST, "/api/posts/**").authenticated()
+                .requestMatchers(HttpMethod.PUT, "/api/posts/{id}").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/api/posts/{id}").authenticated()
+                .requestMatchers(HttpMethod.POST, "/api/comments/**").authenticated()
+                .requestMatchers(HttpMethod.PATCH, "/api/comments/{id}").authenticated()
+                .requestMatchers(HttpMethod.DELETE, "/api/comments/{id}").authenticated()
+                .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
+                .anyRequest().hasAnyRole("ADMIN"))
+        .addFilterBefore(new AuthTokenFilter(userDetailsService),
+            UsernamePasswordAuthenticationFilter.class);
 
-  @Override
-  protected void configure(HttpSecurity http) throws Exception {
-    http.cors().configurationSource(corsConfigurationSource()).and().csrf().disable()
-        .exceptionHandling().authenticationEntryPoint(authEntryPoint)
-        .accessDeniedHandler(accessDeniedHandler).and().sessionManagement()
-        .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and().authorizeRequests()
-        .requestMatchers(CorsUtils::isPreFlightRequest).permitAll()
-        .antMatchers(HttpMethod.GET, "/image/**").permitAll()
-        .antMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
-        .antMatchers(HttpMethod.GET, "/api/auth/logout").authenticated()
-        .antMatchers(HttpMethod.DELETE, "/api/user/{id}/**").authenticated()
-        .antMatchers(HttpMethod.POST, "/api/user/checkpassword").authenticated()
-        .antMatchers(HttpMethod.PUT, "/api/user").authenticated()
-        .antMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
-        .antMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
-        .antMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
-        .antMatchers(HttpMethod.POST, "/api/posts/**").authenticated()
-        .antMatchers(HttpMethod.PUT, "/api/posts/{id}").authenticated()
-        .antMatchers(HttpMethod.DELETE, "/api/posts/{id}").authenticated()
-        .antMatchers(HttpMethod.POST, "/api/comments/**").authenticated()
-        .antMatchers(HttpMethod.PATCH, "/api/comments/{id}").authenticated()
-        .antMatchers(HttpMethod.DELETE, "/api/comments/{id}").authenticated()
-        .antMatchers(HttpMethod.GET, "/api/**").permitAll()
-        .anyRequest().hasAnyRole("ADMIN").and()
-        .addFilterBefore(new AuthTokenFilter(userDetailsService),UsernamePasswordAuthenticationFilter.class);
+    return http.build();
   }
 
   @Bean

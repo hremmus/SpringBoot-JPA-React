@@ -1,7 +1,7 @@
 package com.rem.springboot.payload.request;
 
-import javax.validation.constraints.Pattern;
 import io.swagger.annotations.ApiModel;
+import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,6 +1,6 @@
 import api from "services";
 
-const baseURL = "/categories/";
+const baseURL = "/categories";
 
 export const getCategories = () => {
   return api.get(baseURL);
@@ -11,5 +11,5 @@ export const createCategory = (request) => {
 };
 
 export const deleteCategory = (id) => {
-  return api.delete(baseURL + `${id}`);
+  return api.delete(`${baseURL}/${id}`);
 };

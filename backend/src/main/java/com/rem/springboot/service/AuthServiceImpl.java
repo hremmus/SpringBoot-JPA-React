@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.management.relation.RoleNotFoundException;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +36,9 @@ public class AuthServiceImpl {
   private final UserRepository userRepository;
   private final RoleRepository roleRepository;
   private final PasswordEncoder passwordEncoder;
+  @Qualifier("accessTokenProvider")
   private final JwtUtils accessTokenProvider;
+  @Qualifier("refreshTokenProvider")
   private final JwtUtils refreshTokenProvider;
 
   @Transactional
@@ -86,14 +89,14 @@ public class AuthServiceImpl {
   }
 
   private void validateSignUpInfo(SignUpRequest request) {
-    if(userRepository.existsByEmail(request.getEmail()))
+    if (userRepository.existsByEmail(request.getEmail()))
       throw new UserEmailAlreadyExistsException(request.getEmail());
-    if(userRepository.existsByNickname(request.getNickname()))
+    if (userRepository.existsByNickname(request.getNickname()))
       throw new UserNicknameAlreadyExistsException(request.getNickname());
   }
 
   private void validatePassword(LoginRequest request, User user) {
-    if(!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+    if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
       throw new LoginFailureException();
     }
   }

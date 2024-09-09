@@ -6,7 +6,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.security.SignatureException;
 
 class JwtHandlerTest {
   JwtHandler jwtHandler = new JwtHandler();
@@ -14,7 +14,7 @@ class JwtHandlerTest {
   @Test
   void createTokenTest() {
     // given, when
-    String key = "myKey";
+    String key = "this-is-a-key-for-json-web-token";
     String token = createToken(key, Map.of(), 60L);
 
     // then
@@ -24,7 +24,7 @@ class JwtHandlerTest {
   @Test
   void parseTest() {
     // given
-    String key = "key";
+    String key = "this-is-a-key-for-json-web-token";
     String value = "value";
     String token = createToken(key, Map.of(key, value), 60L);
 
@@ -38,18 +38,18 @@ class JwtHandlerTest {
   @Test
   void parseByInvalidKeyTest() {
     // given
-    String token = createToken("myKey", Map.of(), 60L);
+    String token = createToken("this-is-a-key-for-json-web-token", Map.of(), 60L);
 
     // when & when
     assertThrows(SignatureException.class, () -> {
-      jwtHandler.parse("invalidKey", token);
+      jwtHandler.parse("this-is-a-invalid-key-for-json-web-token-test", token);
     });
   }
 
   @Test
   void parseByExpiredTokenTest() {
     // given
-    String key = "myKey";
+    String key = "this-is-a-key-for-json-web-token";
     String token = createToken(key, Map.of(), 0L);
 
     // when & then
