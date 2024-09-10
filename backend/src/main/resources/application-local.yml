@@ -5,9 +5,6 @@ spring:
     username: admin
     password: 11111111
   jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
     hibernate:
       ddl-auto: none # create, create-drop, validate, update
     show-sql: true

@@ -12,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -22,10 +23,11 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
+@Table(name = "users")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @ToString
-@SQLDelete(sql = "UPDATE user SET deleted = 1 WHERE user_id = ?")
+@SQLDelete(sql = "UPDATE users SET deleted = 1 WHERE user_id = ?")
 public class User extends EntityDate {
   public User(String email, String password, String nickname, List<Role> roles) {
     this.email = email;

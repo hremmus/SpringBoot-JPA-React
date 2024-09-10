@@ -3,6 +3,7 @@ package com.rem.springboot.repository;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -105,6 +106,8 @@ class CategoryRepositoryTest {
     assertThat(foundCategories.get(0).getId()).isEqualTo(category4.getId());
   }
 
+  /*
+  // Spring Data Commons의 정책 변경(2022-8)으로, 존재하지 않는 id로 삭제하려고 할 경우 예외를 던지지 않는다. (no-op)
   @Test
   void deleteNoneValueTest() {
     // given
@@ -114,6 +117,7 @@ class CategoryRepositoryTest {
     assertThatThrownBy(() -> categoryRepository.deleteById(noneValueId))
         .isInstanceOf(EmptyResultDataAccessException.class);
   }
+  */
 
   @Test
   void findAllWithParentOrderByParentIdAscNullsFirstCategoryIdAscTest() {
