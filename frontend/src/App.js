@@ -53,7 +53,7 @@ const App = () => {
       api.interceptors.request.eject(requestInterceptor);
       api.interceptors.response.eject(responseInterceptor);
     };
-  }, []);
+  }, [dispatch]);
 
   const loggedInfo = useSelector((state) => state.user.loggedInfo);
   const accessToken = useSelector((state) => state.user.accessToken);
